@@ -434,6 +434,7 @@ docs:
 
 .PHONY: PGMcpp
 PGMcpp:
+	make clean
 	make dirs
 	make testing_utils
 	make $(COMBUSTION_HIERARCHY)

@@ -25,6 +25,19 @@
 
 
 ///
+/// \struct DieselInputs
+///
+/// \brief A structure which bundles the necessary inputs for the Diesel constructor.
+///     Provides default values for every necessary input. Note that this structure
+///     encapsulates CombustionInputs.
+///
+
+struct DieselInputs {
+    CombustionInputs combustion_inputs; ///< An encapsulated CombustionInputs instance.
+};
+
+
+///
 /// \class Diesel
 ///
 /// \brief A derived class of the Combustion branch of Production which models
@@ -39,6 +52,7 @@ class Diesel : public Combustion {
         
         //  2. methods
         Diesel(void);
+        Diesel (int, DieselInputs);
         
         //...
         

@@ -25,6 +25,31 @@
 
 
 ///
+/// \enum CombustionType
+///
+/// \brief An enumeration of the types of Combustion asset supported by PGMcpp
+///
+
+enum CombustionType {
+    DIESEL, ///< A diesel generator.
+    N_COMBUSTION_TYPES ///< A simple hack to get the number of elements in CombustionType
+};
+
+
+///
+/// \struct CombustionInputs
+///
+/// \brief A structure which bundles the necessary inputs for the Combustion constructor.
+///     Provides default values for every necessary input. Note that this structure
+///     encapsulates ProductionInputs.
+///
+
+struct CombustionInputs {
+    ProductionInputs production_inputs; ///< An encapsulated ProductionInputs instance.
+};
+
+
+///
 /// \class Combustion
 ///
 /// \brief The root of the Combustion branch of the Production hierarchy. This branch 
@@ -40,6 +65,7 @@ class Combustion : public Production {
         
         //  2. methods
         Combustion(void);
+        Combustion(int, CombustionInputs);
         
         //...
         

@@ -35,7 +35,90 @@ int main(int argc, char** argv)
     
     
     try {
-        //...
+        //  1. construction
+        ProductionInputs production_inputs;
+        
+        Production test_production(8760, production_inputs);
+        
+        
+        //  2. test structure attributes
+        testTruth(
+            not production_inputs.print_flag,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            production_inputs.nominal_inflation_annual,
+            0.02,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            production_inputs.nominal_discount_annual,
+            0.04,
+            __FILE__,
+            __LINE__
+        );
+        
+        
+        //  3. test post-construction attributes
+        testFloatEquals(
+            test_production.n_points,
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_production.real_discount_annual,
+            0.0196078431372549,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_production.production_vec_kW.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_production.dispatch_vec_kW.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_production.storage_vec_kW.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_production.curtailment_vec_kW.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_production.capital_cost_vec.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_production.operation_maintenance_cost_vec.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
     }
     
     catch (...) {
@@ -56,6 +139,7 @@ int main(int argc, char** argv)
 
 
 /*
+bool error_flag = true;
 try {
     testTruth(1 == 0, __FILE__, __LINE__);
     error_flag = false;

@@ -56,6 +56,7 @@ int main(int argc, char** argv)
 
 
 /*
+bool error_flag = true;
 try {
     testTruth(1 == 0, __FILE__, __LINE__);
     error_flag = false;
