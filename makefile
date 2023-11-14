@@ -34,6 +34,16 @@ LIBS = -lpthread
 
 ## ======== BUILD =================================================================== ##
 
+#### ==== Testing Utilities ==== ####
+
+SRC_TESTING_UTILS = test/utils/testing_utils.cpp
+OBJ_TESTING_UTILS = test/object/testing_utils.o
+
+.PHONY: testing_utils
+testing_utils: $(SRC_TESTING_UTILS)
+	$(CXX) $(CXXFLAGS) -c $(SRC_TESTING_UTILS) -o $(OBJ_TESTING_UTILS)
+
+
 #### ==== Production Hierarchy <-- Combustion ==== ####
 
 SRC_PRODUCTION = source/Production/Production.cpp
@@ -196,12 +206,73 @@ OBJ_MODEL_COMPONENTS = $(OBJ_CONTROLLER) \
 
 #### ==== Tests ==== ####
 
-OBJ_ALL = $(OBJ_COMBUSTION_HIERARCHY) \
+OBJ_ALL = $(OBJ_TESTING_UTILS) \
+          $(OBJ_COMBUSTION_HIERARCHY) \
           $(OBJ_RENEWABLE_HIERARCHY) \
           $(OBJ_STORAGE_HIERARCHY) \
           $(OBJ_MODEL_COMPONENTS)
 
+
+## == Test: Production Hierarchy <-- Combustion == ##
+
+SRC_TEST_PRODUCTION = test/source/Production/test_Production.cpp
+OUT_TEST_PRODUCTION = test/bin/Production/test_Production.out
+
+.PHONY: test_Production
+test_Production: $(SRC_TEST_PRODUCTION)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_PRODUCTION) $(OBJ_ALL) \
+-o $(OUT_TEST_PRODUCTION) $(LIBS)
+
+
+SRC_TEST_COMBUSTION = test/source/Production/Combustion/test_Combustion.cpp
+OUT_TEST_COMBUSTION = test/bin/Production/Combustion/test_Combustion.out
+
+.PHONY: test_Combustion
+test_Combustion: $(SRC_TEST_COMBUSTION)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_COMBUSTION) $(OBJ_ALL) \
+-o $(OUT_TEST_COMBUSTION) $(LIBS)
+
+
+SRC_TEST_DIESEL = test/source/Production/Combustion/test_Diesel.cpp
+OUT_TEST_DIESEL = test/bin/Production/Combustion/test_Diesel.out
+
+.PHONY: test_Diesel
+test_Diesel: $(SRC_TEST_DIESEL)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_DIESEL) $(OBJ_ALL) \
+-o $(OUT_TEST_DIESEL) $(LIBS)
+
+
+## == Test: Production Hierarchy <-- Renewable == ##
+
+SRC_TEST_RENEWABLE = test/source/Production/Renewable/test_Renewable.cpp
+OUT_TEST_RENEWABLE = test/bin/Production/Renewable/test_Renewable.out
+
+.PHONY: test_Renewable
+test_Renewable: $(SRC_TEST_RENEWABLE)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_RENEWABLE) $(OBJ_ALL) \
+-o $(OUT_TEST_RENEWABLE) $(LIBS)
+
+
+## == Test: Storage Hierarchy == ##
+
 #...
+
+
+## == Test: Model and Components == ##
+
+#...
+
+
+TESTS = test_Production \
+        test_Combustion \
+        test_Diesel \
+        test_Renewable
+
+
+OUT_TESTS = $(OUT_TEST_PRODUCTION) &&\
+            $(OUT_TEST_COMBUSTION) &&\
+            $(OUT_TEST_DIESEL) &&\
+            $(OUT_TEST_RENEWABLE)
 
 
 #### ==== Project ==== ####
@@ -245,9 +316,7 @@ dirs:
 	mkdir -pv test/bin/Production/Combustion
 	mkdir -pv test/bin/Production/Renewable
 	mkdir -pv test/bin/Storage
-	mkdir -pv test/object/Production/Combustion
-	mkdir -pv test/object/Production/Renewable
-	mkdir -pv test/object/Storage
+	mkdir -pv test/object
 
 
 .PHONY: docs
@@ -266,10 +335,16 @@ docs:
 .PHONY: PGMcpp
 PGMcpp:
 	make dirs
+	make testing_utils
 	make $(COMBUSTION_HIERARCHY)
 	make $(RENEWABLE_HIERARCHY)
 	make $(STORAGE_HIERARCHY)
 	make $(MODEL)
+	make $(TESTS)
+	clear
+	@echo
+	$(OUT_TESTS)
+	@echo
 
 
 .PHONY: project
