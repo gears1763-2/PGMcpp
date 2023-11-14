@@ -15,7 +15,10 @@
 
 PROJECT_NAME = example
 
-## ======== END USER INPUTS ========================================================= ##
+SRC_PROJECT = projects/$(PROJECT_NAME).cpp
+OUT_PROJECT = bin/$(PROJECT_NAME).out
+
+## ======== END USER INPUT ========================================================== ##
 
 
 
@@ -253,40 +256,137 @@ test_Renewable: $(SRC_TEST_RENEWABLE)
 -o $(OUT_TEST_RENEWABLE) $(LIBS)
 
 
+SRC_TEST_SOLAR = test/source/Production/Renewable/test_Solar.cpp
+OUT_TEST_SOLAR = test/bin/Production/Renewable/test_Solar.out
+
+.PHONY: test_Solar
+test_Solar: $(SRC_TEST_SOLAR)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_SOLAR) $(OBJ_ALL) \
+-o $(OUT_TEST_SOLAR) $(LIBS)
+
+
+SRC_TEST_TIDAL = test/source/Production/Renewable/test_Tidal.cpp
+OUT_TEST_TIDAL = test/bin/Production/Renewable/test_Tidal.out
+
+.PHONY: test_Tidal
+test_Tidal: $(SRC_TEST_TIDAL)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_TIDAL) $(OBJ_ALL) \
+-o $(OUT_TEST_TIDAL) $(LIBS)
+
+
+SRC_TEST_WAVE = test/source/Production/Renewable/test_Wave.cpp
+OUT_TEST_WAVE = test/bin/Production/Renewable/test_Wave.out
+
+.PHONY: test_Wave
+test_Wave: $(SRC_TEST_WAVE)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_WAVE) $(OBJ_ALL) \
+-o $(OUT_TEST_WAVE) $(LIBS)
+
+
+SRC_TEST_WIND = test/source/Production/Renewable/test_Wind.cpp
+OUT_TEST_WIND = test/bin/Production/Renewable/test_Wind.out
+
+.PHONY: test_Wind
+test_Wind: $(SRC_TEST_WIND)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_WIND) $(OBJ_ALL) \
+-o $(OUT_TEST_WIND) $(LIBS)
+
+
 ## == Test: Storage Hierarchy == ##
 
-#...
+SRC_TEST_STORAGE = test/source/Storage/test_Storage.cpp
+OUT_TEST_STORAGE = test/bin/Storage/test_Storage.out
+
+.PHONY: test_Storage
+test_Storage: $(SRC_TEST_STORAGE)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_STORAGE) $(OBJ_ALL) \
+-o $(OUT_TEST_STORAGE) $(LIBS)
+
+
+SRC_TEST_LIION = test/source/Storage/test_LiIon.cpp
+OUT_TEST_LIION = test/bin/Storage/test_LiIon.out
+
+.PHONY: test_LiIon
+test_LiIon: $(SRC_TEST_LIION)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_LIION) $(OBJ_ALL) \
+-o $(OUT_TEST_LIION) $(LIBS)
 
 
 ## == Test: Model and Components == ##
 
-#...
+SRC_TEST_CONTROLLER = test/source/test_Controller.cpp
+OUT_TEST_CONTROLLER = test/bin/test_Controller.out
+
+.PHONY: test_Controller
+test_Controller: $(SRC_TEST_CONTROLLER)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_CONTROLLER) $(OBJ_ALL) \
+-o $(OUT_TEST_CONTROLLER) $(LIBS)
+
+
+SRC_TEST_ELECTRICALLOAD = test/source/test_ElectricalLoad.cpp
+OUT_TEST_ELECTRICALLOAD = test/bin/test_ElectricalLoad.out
+
+.PHONY: test_ElectricalLoad
+test_ElectricalLoad: $(SRC_TEST_ELECTRICALLOAD)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_ELECTRICALLOAD) $(OBJ_ALL) \
+-o $(OUT_TEST_ELECTRICALLOAD) $(LIBS)
+
+
+SRC_TEST_RESOURCES = test/source/test_Resources.cpp
+OUT_TEST_RESOURCES = test/bin/test_Resources.out
+
+.PHONY: test_Resources
+test_Resources: $(SRC_TEST_RESOURCES)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_RESOURCES) $(OBJ_ALL) \
+-o $(OUT_TEST_RESOURCES) $(LIBS)
+
+
+SRC_TEST_MODEL = test/source/test_Model.cpp
+OUT_TEST_MODEL = test/bin/test_Model.out
+
+.PHONY: test_Model
+test_Model: $(SRC_TEST_MODEL)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_MODEL) $(OBJ_ALL) \
+-o $(OUT_TEST_MODEL) $(LIBS)
 
 
 TESTS = test_Production \
         test_Combustion \
         test_Diesel \
-        test_Renewable
+        test_Renewable \
+        test_Solar \
+        test_Tidal \
+        test_Wave \
+        test_Wind \
+        test_Storage \
+        test_LiIon \
+        test_Controller \
+        test_ElectricalLoad \
+        test_Resources \
+        test_Model
 
 
 OUT_TESTS = $(OUT_TEST_PRODUCTION) &&\
             $(OUT_TEST_COMBUSTION) &&\
             $(OUT_TEST_DIESEL) &&\
-            $(OUT_TEST_RENEWABLE)
+            $(OUT_TEST_RENEWABLE) &&\
+            $(OUT_TEST_SOLAR) &&\
+            $(OUT_TEST_TIDAL) &&\
+            $(OUT_TEST_WAVE) &&\
+            $(OUT_TEST_WIND) &&\
+            $(OUT_TEST_STORAGE) &&\
+            $(OUT_TEST_LIION) &&\
+            $(OUT_TEST_CONTROLLER) &&\
+            $(OUT_TEST_ELECTRICALLOAD) &&\
+            $(OUT_TEST_RESOURCES) &&\
+            $(OUT_TEST_MODEL)
 
 
 #### ==== Project ==== ####
 
-SRC_PROJECT = projects/$(PROJECT_NAME).cpp
-OBJ_PROJECT = object/$(PROJECT_NAME).o
-OUT_PROJECT = bin/$(PROJECT_NAME).out
-
 .PHONY: PGMcpp_project
-PGMcpp_project: $(OBJ_PROJECT)
-	$(CXX) $(CXXFLAGS) $(OBJ_PROJECT) $(OBJ_ALL) -o $(OUT_PROJECT) $(LIBS)
-
-$(OBJ_PROJECT): $(SRC_PROJECT)
-	$(CXX) $(CXXFLAGS) -c $(SRC_PROJECT) -o $(OBJ_PROJECT)
+PGMcpp_project: $(SRC_PROJECT)
+	$(CXX) $(CXXFLAGS) $(SRC_PROJECT) $(OBJ_ALL) -o $(OUT_PROJECT) $(LIBS)
 
 ## ======== END BUILD =============================================================== ##
 

@@ -11,16 +11,16 @@
 
 
 ///
-/// \file test_Combustion.cpp
+/// \file test_Wind.cpp
 ///
-/// \brief Testing suite for Combustion class.
+/// \brief Testing suite for Wind class.
 ///
-/// A suite of tests for the Combustion class.
+/// A suite of tests for the Wind class.
 ///
 
 
 #include "../../../utils/testing_utils.h"
-#include "../../../../header/Production/Combustion/Combustion.h"
+#include "../../../../header/Production/Renewable/Wind.h"
 
 
 int main(int argc, char** argv)
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
         activateVirtualTerminal();
     #endif  /* _WIN32 */
     
-    printGold("\tTesting Production <-- Combustion");
+    printGold("\tTesting Production <-- Renewable <-- Wind");
     
     srand(time(NULL));
     
@@ -41,14 +41,14 @@ int main(int argc, char** argv)
     catch (...) {
         //...
         
-        printGold(" .............. ");
+        printGold(" ...... ");
         printRed("FAIL");
         std::cout << std::endl;
         throw;
     }
     
     
-    printGold(" .............. ");
+    printGold(" ...... ");
     printGreen("PASS");
     std::cout << std::endl;
     return 0;

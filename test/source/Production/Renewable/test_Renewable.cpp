@@ -29,7 +29,7 @@ int main(int argc, char** argv)
         activateVirtualTerminal();
     #endif  /* _WIN32 */
     
-    printGold("\tTesting Production <-- Renewable ... ");
+    printGold("\tTesting Production <-- Renewable");
     
     srand(time(NULL));
     
@@ -41,13 +41,15 @@ int main(int argc, char** argv)
     catch (...) {
         //...
         
-        printRed("\t\t\tFAIL");
+        printGold(" ............... ");
+        printRed("FAIL");
         std::cout << std::endl;
         throw;
     }
     
     
-    printGreen("\t\t\tPASS");
+    printGold(" ............... ");
+    printGreen("PASS");
     std::cout << std::endl;
     return 0;
 }   /* main() */

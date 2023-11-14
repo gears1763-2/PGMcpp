@@ -1,5 +1,5 @@
 /*
- *  PGMcpp : PRIMED Grid Controllerling (in C++)
+ *  PGMcpp : PRIMED Grid ElectricalLoadling (in C++)
  *
  *  Anthony Truelove MASc, P.Eng.
  *  email:  gears1763@tutanota.com
@@ -11,16 +11,16 @@
 
 
 ///
-/// \file test_Combustion.cpp
+/// \file test_ElectricalLoad.cpp
 ///
-/// \brief Testing suite for Combustion class.
+/// \brief Testing suite for ElectricalLoad class.
 ///
-/// A suite of tests for the Combustion class.
+/// A suite of tests for the ElectricalLoad class.
 ///
 
 
-#include "../../../utils/testing_utils.h"
-#include "../../../../header/Production/Combustion/Combustion.h"
+#include "../utils/testing_utils.h"
+#include "../../header/ElectricalLoad.h"
 
 
 int main(int argc, char** argv)
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
         activateVirtualTerminal();
     #endif  /* _WIN32 */
     
-    printGold("\tTesting Production <-- Combustion");
+    printGold("\tTesting ElectricalLoad");
     
     srand(time(NULL));
     
@@ -41,14 +41,14 @@ int main(int argc, char** argv)
     catch (...) {
         //...
         
-        printGold(" .............. ");
+        printGold(" ......................... ");
         printRed("FAIL");
         std::cout << std::endl;
         throw;
     }
     
     
-    printGold(" .............. ");
+    printGold(" ......................... ");
     printGreen("PASS");
     std::cout << std::endl;
     return 0;
