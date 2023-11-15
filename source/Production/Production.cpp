@@ -25,6 +25,18 @@
 
 // ======== PRIVATE ================================================================= //
 
+void Production :: __checkInputs(ProductionInputs production_inputs)
+{
+    /*
+     *  Helper method (private) to check inputs to the Production constructor.
+     */
+    
+    // ...
+    
+    return;
+}   /* __checkInputs() */
+
+
 double Production :: __computeRealDiscountAnnual(
     double nominal_inflation_annual,
     double nominal_discount_annual
@@ -43,7 +55,7 @@ double Production :: __computeRealDiscountAnnual(
     real_discount_annual /= 1 + nominal_inflation_annual;
     
     return real_discount_annual;
-}
+}   /* __computeRealDiscountAnnual() */
 
 // ======== END PRIVATE ============================================================= //
 
@@ -80,13 +92,13 @@ Production :: Production(void)
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
-/// \param production_inputs A structure of constructor inputs.
+/// \param production_inputs A structure of Production constructor inputs.
 ///
 
 Production :: Production(int n_points, ProductionInputs production_inputs)
 {
     //  1. check inputs
-    //...
+    this->__checkInputs(production_inputs);
     
     //  2. set attributes
     this->print_flag = production_inputs.print_flag;
@@ -108,7 +120,7 @@ Production :: Production(int n_points, ProductionInputs production_inputs)
     this->capital_cost_vec.resize(this->n_points, 0);
     this->operation_maintenance_cost_vec.resize(this->n_points, 0);
     
-    //  3. test print
+    //  3. construction print
     if (this->print_flag) {
         std::cout << "Production object constructed at " << this << std::endl;
     }
@@ -138,7 +150,7 @@ Production :: Production(int n_points, ProductionInputs production_inputs)
 
 Production :: ~Production(void)
 {
-    //  1. test print
+    //  1. destruction print
     if (this->print_flag) {
         std::cout << "Production object at " << this << " destroyed" << std::endl;
     }

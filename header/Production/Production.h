@@ -54,6 +54,7 @@ class Production {
         
         
         //  2. methods
+        void __checkInputs(ProductionInputs);
         double __computeRealDiscountAnnual(double, double);
         
         
@@ -72,8 +73,8 @@ class Production {
         std::vector<double> storage_vec_kW; ///< A vector of storage [kW] at each point in the modelling time series. Storage is the amount of production that is sent to storage.
         std::vector<double> curtailment_vec_kW; ///< A vector of curtailment [kW] at each point in the modelling time series. Curtailment is the amount of production that can be neither dispatched nor stored, and is hence curtailed.
         
-        std::vector<double> capital_cost_vec; ///< A vector of capital costs (undefined currency) incurred at each point in time.
-        std::vector<double> operation_maintenance_cost_vec; ///< A vector of operation and maintenance costs (undefined currency) incurred at each point in time.
+        std::vector<double> capital_cost_vec; ///< A vector of capital costs (undefined currency) incurred over each modelling time step.
+        std::vector<double> operation_maintenance_cost_vec; ///< A vector of operation and maintenance costs (undefined currency) incurred over each modelling time step.
         
         
         //  2. methods

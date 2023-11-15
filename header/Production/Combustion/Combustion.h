@@ -58,9 +58,26 @@ struct CombustionInputs {
 ///
 
 class Combustion : public Production {
-    public:
+    private:
         //  1. attributes
         //...
+        
+        
+        //  2. methods
+        void __checkInputs(CombustionInputs);
+        
+        
+    public:
+        //  1. attributes
+        std::vector<double> fuel_consumption_vec_L; ///< A vector of fuel consumed [L] over each modelling time step.
+        std::vector<double> fuel_cost_vec; ///< A vector of fuel costs (undefined currency) incurred over each modelling time step.
+        
+        std::vector<double> CO2_emissions_vec_kg; ///< A vector of carbon dioxide (CO2) emitted [kg] over each modelling time step.
+        std::vector<double> CO_emissions_vec_kg; ///< A vector of carbon monoxide (CO) emitted [kg] over each modelling time step.
+        std::vector<double> NOx_emissions_vec_kg; ///< A vector of nitrogen oxide (NOx) emitted [kg] over each modelling time step.
+        std::vector<double> SOx_emissions_vec_kg; ///< A vector of sulfur oxide (SOx) emitted [kg] over each modelling time step.
+        std::vector<double> CH4_emissions_vec_kg; ///< A vector of methane (CH4) emitted [kg] over each modelling time step.
+        std::vector<double> PM_emissions_vec_kg; ///< A vector of particulate matter (PM) emitted [kg] over each modelling time step.
         
         
         //  2. methods

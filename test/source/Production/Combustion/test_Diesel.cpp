@@ -35,6 +35,21 @@ int main(int argc, char** argv)
     
     
     try {
+        //  1. construction
+        DieselInputs diesel_inputs;
+        
+        Diesel test_diesel(8760, diesel_inputs);
+        
+        
+        //  2. test structure attributes
+        testTruth(
+            not diesel_inputs.combustion_inputs.production_inputs.print_flag,
+            __FILE__,
+            __LINE__
+        );
+
+        
+        //  3. test post-construction attributes
         //...
     }
     

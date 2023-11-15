@@ -35,7 +35,76 @@ int main(int argc, char** argv)
     
     
     try {
-        //...
+        //  1. construction
+        CombustionInputs combustion_inputs;
+        
+        Combustion test_combustion(8760, combustion_inputs);
+        
+        
+        //  2. test structure attributes
+        testTruth(
+            not combustion_inputs.production_inputs.print_flag,
+            __FILE__,
+            __LINE__
+        );
+        
+        
+        //  3. test post-construction attributes
+        testFloatEquals(
+            test_combustion.fuel_consumption_vec_L.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_combustion.fuel_cost_vec.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_combustion.CO2_emissions_vec_kg.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_combustion.CO_emissions_vec_kg.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_combustion.NOx_emissions_vec_kg.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_combustion.SOx_emissions_vec_kg.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_combustion.CH4_emissions_vec_kg.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_combustion.PM_emissions_vec_kg.size(),
+            8760,
+            __FILE__,
+            __LINE__
+        );
     }
     
     catch (...) {
