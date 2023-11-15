@@ -79,6 +79,9 @@ Production(n_points, combustion_inputs.production_inputs)
     this->__checkInputs(combustion_inputs);
     
     //  2. set attributes
+    this->linear_fuel_slope_LkWh = 0;
+    this->linear_fuel_intercept_LkWh = 0;
+    
     this->fuel_consumption_vec_L.resize(this->n_points, 0);
     this->fuel_cost_vec.resize(this->n_points, 0);
     

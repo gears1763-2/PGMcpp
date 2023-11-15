@@ -36,10 +36,25 @@ int main(int argc, char** argv)
     
     try {
         //  1. construction
+        bool error_flag = true;
+        try {
+            DieselInputs bad_diesel_inputs;
+            bad_diesel_inputs.fuel_cost_L = -1;
+            
+            Diesel bad_diesel(8760, bad_diesel_inputs);
+            
+            error_flag = false;
+        } catch (...) {
+            // Task failed successfully! =P
+        }
+        if (not error_flag) {
+            expectedErrorNotDetected(__FILE__, __LINE__);
+        }
+        
+        
         DieselInputs diesel_inputs;
         
         Diesel test_diesel(8760, diesel_inputs);
-        
         
         //  2. test structure attributes
         testTruth(
@@ -50,7 +65,33 @@ int main(int argc, char** argv)
 
         
         //  3. test post-construction attributes
-        //...
+        testFloatEquals(
+            test_diesel.linear_fuel_slope_LkWh,
+            0.265675,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel.linear_fuel_intercept_LkWh,
+            0.026676,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel.capital_cost,
+            67846.467018,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel.operation_maintenance_cost_kWh,
+            0.038027,
+            __FILE__,
+            __LINE__
+        );
     }
     
     catch (...) {

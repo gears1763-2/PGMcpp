@@ -36,6 +36,21 @@ int main(int argc, char** argv)
     
     try {
         //  1. construction
+        bool error_flag = true;
+        try {
+            ProductionInputs production_inputs;
+            
+            Production bad_production(0, production_inputs);
+            
+            error_flag = false;
+        } catch (...) {
+            // Task failed successfully! =P
+        }
+        if (not error_flag) {
+            expectedErrorNotDetected(__FILE__, __LINE__);
+        }
+        
+        
         ProductionInputs production_inputs;
         
         Production test_production(8760, production_inputs);
@@ -67,6 +82,13 @@ int main(int argc, char** argv)
         testFloatEquals(
             test_production.n_points,
             8760,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_production.capacity_kW,
+            100,
             __FILE__,
             __LINE__
         );

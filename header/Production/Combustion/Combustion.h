@@ -69,8 +69,11 @@ class Combustion : public Production {
         
     public:
         //  1. attributes
+        double linear_fuel_slope_LkWh; ///< The slope [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.
+        double linear_fuel_intercept_LkWh; ///< The intercept [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.
+    
         std::vector<double> fuel_consumption_vec_L; ///< A vector of fuel consumed [L] over each modelling time step.
-        std::vector<double> fuel_cost_vec; ///< A vector of fuel costs (undefined currency) incurred over each modelling time step.
+        std::vector<double> fuel_cost_vec; ///< A vector of fuel costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are nominal costs).
         
         std::vector<double> CO2_emissions_vec_kg; ///< A vector of carbon dioxide (CO2) emitted [kg] over each modelling time step.
         std::vector<double> CO_emissions_vec_kg; ///< A vector of carbon monoxide (CO) emitted [kg] over each modelling time step.

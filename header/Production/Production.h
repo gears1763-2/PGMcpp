@@ -34,6 +34,9 @@
 
 struct ProductionInputs {
     bool print_flag = false; ///< A flag which indicates whether or not object construct/destruction should be verbose.
+    bool is_sunk = false; ///< A boolean which indicates whether or not the asset should be considered a sunk cost (i.e., capital cost incurred at the start of the model, or no).
+    
+    double capacity_kW = 100; ///< The rated production capacity [kW] of the asset.
     
     double nominal_inflation_annual = 0.02; ///< The nominal, annual inflation rate to use in computing model economics.
     double nominal_discount_annual = 0.04; ///< The nominal, annual discount rate to use in computing model economics.
@@ -54,27 +57,35 @@ class Production {
         
         
         //  2. methods
-        void __checkInputs(ProductionInputs);
+        void __checkInputs(int, ProductionInputs);
         double __computeRealDiscountAnnual(double, double);
         
         
     public:
         //  1. attributes
         bool print_flag; ///< A flag which indicates whether or not object construct/destruction should be verbose.
+        bool is_running; ///< A boolean which indicates whether or not the asset is running.
+        bool is_sunk; ///< A boolean which indicates whether or not the asset should be considered a sunk cost (i.e., capital cost incurred at the start of the model, or no).
         
         int n_points; ///< The number of points in the modelling time series.
         
+        double capacity_kW; ///< The rated production capacity [kW] of the asset.
+        
         double real_discount_annual; ///< The real, annual discount rate used in computing model economics. Is computed from the given nominal inflation and discount rates.
+        double capital_cost; ///< The capital cost of the asset (undefined currency).
+        double operation_maintenance_cost_kWh; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced.
         double net_present_cost; ///< The net present cost of this asset.
         double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatched and stored energy.
+        
+        std::vector<bool> is_running_vec; ///< A boolean vector for tracking if the asset is running at a particular point in time.
         
         std::vector<double> production_vec_kW; ///< A vector of production [kW] at each point in the modelling time series.
         std::vector<double> dispatch_vec_kW; ///< A vector of dispatch [kW] at each point in the modelling time series. Dispatch is the amount of production that is sent to the grid to satisfy load.
         std::vector<double> storage_vec_kW; ///< A vector of storage [kW] at each point in the modelling time series. Storage is the amount of production that is sent to storage.
         std::vector<double> curtailment_vec_kW; ///< A vector of curtailment [kW] at each point in the modelling time series. Curtailment is the amount of production that can be neither dispatched nor stored, and is hence curtailed.
         
-        std::vector<double> capital_cost_vec; ///< A vector of capital costs (undefined currency) incurred over each modelling time step.
-        std::vector<double> operation_maintenance_cost_vec; ///< A vector of operation and maintenance costs (undefined currency) incurred over each modelling time step.
+        std::vector<double> capital_cost_vec; ///< A vector of capital costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are nominal costs).
+        std::vector<double> operation_maintenance_cost_vec; ///< A vector of operation and maintenance costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are nominal costs).
         
         
         //  2. methods

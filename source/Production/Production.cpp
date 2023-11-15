@@ -25,13 +25,34 @@
 
 // ======== PRIVATE ================================================================= //
 
-void Production :: __checkInputs(ProductionInputs production_inputs)
+void Production :: __checkInputs(int n_points, ProductionInputs production_inputs)
 {
     /*
      *  Helper method (private) to check inputs to the Production constructor.
      */
     
-    // ...
+    //  1. check n_points
+    if (n_points <= 0) {
+        std::string error_str = "ERROR: Production():\tn_points must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  2. check capacity_kW
+    if (production_inputs.capacity_kW <= 0) {
+        std::string error_str = "ERROR: Production():\t";
+        error_str += "ProductionInputs::capacity_kW must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
     
     return;
 }   /* __checkInputs() */
@@ -98,17 +119,22 @@ Production :: Production(void)
 Production :: Production(int n_points, ProductionInputs production_inputs)
 {
     //  1. check inputs
-    this->__checkInputs(production_inputs);
+    this->__checkInputs(n_points, production_inputs);
     
     //  2. set attributes
     this->print_flag = production_inputs.print_flag;
+    this->is_running = false;
     
     this->n_points = n_points;
+    
+    this->capacity_kW = production_inputs.capacity_kW;
     
     this->real_discount_annual = this->__computeRealDiscountAnnual(
         production_inputs.nominal_inflation_annual,
         production_inputs.nominal_discount_annual
     );
+    this->capital_cost = 0;
+    this->operation_maintenance_cost_kWh = 0;
     this->net_present_cost = 0;
     this->levellized_cost_of_energy_kWh = 0;
     
