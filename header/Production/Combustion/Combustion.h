@@ -85,6 +85,8 @@ class Combustion : public Production {
         
     public:
         //  1. attributes
+        CombustionType type; ///< The type (CombustionType) of the asset.
+        
         double fuel_cost_L; ///< The cost of fuel [1/L] (undefined currency).
         
         double linear_fuel_slope_LkWh; ///< The slope [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.

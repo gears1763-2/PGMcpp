@@ -329,6 +329,8 @@ Combustion(n_points, diesel_inputs.combustion_inputs)
     this->__checkInputs(diesel_inputs);
     
     //  2. set attributes
+    this->type = CombustionType :: DIESEL;
+    
     this->replace_running_hrs = diesel_inputs.replace_running_hrs;
     
     this->fuel_cost_L = diesel_inputs.fuel_cost_L;

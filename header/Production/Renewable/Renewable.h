@@ -25,6 +25,34 @@
 
 
 ///
+/// \enum RenewableType
+///
+/// \brief An enumeration of the types of Renewable asset supported by PGMcpp
+///
+
+enum RenewableType {
+    SOLAR, ///< A solar photovoltaic (PV) array
+    TIDAL, ///< A tidal stream turbine (or tidal energy converter, TEC)
+    WAVE, ///< A wave energy converter (WEC)
+    WIND, ///< A wind turbine
+    N_RENEWABLE_TYPES ///< A simple hack to get the number of elements in RenewableType
+};
+
+
+///
+/// \struct RenewableInputs
+///
+/// \brief A structure which bundles the necessary inputs for the Renewable constructor.
+///     Provides default values for every necessary input. Note that this structure
+///     encapsulates ProductionInputs.
+///
+
+struct RenewableInputs {
+    ProductionInputs production_inputs; ///< An encapsulated ProductionInputs instance.
+};
+
+
+///
 /// \class Renewable
 ///
 /// \brief The root of the Renewable branch of the Production hierarchy. This branch 
@@ -32,15 +60,26 @@
 ///
 
 class Renewable : public Production {
-    public:
+    private:
         //  1. attributes
         //...
         
         
         //  2. methods
-        Renewable(void);
+        void __checkInputs(RenewableInputs);
         
-        //...
+        
+    public:
+        //  1. attributes
+        RenewableType type;
+        
+        
+        //  2. methods
+        Renewable(void);
+        Renewable(int, RenewableInputs);
+        
+        virtual double computeProductionkW(int, double, double) {return 0;}
+        virtual double commit(int, double, double, double);
         
         virtual ~Renewable(void);
         

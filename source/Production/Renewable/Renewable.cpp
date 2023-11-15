@@ -23,12 +23,22 @@
 #include "../../../header/Production/Renewable/Renewable.h"
 
 
+// ======== PRIVATE ================================================================= //
+
+//...
+
+// ======== END PRIVATE ============================================================= //
+
+
+
+// ======== PUBLIC ================================================================== //
+
 // ---------------------------------------------------------------------------------- //
 
 ///
 /// \fn Renewable :: Renewable(void)
 ///
-/// \brief Constructor for the Renewable class.
+/// \brief Constructor (dummy) for the Renewable class.
 ///
 // \param [...]
 
@@ -46,7 +56,48 @@ Production()
 
 // ---------------------------------------------------------------------------------- //
 
-//...
+///
+/// \fn double Renewable :: commit(
+///         int timestep,
+///         double dt_hrs,
+///         double production_kW,
+///         double load_kW
+///     )
+///
+/// \brief Method which takes in production and load for the current timestep, computes
+///     and records dispatch and curtailment, and then returns remaining load.
+///
+/// \param timestep The timestep (i.e., time series index) for the request.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the timestep.
+///
+/// \param production_kW The production [kW] of the asset in this timestep.
+///
+/// \param load_kW The load [kW] passed to the asset in this timestep.
+///
+/// \return The load [kW] remaining after the dispatch is deducted from it.
+///
+
+double Renewable :: commit(
+    int timestep,
+    double dt_hrs,
+    double production_kW,
+    double load_kW
+)
+{
+    //  1. invoke base class method
+    load_kW = Production :: commit(
+        timestep,
+        dt_hrs,
+        production_kW,
+        load_kW
+    );
+    
+    
+    //...
+    
+    return load_kW;
+}   /* commit() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -68,3 +119,5 @@ Renewable :: ~Renewable(void)
 }   /* ~Renewable() */
 
 // ---------------------------------------------------------------------------------- //
+
+// ======== END PUBLIC ============================================================== //

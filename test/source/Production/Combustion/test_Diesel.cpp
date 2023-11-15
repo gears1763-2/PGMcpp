@@ -73,6 +73,13 @@ testTruth(
 );
 
 testFloatEquals(
+    test_diesel_ptr->type,
+    CombustionType :: DIESEL,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
     test_diesel_ptr->linear_fuel_slope_LkWh,
     0.265675,
     __FILE__,
