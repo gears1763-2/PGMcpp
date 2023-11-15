@@ -271,6 +271,11 @@ double Production :: commit(
         
         //  5. incur operation and maintenance costs
         double produced_kWh = production_kW * dt_hrs;
+        
+        if (produced_kWh <= 0) {    // <-- ensures that there are still non-zero operation and maintenance costs if asset is idling.
+            produced_kWh = 0.01 * this->capacity_kW * dt_hrs;
+        }
+        
         double operation_maintenance_cost =
             this->operation_maintenance_cost_kWh * produced_kWh;
         this->operation_maintenance_cost_vec[timestep] = operation_maintenance_cost;

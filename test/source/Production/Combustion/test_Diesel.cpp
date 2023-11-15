@@ -149,8 +149,8 @@ testFloatEquals(
 );
 
 //  test commit()
-std::vector<double> time_vec_hrs (48, 0);
 std::vector<double> dt_vec_hrs (48, 1);
+
 std::vector<double> load_vec_kW = {
     1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1,
     1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0,
@@ -167,7 +167,8 @@ std::vector<bool> expected_is_running_vec = {
 
 double roll = 0;
 double production_kW = 0;
-std::cout << std::endl;
+double load_kW = 0;
+
 for (int i = 0; i < 48; i++) {
     roll = (double)rand() / RAND_MAX;
     
@@ -175,23 +176,31 @@ for (int i = 0; i < 48; i++) {
         roll = 1.25;
     }
     
-    time_vec_hrs[i] = i;
     load_vec_kW[i] *= roll * test_diesel_ptr->capacity_kW;
+    load_kW = load_vec_kW[i];
     
     production_kW = test_diesel_ptr->requestProductionkW(
         i,
         dt_vec_hrs[i],
-        load_vec_kW[i]
+        load_kW
     );
     
-    test_diesel_ptr->commit(
+    load_kW = test_diesel_ptr->commit(
         i,
         dt_vec_hrs[i],
         production_kW,
-        load_vec_kW[i]
+        load_kW
     );
     
-    // production = dispatch + storage + curtailment, at every point in time
+    // load_kW <= load_vec_kW (i.e., after vs before
+    testLessThanOrEqualTo(
+        load_kW,
+        load_vec_kW[i],
+        __FILE__,
+        __LINE__
+    );
+    
+    // production = dispatch + storage + curtailment
     testFloatEquals(
         test_diesel_ptr->production_vec_kW[i] -
         test_diesel_ptr->dispatch_vec_kW[i] -
@@ -202,13 +211,170 @@ for (int i = 0; i < 48; i++) {
         __LINE__
     );
     
-    // fuel consumption and emissions > 0 whenver diesel is running
+    // capacity constraint
+    if (load_vec_kW[i] > test_diesel_ptr->capacity_kW) {
+        testFloatEquals(
+            test_diesel_ptr->production_vec_kW[i],
+            test_diesel_ptr->capacity_kW,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    // minimum load ratio constraint
+    else if (
+        test_diesel_ptr->is_running and
+        test_diesel_ptr->production_vec_kW[i] > 0 and
+        load_vec_kW[i] <
+        ((Diesel*)test_diesel_ptr)->minimum_load_ratio * test_diesel_ptr->capacity_kW
+    ) {
+        testFloatEquals(
+            test_diesel_ptr->production_vec_kW[i],
+            ((Diesel*)test_diesel_ptr)->minimum_load_ratio *
+                test_diesel_ptr->capacity_kW,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    // minimum runtime constraint
+    testFloatEquals(
+        test_diesel_ptr->is_running_vec[i],
+        expected_is_running_vec[i],
+        __FILE__,
+        __LINE__
+    );
+    
+    // O&M, fuel consumption, and emissions > 0 whenever diesel is running
     if (test_diesel_ptr->is_running) {
-        std::cout << test_diesel_ptr->production_vec_kW[i] << "\t" <<
-            test_diesel_ptr->fuel_consumption_vec_L[i] << "\t" <<
-            ((Diesel*)test_diesel_ptr)->time_since_last_start_hrs << "\t" <<
-            test_diesel_ptr->is_running << "\t" <<
-            test_diesel_ptr->is_running_vec[i] << std::endl;
+        testGreaterThan(
+            test_diesel_ptr->operation_maintenance_cost_vec[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_diesel_ptr->fuel_consumption_vec_L[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_diesel_ptr->fuel_cost_vec[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_diesel_ptr->CO2_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_diesel_ptr->CO_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_diesel_ptr->NOx_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_diesel_ptr->SOx_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_diesel_ptr->CH4_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_diesel_ptr->PM_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    // O&M, fuel consumption, and emissions = 0 whenever diesel is not running
+    else {
+        testFloatEquals(
+            test_diesel_ptr->operation_maintenance_cost_vec[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel_ptr->fuel_consumption_vec_L[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel_ptr->fuel_cost_vec[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel_ptr->CO2_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel_ptr->CO_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel_ptr->NOx_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel_ptr->SOx_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel_ptr->CH4_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_diesel_ptr->PM_emissions_vec_kg[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
     }
 }
 
