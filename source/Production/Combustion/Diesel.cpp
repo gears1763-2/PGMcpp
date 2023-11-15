@@ -25,6 +25,8 @@
 
 // ======== PRIVATE ================================================================= //
 
+// ---------------------------------------------------------------------------------- //
+
 void Diesel :: __checkInputs(DieselInputs diesel_inputs)
 {
     /*
@@ -115,9 +117,50 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
         throw std::invalid_argument(error_str);
     }
     
+    //  8. check minimum_load_ratio
+    if (diesel_inputs.minimum_load_ratio < 0) {
+        std::string error_str = "ERROR: Diesel():\t";
+        error_str += "DieselInputs::minimum_load_ratio must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  9. check minimum_runtime_hrs
+    if (diesel_inputs.minimum_runtime_hrs < 0) {
+        std::string error_str = "ERROR: Diesel():\t";
+        error_str += "DieselInputs::minimum_runtime_hrs must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  10. check replace_running_hrs
+    if (diesel_inputs.replace_running_hrs <= 0) {
+        std::string error_str = "ERROR: Diesel():\t";
+        error_str += "DieselInputs::replace_running_hrs must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
     return;
 }   /* __checkInputs() */
 
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
 
 double Diesel :: __getGenericFuelSlope()
 {
@@ -138,6 +181,11 @@ double Diesel :: __getGenericFuelSlope()
     return linear_fuel_slope_LkWh;
 }   /* __getGenericFuelSlope() */
 
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
 
 double Diesel :: __getGenericFuelIntercept()
 {
@@ -158,6 +206,11 @@ double Diesel :: __getGenericFuelIntercept()
     return linear_fuel_intercept_LkWh;
 }   /* __getGenericFuelIntercept() */
 
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
 
 double Diesel :: __getGenericCapitalCost(void)
 {
@@ -174,6 +227,11 @@ double Diesel :: __getGenericCapitalCost(void)
     return capital_cost;
 }   /* __getGenericCapitalCost() */
 
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
 
 double Diesel :: __getGenericOpMaintCost(void)
 {
@@ -192,6 +250,42 @@ double Diesel :: __getGenericOpMaintCost(void)
     
     return operation_maintenance_cost_kWh;
 }   /* __getGenericOpMaintCost() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+void Diesel :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+{
+    /*
+     *  Helper method (private) to handle the starting/stopping of the diesel 
+     *  generator. The minimum runtime constraint is enforced in this method.
+     */
+    if (this->is_running) {
+        // handle stopping
+        if (
+            production_kW <= 0 and
+            this->time_since_last_start_hrs >= this->minimum_runtime_hrs
+        ) {
+            this->is_running = false;
+        }
+    }
+    
+    else {
+        // handle starting
+        if (production_kW > 0) {
+            this->is_running = true;
+            this->n_starts++;
+            this->time_since_last_start_hrs = 0;
+        }
+    }
+    
+    return;
+}   /* __handleStartStop() */
+
+// ---------------------------------------------------------------------------------- //
 
 // ======== END PRIVATE ============================================================= //
 
@@ -235,7 +329,13 @@ Combustion(n_points, diesel_inputs.combustion_inputs)
     this->__checkInputs(diesel_inputs);
     
     //  2. set attributes
+    this->replace_running_hrs = diesel_inputs.replace_running_hrs;
+    
     this->fuel_cost_L = diesel_inputs.fuel_cost_L;
+    
+    this->minimum_load_ratio = diesel_inputs.minimum_load_ratio;
+    this->minimum_runtime_hrs = diesel_inputs.minimum_runtime_hrs;
+    this->time_since_last_start_hrs = 0;
     
     this->CO2_emissions_intensity_kgL = diesel_inputs.CO2_emissions_intensity_kgL;
     this->CO_emissions_intensity_kgL = diesel_inputs.CO_emissions_intensity_kgL;
@@ -279,7 +379,100 @@ Combustion(n_points, diesel_inputs.combustion_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
-//...
+///
+/// \fn double Diesel :: requestProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double request_kW
+///     )
+///
+/// \brief Method which takes in production request, and then returns what the asset can
+///     deliver (subject to operating constraints, etc.).
+///
+/// \param timestep The timestep (i.e., time series index) for the request.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the timestep.
+///
+/// \param request_kW The requested production [kW].
+///
+
+double Diesel :: requestProductionkW(
+    int timestep,
+    double dt_hrs,
+    double request_kW
+)
+{
+    //  1. return on request of zero
+    if (request_kW <= 0) {
+        return 0;
+    }
+    
+    double deliver_kW = request_kW;
+    
+    //  2. enforce capacity constraint
+    if (deliver_kW > this->capacity_kW) {
+        deliver_kW = this->capacity_kW;
+    }
+    
+    //  3. enforce minimum load ratio
+    if (deliver_kW < this->minimum_load_ratio * this->capacity_kW) {
+        deliver_kW = this->minimum_load_ratio * this->capacity_kW;
+    }
+    
+    return deliver_kW;
+}   /* requestProductionkW() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double Diesel :: commit(
+///         int timestep,
+///         double dt_hrs,
+///         double production_kW,
+///         double load_kW
+///     )
+///
+/// \brief Method which takes in production and load for the current timestep, computes
+///     and records dispatch and curtailment, and then returns remaining load.
+///
+/// \param timestep The timestep (i.e., time series index) for the request.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the timestep.
+///
+/// \param production_kW The production [kW] of the asset in this timestep.
+///
+/// \param load_kW The load [kW] passed to the asset in this timestep.
+///
+
+double Diesel :: commit(
+    int timestep,
+    double dt_hrs,
+    double production_kW,
+    double load_kW
+)
+{
+    //  1. handle start/stop, enforce minimum runtime constraint
+    this->__handleStartStop(timestep, dt_hrs, production_kW);
+    
+    //  2. invoke base class method
+    load_kW = Combustion :: commit(
+        timestep,
+        dt_hrs,
+        production_kW,
+        load_kW
+    );
+    
+    if (this->is_running) {
+        //  3. log time since last start
+        this->time_since_last_start_hrs += dt_hrs;
+    }
+    
+    return load_kW;
+}   /* commit() */
 
 // ---------------------------------------------------------------------------------- //
 

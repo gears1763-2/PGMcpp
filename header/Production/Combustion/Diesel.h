@@ -35,9 +35,14 @@
 struct DieselInputs {
     CombustionInputs combustion_inputs; ///< An encapsulated CombustionInputs instance.
     
+    double replace_running_hrs = 30000; ///< The number of running hours after which the asset must be replaced. Overwrites the ProductionInputs attribute.
+    
     double capital_cost = -1; ///< The capital cost of the asset (undefined currency). -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD].
     double operation_maintenance_cost_kWh = -1; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced. -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD/kWh].
     double fuel_cost_L = 1.70; ///< The cost of fuel [1/L] (undefined currency).
+    
+    double minimum_load_ratio = 0.2; ///< The minimum load ratio of the asset. That is, when the asset is producing, it must produce at least this ratio of its rated capacity.
+    double minimum_runtime_hrs = 4; ///< The minimum runtime [hrs] of the asset. This is the minimum time that must elapse between successive starts and stops.
     
     /*
      * ref: https://www.homerenergy.com/products/pro/docs/latest/fuel_curve.html
@@ -75,6 +80,8 @@ class Diesel : public Combustion {
         
         //  2. methods
         void __checkInputs(DieselInputs);
+        void __handleStartStop(int, double, double);
+        
         double __getGenericFuelSlope(void);
         double __getGenericFuelIntercept(void);
         double __getGenericCapitalCost(void);
@@ -83,21 +90,17 @@ class Diesel : public Combustion {
         
     public:
         //  1. attributes
-        double fuel_cost_L; ///< The cost of fuel [1/L] (undefined currency).
-        
-        double CO2_emissions_intensity_kgL; ///< Carbon dioxide (CO2) emissions intensity [kg/L].
-        double CO_emissions_intensity_kgL; ///< Carbon monoxide (CO) emissions intensity [kg/L].
-        double NOx_emissions_intensity_kgL; ///< Nitrogen oxide (NOx) emissions intensity [kg/L].
-        double SOx_emissions_intensity_kgL; ///< Sulfur oxide (SOx) emissions intensity [kg/L].
-        double CH4_emissions_intensity_kgL; ///< Methane (CH4) emissions intensity [kg/L].
-        double PM_emissions_intensity_kgL; ///< Particulate Matter (PM) emissions intensity [kg/L].
+        double minimum_load_ratio; ///< The minimum load ratio of the asset. That is, when the asset is producing, it must produce at least this ratio of its rated capacity.
+        double minimum_runtime_hrs; ///< The minimum runtime [hrs] of the asset. This is the minimum time that must elapse between successive starts and stops.
+        double time_since_last_start_hrs; ///< The time that has elapsed [hrs] since the last start of the asset.
         
         
         //  2. methods
         Diesel(void);
         Diesel (int, DieselInputs);
         
-        //...
+        double requestProductionkW(int, double, double);
+        double commit(int, double, double, double);
         
         ~Diesel(void);
         

@@ -40,6 +40,8 @@ struct ProductionInputs {
     
     double nominal_inflation_annual = 0.02; ///< The nominal, annual inflation rate to use in computing model economics.
     double nominal_discount_annual = 0.04; ///< The nominal, annual discount rate to use in computing model economics.
+    
+    double replace_running_hrs = 90000; ///< The number of running hours after which the asset must be replaced.
 };
 
 
@@ -58,6 +60,8 @@ class Production {
         
         //  2. methods
         void __checkInputs(int, ProductionInputs);
+        void __handleReplacement(int);
+        
         double __computeRealDiscountAnnual(double, double);
         
         
@@ -68,6 +72,11 @@ class Production {
         bool is_sunk; ///< A boolean which indicates whether or not the asset should be considered a sunk cost (i.e., capital cost incurred at the start of the model, or no).
         
         int n_points; ///< The number of points in the modelling time series.
+        int n_starts; ///< The number of times the asset has been started.
+        int n_replacements; ///< The number of times the asset has been replaced.
+        
+        double running_hours; ///< The number of hours for which the assset has been operating.
+        double replace_running_hrs; ///< The number of running hours after which the asset must be replaced.
         
         double capacity_kW; ///< The rated production capacity [kW] of the asset.
         
@@ -92,7 +101,7 @@ class Production {
         Production(void);
         Production(int, ProductionInputs);
         
-        //...
+        virtual double commit(int, double, double, double);
         
         virtual ~Production(void);
         

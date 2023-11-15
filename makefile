@@ -398,7 +398,6 @@ PGMcpp_project: $(SRC_PROJECT)
 .PHONY: clean
 clean:
 	rm -frv bin
-	rm -frv core
 	rm -frv object
 	rm -frv test/bin
 	rm -frv test/object
@@ -409,7 +408,6 @@ dirs:
 	mkdir -pv bin/Production/Combustion
 	mkdir -pv bin/Production/Renewable
 	mkdir -pv bin/Storage
-	mkdir -pv core
 	mkdir -pv object/Production/Combustion
 	mkdir -pv object/Production/Renewable
 	mkdir -pv object/Storage

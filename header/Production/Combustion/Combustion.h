@@ -50,6 +50,22 @@ struct CombustionInputs {
 
 
 ///
+/// \struct Emissions
+///
+/// \brief A structure which bundles the emitted masses of various emissions chemistries.
+///
+
+struct Emissions {
+    double CO2_kg = 0; ///< The mass of carbon dioxide (CO2) emitted [kg].
+    double CO_kg = 0; ///< The mass of carbon monoxide (CO) emitted [kg].
+    double NOx_kg = 0; ///< The mass of nitrogen oxides (NOx) emitted [kg].
+    double SOx_kg = 0; ///< The mass of sulfur oxides (SOx) emitted [kg].
+    double CH4_kg = 0; ///< The mass of methane (CH4) emitted [kg].
+    double PM_kg = 0; ///< The mass of particulate matter (PM) emitted [kg].
+};
+
+
+///
 /// \class Combustion
 ///
 /// \brief The root of the Combustion branch of the Production hierarchy. This branch 
@@ -69,8 +85,17 @@ class Combustion : public Production {
         
     public:
         //  1. attributes
+        double fuel_cost_L; ///< The cost of fuel [1/L] (undefined currency).
+        
         double linear_fuel_slope_LkWh; ///< The slope [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.
         double linear_fuel_intercept_LkWh; ///< The intercept [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.
+        
+        double CO2_emissions_intensity_kgL; ///< Carbon dioxide (CO2) emissions intensity [kg/L].
+        double CO_emissions_intensity_kgL; ///< Carbon monoxide (CO) emissions intensity [kg/L].
+        double NOx_emissions_intensity_kgL; ///< Nitrogen oxide (NOx) emissions intensity [kg/L].
+        double SOx_emissions_intensity_kgL; ///< Sulfur oxide (SOx) emissions intensity [kg/L].
+        double CH4_emissions_intensity_kgL; ///< Methane (CH4) emissions intensity [kg/L].
+        double PM_emissions_intensity_kgL; ///< Particulate Matter (PM) emissions intensity [kg/L].
     
         std::vector<double> fuel_consumption_vec_L; ///< A vector of fuel consumed [L] over each modelling time step.
         std::vector<double> fuel_cost_vec; ///< A vector of fuel costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are nominal costs).
@@ -87,7 +112,11 @@ class Combustion : public Production {
         Combustion(void);
         Combustion(int, CombustionInputs);
         
-        //...
+        virtual double requestProductionkW(int, double, double) {return 0;}
+        virtual double commit(int, double, double, double);
+        
+        double getFuelConsumptionL(double, double);
+        Emissions getEmissionskg(double);
         
         virtual ~Combustion(void);
         
