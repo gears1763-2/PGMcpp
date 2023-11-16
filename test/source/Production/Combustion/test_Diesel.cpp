@@ -41,6 +41,7 @@ try {
 // ======== CONSTRUCTION ============================================================ //
 
 bool error_flag = true;
+
 try {
     DieselInputs bad_diesel_inputs;
     bad_diesel_inputs.fuel_cost_L = -1;
@@ -412,6 +413,7 @@ return 0;
 
 /*
 bool error_flag = true;
+
 try {
     testTruth(1 == 0, __FILE__, __LINE__);
     error_flag = false;

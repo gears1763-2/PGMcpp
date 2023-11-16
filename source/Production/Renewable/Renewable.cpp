@@ -25,7 +25,20 @@
 
 // ======== PRIVATE ================================================================= //
 
-//...
+// ---------------------------------------------------------------------------------- //
+
+void Renewable :: __checkInputs(RenewableInputs renewable_inputs)
+{
+    /*
+     *  Helper method (private) to check inputs to the Renewable constructor.
+     */
+    
+    //...
+    
+    return;
+}   /* __checkInputs() */
+
+// ---------------------------------------------------------------------------------- //
 
 // ======== END PRIVATE ============================================================= //
 
@@ -40,12 +53,43 @@
 ///
 /// \brief Constructor (dummy) for the Renewable class.
 ///
-// \param [...]
 
-Renewable :: Renewable(void) :
-Production()
+Renewable :: Renewable(void)
 {
     //...
+    
+    return;
+}   /* Renewable() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn Renewable :: Renewable(void)
+///
+/// \brief Constructor (intended) for the Renewable class.
+///
+/// \param n_points The number of points in the modelling time series.
+///
+/// \param renewable_inputs A structure of Renewable constructor inputs.
+///
+
+Renewable :: Renewable(int n_points, RenewableInputs renewable_inputs) :
+Production(n_points, renewable_inputs.production_inputs)
+{
+    //  1. check inputs
+    this->__checkInputs(renewable_inputs);
+    
+    //  2. set attributes
+    //...
+    
+    //  3. construction print
+    if (this->print_flag) {
+        std::cout << "Renewable object constructed at " << this << std::endl;
+    }
     
     return;
 }   /* Renewable() */
@@ -113,7 +157,10 @@ double Renewable :: commit(
 
 Renewable :: ~Renewable(void)
 {
-    //...
+    //  1. destruction print
+    if (this->print_flag) {
+        std::cout << "Renewable object at " << this << " destroyed" << std::endl;
+    }
     
     return;
 }   /* ~Renewable() */

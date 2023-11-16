@@ -34,6 +34,13 @@
 
 struct SolarInputs {
     RenewableInputs renewable_inputs; ///< An encapsulated RenewableInputs instance.
+    
+    int resource_key = 0; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
+    
+    double capital_cost = -1; ///< The capital cost of the asset (undefined currency). -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD].
+    double operation_maintenance_cost_kWh = -1; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced. -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD/kWh].
+    
+    double derating = 0.8; ///< The derating of the solar PV array (i.e., shadowing, soiling, etc.).
 };
 
 
@@ -52,11 +59,15 @@ class Solar : public Renewable {
         
         //  2. methods
         void __checkInputs(SolarInputs);
+        void __handleStartStop(int, double, double);
+        
+        double __getGenericCapitalCost(void);
+        double __getGenericOpMaintCost(void);
         
         
     public:
         //  1. attributes
-        //...
+        double derating; ///< The derating of the solar PV array (i.e., shadowing, soiling, etc.).
         
         
         //  2. methods

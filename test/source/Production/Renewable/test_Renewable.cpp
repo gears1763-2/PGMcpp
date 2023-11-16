@@ -34,24 +34,45 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    try {
-        //...
-    }
-    
-    catch (...) {
-        //...
-        
-        printGold(" ............... ");
-        printRed("FAIL");
-        std::cout << std::endl;
-        throw;
-    }
-    
+try {
+
+// ======== CONSTRUCTION ============================================================ //
+
+RenewableInputs renewable_inputs;
+
+Renewable test_renewable(8760, renewable_inputs);
+
+// ======== END CONSTRUCTION ======================================================== //
+
+
+
+// ======== ATTRIBUTES ============================================================== //
+
+testTruth(
+    not renewable_inputs.production_inputs.print_flag,
+    __FILE__,
+    __LINE__
+);
+
+// ======== END ATTRIBUTES ========================================================== //
+
+}   /* try */
+
+
+catch (...) {
+    //...
     
     printGold(" ............... ");
-    printGreen("PASS");
+    printRed("FAIL");
     std::cout << std::endl;
-    return 0;
+    throw;
+}
+
+
+printGold(" ............... ");
+printGreen("PASS");
+std::cout << std::endl;
+return 0;
 }   /* main() */
 
 

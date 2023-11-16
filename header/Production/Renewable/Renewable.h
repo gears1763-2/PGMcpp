@@ -71,7 +71,9 @@ class Renewable : public Production {
         
     public:
         //  1. attributes
-        RenewableType type;
+        RenewableType type; ///< The type (RenewableType) of the asset.
+        
+        int resource_key; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
         
         
         //  2. methods

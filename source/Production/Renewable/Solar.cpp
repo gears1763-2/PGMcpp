@@ -25,7 +25,103 @@
 
 // ======== PRIVATE ================================================================= //
 
-//...
+// ---------------------------------------------------------------------------------- //
+
+void Solar :: __checkInputs(SolarInputs solar_inputs)
+{
+    /*
+     *  Helper method (private) to check inputs to the Solar constructor.
+     */
+    
+    //  1. check derating
+    if (
+        solar_inputs.derating < 0 or
+        solar_inputs.derating > 1
+    ) {
+        std::string error_str = "ERROR: Solar():\t";
+        error_str += "SolarInputs::derating must be in the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    return;
+}   /* __checkInputs() */
+
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+double Solar :: __getGenericCapitalCost(void)
+{
+    /*
+     *  Helper method (private) to generate a generic solar PV array capital cost.
+     *
+     *  This model was obtained by way of surveying an assortment of published solar PV
+     *  costs, and then constructing a best fit model. Note that this model
+     *  expresses cost in terms of Canadian dollars [CAD].
+     */
+    
+    return 3000 * this->capacity_kW;
+}   /* __getGenericCapitalCost() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+double Solar :: __getGenericOpMaintCost(void)
+{
+    /*
+     *  Helper method (private) to generate a generic solar PV array operation and
+     *  maintenance cost. This is a cost incurred per unit energy produced.
+     *
+     *  This model was obtained by way of surveying an assortment of published solar PV
+     *  costs, and then constructing a best fit model. Note that this model
+     *  expresses cost in terms of Canadian dollars [CAD].
+     */
+    
+    return 0.01;
+}   /* __getGenericOpMaintCost() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+void Solar :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+{
+    /*
+     *  Helper method (private) to handle the starting/stopping of the solar PV array.
+     */
+    
+    if (this->is_running) {
+        // handle stopping
+        if (production_kW <= 0) {
+            this->is_running = false;
+        }
+    }
+    
+    else {
+        // handle starting
+        if (production_kW > 0) {
+            this->is_running = true;
+            this->n_starts++;
+        }
+    }
+    
+    return;
+}   /* __handleStartStop() */
+
+// ---------------------------------------------------------------------------------- //
 
 // ======== END PRIVATE ============================================================= //
 
@@ -38,12 +134,10 @@
 ///
 /// \fn Solar :: Solar(void)
 ///
-/// \brief Constructor for the Solar class.
+/// \brief Constructor (dummy) for the Solar class.
 ///
-// \param [...]
 
-Solar :: Solar(void) :
-Renewable()
+Solar :: Solar(void)
 {
     //...
     
@@ -56,7 +150,48 @@ Renewable()
 
 // ---------------------------------------------------------------------------------- //
 
-//... INTENDED CONSTRUCTOR HERE
+///
+/// \fn Solar :: Solar(void)
+///
+/// \brief Constructor (intended) for the Solar class.
+///
+/// \param n_points The number of points in the modelling time series.
+///
+/// \param solar_inputs A structure of Solar constructor inputs.
+///
+
+Solar :: Solar(int n_points, SolarInputs solar_inputs) :
+Renewable(n_points, solar_inputs.renewable_inputs)
+{
+    //  1. check inputs
+    this->__checkInputs(solar_inputs);
+    
+    //  2. set attributes
+    this->type = RenewableType :: SOLAR;
+    
+    this->resource_key = solar_inputs.resource_key;
+    
+    this->derating = solar_inputs.derating;
+    
+    if (solar_inputs.capital_cost < 0) {
+        this->capital_cost = this->__getGenericCapitalCost();
+    }
+    
+    if (solar_inputs.operation_maintenance_cost_kWh < 0) {
+        this->operation_maintenance_cost_kWh = this->__getGenericOpMaintCost();
+    }
+    
+    if (this->is_sunk) {
+        this->capital_cost_vec[0] = this->capital_cost;
+    }
+    
+    //  3. construction print
+    if (this->print_flag) {
+        std::cout << "Solar object constructed at " << this << std::endl;
+    }
+    
+    return;
+}   /* Renewable() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -74,6 +209,8 @@ Renewable()
 /// \brief Method which takes in the solar resource at a particular point in time, and
 ///     then returns the solar PV production at that point in time.
 ///
+/// ref: https://www.homerenergy.com/products/pro/docs/3.11/how_homer_calculates_the_pv_array_power_output.html
+///
 /// \param timestep The timestep (i.e., time series index) for the request.
 ///
 /// \param dt_hrs The interval of time [hrs] associated with the timestep.
@@ -89,10 +226,13 @@ double Solar :: computeProductionkW(
     double solar_resource_kWm2
 )
 {
-    // ref: https://www.homerenergy.com/products/pro/docs/3.11/how_homer_calculates_the_pv_array_power_output.html
-    //...
+    if (solar_resource_kWm2 <= 0) {
+        return 0;
+    }
     
-    return 0;
+    double production_kW = this->derating * solar_resource_kWm2 * this->capacity_kW;
+    
+    return production_kW;
 }   /* computeProductionkW() */
 
 // ---------------------------------------------------------------------------------- //
@@ -130,7 +270,10 @@ double Solar :: commit(
     double load_kW
 )
 {
-    //  1. invoke base class method
+    //  1. handle start/stop
+    this->__handleStartStop(timestep, dt_hrs, production_kW);
+    
+    //  2. invoke base class method
     load_kW = Renewable :: commit(
         timestep,
         dt_hrs,
@@ -158,7 +301,10 @@ double Solar :: commit(
 
 Solar :: ~Solar(void)
 {
-    //...
+    //  1. destruction print
+    if (this->print_flag) {
+        std::cout << "Solar object at " << this << " destroyed" << std::endl;
+    }
     
     return;
 }   /* ~Solar() */

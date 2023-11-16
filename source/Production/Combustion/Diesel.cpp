@@ -263,6 +263,7 @@ void Diesel :: __handleStartStop(int timestep, double dt_hrs, double production_
      *  Helper method (private) to handle the starting/stopping of the diesel 
      *  generator. The minimum runtime constraint is enforced in this method.
      */
+    
     if (this->is_running) {
         // handle stopping
         if (
@@ -471,6 +472,15 @@ double Diesel :: commit(
     if (this->is_running) {
         //  3. log time since last start
         this->time_since_last_start_hrs += dt_hrs;
+        
+        //  4. correct operation and maintenance costs (should be non-zero if idling)
+        if (production_kW <= 0) {
+            double produced_kWh = 0.01 * this->capacity_kW * dt_hrs;
+        
+            double operation_maintenance_cost =
+                this->operation_maintenance_cost_kWh * produced_kWh;
+            this->operation_maintenance_cost_vec[timestep] = operation_maintenance_cost;
+        }
     }
     
     return load_kW;

@@ -39,6 +39,7 @@ try {
 // ======== CONSTRUCTION ============================================================ //
 
 bool error_flag = true;
+
 try {
     ProductionInputs production_inputs;
     
@@ -170,6 +171,7 @@ return 0;
 
 /*
 bool error_flag = true;
+
 try {
     testTruth(1 == 0, __FILE__, __LINE__);
     error_flag = false;

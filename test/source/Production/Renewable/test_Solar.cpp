@@ -33,30 +33,100 @@ int main(int argc, char** argv)
     
     srand(time(NULL));
     
+    Renewable* test_solar_ptr;
     
-    try {
-        //...
-    }
+try {
+
+// ======== CONSTRUCTION ============================================================ //
+
+bool error_flag = true;
+
+try {
+    SolarInputs bad_solar_inputs;
+    bad_solar_inputs.derating = -1;
     
-    catch (...) {
-        //...
-        
-        printGold(" ..... ");
-        printRed("FAIL");
-        std::cout << std::endl;
-        throw;
-    }
+    Solar bad_solar(8760, bad_solar_inputs);
     
+    error_flag = false;
+} catch (...) {
+    // Task failed successfully! =P
+}
+if (not error_flag) {
+    expectedErrorNotDetected(__FILE__, __LINE__);
+}
+
+SolarInputs solar_inputs;
+
+test_solar_ptr = new Solar(8760, solar_inputs);
+
+// ======== END CONSTRUCTION ======================================================== //
+
+
+
+// ======== ATTRIBUTES ============================================================== //
+
+testTruth(
+    not solar_inputs.renewable_inputs.production_inputs.print_flag,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_solar_ptr->type,
+    RenewableType :: SOLAR,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_solar_ptr->capital_cost,
+    3000 * 100,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_solar_ptr->operation_maintenance_cost_kWh,
+    0.01,
+    __FILE__,
+    __LINE__
+);
+
+// ======== END ATTRIBUTES ========================================================== //
+
+
+
+// ======== METHODS ================================================================= //
+
+//...
+
+// ======== END METHODS ============================================================= //
+
+}   /* try */
+
+
+catch (...) {
+    delete test_solar_ptr;
     
     printGold(" ..... ");
-    printGreen("PASS");
+    printRed("FAIL");
     std::cout << std::endl;
-    return 0;
+    throw;
+}
+
+
+delete test_solar_ptr;
+
+printGold(" ..... ");
+printGreen("PASS");
+std::cout << std::endl;
+return 0;
 }   /* main() */
 
 
 /*
 bool error_flag = true;
+
 try {
     testTruth(1 == 0, __FILE__, __LINE__);
     error_flag = false;
