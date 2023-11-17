@@ -80,14 +80,14 @@ testFloatEquals(
 
 testFloatEquals(
     test_wind_ptr->capital_cost,
-    414755.573545,
+    450356.170088,
     __FILE__,
     __LINE__
 );
 
 testFloatEquals(
     test_wind_ptr->operation_maintenance_cost_kWh,
-    0.05,
+    0.034953,
     __FILE__,
     __LINE__
 );

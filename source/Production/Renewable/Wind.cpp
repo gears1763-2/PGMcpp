@@ -65,8 +65,7 @@ double Wind :: __getGenericCapitalCost(void)
      *  expresses cost in terms of Canadian dollars [CAD].
      */
     
-    double capital_cost_per_kW =
-        9000 * exp(0.333333333 * log(0.8839779) * this->capacity_kW) + 4000;
+    double capital_cost_per_kW = 3000 * pow(this->capacity_kW, -0.15) + 3000;
     
     return capital_cost_per_kW * this->capacity_kW;
 }   /* __getGenericCapitalCost() */
@@ -88,7 +87,9 @@ double Wind :: __getGenericOpMaintCost(void)
      *  expresses cost in terms of Canadian dollars [CAD/kWh].
      */
     
-    return 0.05;
+    double operation_maintenance_cost_kWh = 0.025 * pow(this->capacity_kW, -0.2) + 0.025;
+    
+    return operation_maintenance_cost_kWh;
 }   /* __getGenericOpMaintCost() */
 
 // ---------------------------------------------------------------------------------- //
@@ -129,6 +130,28 @@ double Wind :: __computeExponentialProductionkW(
     
     return production * this->capacity_kW;
 }   /* __computeExponentialProductionkW() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+double Wind :: __computeLookupProductionkW(
+    int timestep,
+    double dt_hrs,
+    double wind_resource_ms
+)
+{
+    /*
+     *  Helper method (private) to compute tidal turbine production by way of looking up
+     *  using given power curve data.
+     */
+    
+    // *** WORK IN PROGRESS *** //
+    
+    return 0;
+}   /* __computeLookupProductionkW() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -178,6 +201,8 @@ Renewable(n_points, wind_inputs.renewable_inputs)
     this->resource_key = wind_inputs.resource_key;
     
     this->design_speed_ms = wind_inputs.design_speed_ms;
+    
+    this->power_model = wind_inputs.power_model;
     
     if (wind_inputs.capital_cost < 0) {
         this->capital_cost = this->__getGenericCapitalCost();
@@ -236,11 +261,29 @@ double Wind :: computeProductionkW(
     }
     
     // compute production
-    double production_kW = this->__computeExponentialProductionkW(
-        timestep,
-        dt_hrs,
-        wind_resource_ms
-    );
+    double production_kW = 0;
+    
+    switch (this->power_model) {
+        case (WindPowerProductionModel :: WIND_POWER_LOOKUP): {
+            production_kW = this->__computeLookupProductionkW(
+                timestep,
+                dt_hrs,
+                wind_resource_ms
+            );
+            
+            break;
+        }
+        
+        default: {   // default to WIND_POWER_EXPONENTIAL
+            production_kW = this->__computeExponentialProductionkW(
+                timestep,
+                dt_hrs,
+                wind_resource_ms
+            );
+            
+            break;
+        }
+    }
     
     return production_kW;
 }   /* computeProductionkW() */

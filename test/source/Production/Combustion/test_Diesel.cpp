@@ -96,14 +96,14 @@ testFloatEquals(
 
 testFloatEquals(
     test_diesel_ptr->capital_cost,
-    67846.467018,
+    94125.375446,
     __FILE__,
     __LINE__
 );
 
 testFloatEquals(
     test_diesel_ptr->operation_maintenance_cost_kWh,
-    0.038027,
+    0.069905,
     __FILE__,
     __LINE__
 );

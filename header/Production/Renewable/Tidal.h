@@ -32,9 +32,10 @@
 ///
 
 enum TidalPowerProductionModel {
-    CUBIC, ///< A cubic power production model
-    EXPONENTIAL, ///< An exponential power production model
-    N_TIDALPOWERPRODUCTIONMODELS ///< A simple hack to get the number of elements in RenewableType
+    TIDAL_POWER_CUBIC, ///< A cubic power production model
+    TIDAL_POWER_EXPONENTIAL, ///< An exponential power production model
+    TIDAL_POWER_LOOKUP, ///< Lookup from a given set of power curve data
+    N_TIDAL_POWER_PRODUCTION_MODELS ///< A simple hack to get the number of elements in TidalPowerProductionModel
 };
 
 
@@ -56,7 +57,7 @@ struct TidalInputs {
     
     double design_speed_ms = 3; ///< The tidal stream speed [m/s] at which the tidal turbine achieves its rated capacity.
     
-    TidalPowerProductionModel power_model = TidalPowerProductionModel :: CUBIC; ///< The tidal power production model to be applied.
+    TidalPowerProductionModel power_model = TidalPowerProductionModel :: TIDAL_POWER_CUBIC; ///< The tidal power production model to be applied.
 };
 
 
@@ -81,6 +82,7 @@ class Tidal : public Renewable {
         
         double __computeCubicProductionkW(int, double, double);
         double __computeExponentialProductionkW(int, double, double);
+        double __computeLookupProductionkW(int, double, double);
         
         
     public:

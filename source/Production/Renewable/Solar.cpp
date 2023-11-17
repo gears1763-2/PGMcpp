@@ -68,7 +68,9 @@ double Solar :: __getGenericCapitalCost(void)
      *  expresses cost in terms of Canadian dollars [CAD].
      */
     
-    return 3000 * this->capacity_kW;
+    double capital_cost_per_kW = 1000 * pow(this->capacity_kW, -0.15) + 3000;
+    
+    return capital_cost_per_kW * this->capacity_kW;
 }   /* __getGenericCapitalCost() */
 
 // ---------------------------------------------------------------------------------- //

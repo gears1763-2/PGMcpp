@@ -64,10 +64,11 @@ double Tidal :: __getGenericCapitalCost(void)
      *        Renewables in British Columbia, technical report
      *        submitted to Natural Resources Canada, 
      *        S.L. MacDougall Research & Consulting, 2019
+     *
+     *  Note that this model expresses cost in terms of Canadian dollars [CAD].
      */
     
-    double capital_cost_per_kW =
-        4497 * exp(0.0002 * log(0.894596397) * this->capacity_kW) + 2000;
+    double capital_cost_per_kW = 2000 * pow(this->capacity_kW, -0.15) + 4000;
     
     return capital_cost_per_kW * this->capacity_kW;
 }   /* __getGenericCapitalCost() */
@@ -88,9 +89,13 @@ double Tidal :: __getGenericOpMaintCost(void)
      *        Renewables in British Columbia, technical report
      *        submitted to Natural Resources Canada, 
      *        S.L. MacDougall Research & Consulting, 2019
+     *
+     *  Note that this model expresses cost in terms of Canadian dollars [CAD/kWh].
      */
     
-    return 0.05;
+    double operation_maintenance_cost_kWh = 0.05 * pow(this->capacity_kW, -0.2) + 0.05;
+    
+    return operation_maintenance_cost_kWh;
 }   /* __getGenericOpMaintCost() */
 
 // ---------------------------------------------------------------------------------- //
@@ -178,6 +183,28 @@ double Tidal :: __computeExponentialProductionkW(
     
     return production * this->capacity_kW;
 }   /* __computeExponentialProductionkW() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+double Tidal :: __computeLookupProductionkW(
+    int timestep,
+    double dt_hrs,
+    double tidal_resource_ms
+)
+{
+    /*
+     *  Helper method (private) to compute tidal turbine production by way of looking up
+     *  using given power curve data.
+     */
+    
+    // *** WORK IN PROGRESS *** //
+    
+    return 0;
+}   /* __computeLookupProductionkW() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -291,8 +318,18 @@ double Tidal :: computeProductionkW(
     double production_kW = 0;
     
     switch (this->power_model) {
-        case (TidalPowerProductionModel :: EXPONENTIAL): {
+        case (TidalPowerProductionModel :: TIDAL_POWER_EXPONENTIAL): {
             production_kW = this->__computeExponentialProductionkW(
+                timestep,
+                dt_hrs,
+                tidal_resource_ms
+            );
+            
+            break;
+        }
+        
+        case (TidalPowerProductionModel :: TIDAL_POWER_LOOKUP): {
+            production_kW = this->__computeLookupProductionkW(
                 timestep,
                 dt_hrs,
                 tidal_resource_ms

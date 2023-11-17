@@ -80,14 +80,14 @@ testFloatEquals(
 
 testFloatEquals(
     test_tidal_ptr->capital_cost,
-    648699.339732,
+    500237.446725,
     __FILE__,
     __LINE__
 );
 
 testFloatEquals(
     test_tidal_ptr->operation_maintenance_cost_kWh,
-    0.05,
+    0.069905,
     __FILE__,
     __LINE__
 );

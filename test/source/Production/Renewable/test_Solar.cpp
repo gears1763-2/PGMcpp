@@ -80,7 +80,7 @@ testFloatEquals(
 
 testFloatEquals(
     test_solar_ptr->capital_cost,
-    3000 * 100,
+    350118.723363,
     __FILE__,
     __LINE__
 );

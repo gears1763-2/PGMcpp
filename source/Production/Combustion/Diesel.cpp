@@ -222,9 +222,9 @@ double Diesel :: __getGenericCapitalCost(void)
      *  expresses cost in terms of Canadian dollars [CAD].
      */
     
-    double capital_cost = 4831 * pow(this->capacity_kW, 0.5737451);
+    double capital_cost_per_kW = 1000 * pow(this->capacity_kW, -0.425) + 800;
     
-    return capital_cost;
+    return capital_cost_per_kW * this->capacity_kW;
 }   /* __getGenericCapitalCost() */
 
 // ---------------------------------------------------------------------------------- //
@@ -245,8 +245,7 @@ double Diesel :: __getGenericOpMaintCost(void)
      *  [CAD/kWh].
      */
     
-    double operation_maintenance_cost_kWh =
-        0.03 * exp(0.0002 * log(0.03333333) * this->capacity_kW) + 0.01;
+    double operation_maintenance_cost_kWh = 0.05 * pow(this->capacity_kW, -0.2) + 0.05;
     
     return operation_maintenance_cost_kWh;
 }   /* __getGenericOpMaintCost() */
