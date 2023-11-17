@@ -82,6 +82,7 @@ class Renewable : public Production {
         Renewable(int, RenewableInputs);
         
         virtual double computeProductionkW(int, double, double) {return 0;}
+        virtual double computeProductionKW(int, double, double, double) {return 0;}
         virtual double commit(int, double, double, double);
         
         virtual ~Renewable(void);

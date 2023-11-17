@@ -85,7 +85,7 @@ double Solar :: __getGenericOpMaintCost(void)
      *
      *  This model was obtained by way of surveying an assortment of published solar PV
      *  costs, and then constructing a best fit model. Note that this model
-     *  expresses cost in terms of Canadian dollars [CAD].
+     *  expresses cost in terms of Canadian dollars [CAD/kWh].
      */
     
     return 0.01;
@@ -196,11 +196,18 @@ double Solar :: computeProductionkW(
     double solar_resource_kWm2
 )
 {
+    // check if no resource
     if (solar_resource_kWm2 <= 0) {
         return 0;
     }
     
+    // compute production
     double production_kW = this->derating * solar_resource_kWm2 * this->capacity_kW;
+    
+    // cap production at capacity
+    if (production_kW > this->capacity_kW) {
+        production_kW = this->capacity_kW;
+    }
     
     return production_kW;
 }   /* computeProductionkW() */

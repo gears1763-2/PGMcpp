@@ -173,9 +173,9 @@ std::vector<bool> expected_is_running_vec = {
     1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0
 };
 
-double roll = 0;
-double production_kW = 0;
 double load_kW = 0;
+double production_kW = 0;
+double roll = 0;
 
 for (int i = 0; i < 48; i++) {
     roll = (double)rand() / RAND_MAX;
@@ -200,7 +200,7 @@ for (int i = 0; i < 48; i++) {
         load_kW
     );
     
-    // load_kW <= load_vec_kW (i.e., after vs before
+    // load_kW <= load_vec_kW (i.e., after vs before)
     testLessThanOrEqualTo(
         load_kW,
         load_vec_kW[i],

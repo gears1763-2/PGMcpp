@@ -98,7 +98,154 @@ testFloatEquals(
 
 // ======== METHODS ================================================================= //
 
-//...
+// test production constraints
+testFloatEquals(
+    test_solar_ptr->computeProductionkW(0, 1, 2),
+    100,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_solar_ptr->computeProductionkW(0, 1, -1),
+    0,
+    __FILE__,
+    __LINE__
+);
+
+// test commit()
+std::vector<double> dt_vec_hrs (48, 1);
+
+std::vector<double> load_vec_kW = {
+    1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1,
+    1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+    1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+    1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0
+};
+
+double load_kW = 0;
+double production_kW = 0;
+double roll = 0;
+double solar_resource_kWm2 = 0;
+
+for (int i = 0; i < 48; i++) {
+    roll = (double)rand() / RAND_MAX;
+    
+    solar_resource_kWm2 = roll;
+    
+    roll = (double)rand() / RAND_MAX;
+    
+    if (roll <= 0.1) {
+        solar_resource_kWm2 = 0;
+    }
+    
+    else if (roll >= 0.95) {
+        solar_resource_kWm2 = 1.25;
+    }
+    
+    roll = (double)rand() / RAND_MAX;
+    
+    if (roll >= 0.95) {
+        roll = 1.25;
+    }
+    
+    load_vec_kW[i] *= roll * test_solar_ptr->capacity_kW;
+    load_kW = load_vec_kW[i];
+    
+    production_kW = test_solar_ptr->computeProductionkW(
+        i,
+        dt_vec_hrs[i],
+        solar_resource_kWm2
+    );
+    
+    load_kW = test_solar_ptr->commit(
+        i,
+        dt_vec_hrs[i],
+        production_kW,
+        load_kW
+    );
+    
+    // is running (or not) as expected
+    if (solar_resource_kWm2 > 0) {
+        testTruth(
+            test_solar_ptr->is_running,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    else {
+        testTruth(
+            not test_solar_ptr->is_running,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    // load_kW <= load_vec_kW (i.e., after vs before)
+    testLessThanOrEqualTo(
+        load_kW,
+        load_vec_kW[i],
+        __FILE__,
+        __LINE__
+    );
+    
+    // production = dispatch + storage + curtailment
+    testFloatEquals(
+        test_solar_ptr->production_vec_kW[i] -
+        test_solar_ptr->dispatch_vec_kW[i] -
+        test_solar_ptr->storage_vec_kW[i] -
+        test_solar_ptr->curtailment_vec_kW[i],
+        0,
+        __FILE__,
+        __LINE__
+    );
+    
+    // capacity constraint
+    if (solar_resource_kWm2 > 1) {
+        testFloatEquals(
+            test_solar_ptr->production_vec_kW[i],
+            test_solar_ptr->capacity_kW,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    // resource, O&M > 0 whenever solar is running (i.e., producing)
+    if (test_solar_ptr->is_running) {
+        testGreaterThan(
+            solar_resource_kWm2,
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testGreaterThan(
+            test_solar_ptr->operation_maintenance_cost_vec[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    // resource, O&M = 0 whenever solar is not running (i.e., not producing)
+    else {
+        testFloatEquals(
+            solar_resource_kWm2,
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_solar_ptr->operation_maintenance_cost_vec[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+    }
+}
+
 
 // ======== END METHODS ============================================================= //
 
