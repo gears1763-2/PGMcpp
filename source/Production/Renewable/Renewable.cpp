@@ -40,6 +40,36 @@ void Renewable :: __checkInputs(RenewableInputs renewable_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
+
+
+// ---------------------------------------------------------------------------------- //
+
+void Renewable :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+{
+    /*
+     *  Helper method (private) to handle the starting/stopping of the renewable asset.
+     */
+    
+    if (this->is_running) {
+        // handle stopping
+        if (production_kW <= 0) {
+            this->is_running = false;
+        }
+    }
+    
+    else {
+        // handle starting
+        if (production_kW > 0) {
+            this->is_running = true;
+            this->n_starts++;
+        }
+    }
+    
+    return;
+}   /* __handleStartStop() */
+
+// ---------------------------------------------------------------------------------- //
+
 // ======== END PRIVATE ============================================================= //
 
 
@@ -129,7 +159,10 @@ double Renewable :: commit(
     double load_kW
 )
 {
-    //  1. invoke base class method
+    //  1. handle start/stop
+    this->__handleStartStop(timestep, dt_hrs, production_kW);
+    
+    //  2. invoke base class method
     load_kW = Production :: commit(
         timestep,
         dt_hrs,

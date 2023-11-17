@@ -59,7 +59,6 @@ class Solar : public Renewable {
         
         //  2. methods
         void __checkInputs(SolarInputs);
-        void __handleStartStop(int, double, double);
         
         double __getGenericCapitalCost(void);
         double __getGenericOpMaintCost(void);

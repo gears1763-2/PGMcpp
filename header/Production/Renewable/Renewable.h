@@ -67,6 +67,7 @@ class Renewable : public Production {
         
         //  2. methods
         void __checkInputs(RenewableInputs);
+        void __handleStartStop(int, double, double);
         
         
     public:
