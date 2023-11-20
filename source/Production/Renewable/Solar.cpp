@@ -140,6 +140,7 @@ Renewable(n_points, solar_inputs.renewable_inputs)
     
     //  2. set attributes
     this->type = RenewableType :: SOLAR;
+    this->type_str = "SOLAR";
     
     this->resource_key = solar_inputs.resource_key;
     

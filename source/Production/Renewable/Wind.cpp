@@ -197,6 +197,7 @@ Renewable(n_points, wind_inputs.renewable_inputs)
     
     //  2. set attributes
     this->type = RenewableType :: WIND;
+    this->type_str = "WIND";
     
     this->resource_key = wind_inputs.resource_key;
     

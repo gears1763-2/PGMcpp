@@ -78,6 +78,12 @@ testFloatEquals(
     __LINE__
 );
 
+testTruth(
+    test_tidal_ptr->type_str == "TIDAL",
+    __FILE__,
+    __LINE__
+);
+
 testFloatEquals(
     test_tidal_ptr->capital_cost,
     500237.446725,

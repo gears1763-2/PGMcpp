@@ -78,6 +78,12 @@ testFloatEquals(
     __LINE__
 );
 
+testTruth(
+    test_wave_ptr->type_str == "WAVE",
+    __FILE__,
+    __LINE__
+);
+
 testFloatEquals(
     test_wave_ptr->capital_cost,
     850831.063539,
@@ -248,7 +254,7 @@ for (int i = 0; i < 48; i++) {
 catch (...) {
     delete test_wave_ptr;
     
-    printGold(" ..... ");
+    printGold(" ...... ");
     printRed("FAIL");
     std::cout << std::endl;
     throw;
@@ -257,7 +263,7 @@ catch (...) {
 
 delete test_wave_ptr;
 
-printGold(" ..... ");
+printGold(" ...... ");
 printGreen("PASS");
 std::cout << std::endl;
 return 0;

@@ -80,6 +80,12 @@ testFloatEquals(
     __LINE__
 );
 
+testTruth(
+    test_diesel_ptr->type_str == "DIESEL",
+    __FILE__,
+    __LINE__
+);
+
 testFloatEquals(
     test_diesel_ptr->linear_fuel_slope_LkWh,
     0.265675,

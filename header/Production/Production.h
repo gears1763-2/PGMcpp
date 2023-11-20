@@ -86,6 +86,8 @@ class Production {
         double net_present_cost; ///< The net present cost of this asset.
         double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatched and stored energy.
         
+        std::string type_str; ///< A string describing the type of the asset.
+        
         std::vector<bool> is_running_vec; ///< A boolean vector for tracking if the asset is running at a particular point in time.
         
         std::vector<double> production_vec_kW; ///< A vector of production [kW] at each point in the modelling time series.

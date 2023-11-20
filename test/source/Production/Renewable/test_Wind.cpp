@@ -78,6 +78,12 @@ testFloatEquals(
     __LINE__
 );
 
+testTruth(
+    test_wind_ptr->type_str == "WIND",
+    __FILE__,
+    __LINE__
+);
+
 testFloatEquals(
     test_wind_ptr->capital_cost,
     450356.170088,

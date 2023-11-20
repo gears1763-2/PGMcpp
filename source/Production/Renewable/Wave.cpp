@@ -262,6 +262,7 @@ Renewable(n_points, wave_inputs.renewable_inputs)
     
     //  2. set attributes
     this->type = RenewableType :: WAVE;
+    this->type_str = "WAVE";
     
     this->resource_key = wave_inputs.resource_key;
     

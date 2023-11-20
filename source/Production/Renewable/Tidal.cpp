@@ -251,6 +251,7 @@ Renewable(n_points, tidal_inputs.renewable_inputs)
     
     //  2. set attributes
     this->type = RenewableType :: TIDAL;
+    this->type_str = "TIDAL";
     
     this->resource_key = tidal_inputs.resource_key;
     

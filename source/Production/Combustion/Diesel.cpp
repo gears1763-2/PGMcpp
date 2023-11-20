@@ -330,6 +330,7 @@ Combustion(n_points, diesel_inputs.combustion_inputs)
     
     //  2. set attributes
     this->type = CombustionType :: DIESEL;
+    this->type_str = "DIESEL";
     
     this->replace_running_hrs = diesel_inputs.replace_running_hrs;
     

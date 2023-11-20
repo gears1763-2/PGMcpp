@@ -78,6 +78,12 @@ testFloatEquals(
     __LINE__
 );
 
+testTruth(
+    test_solar_ptr->type_str == "SOLAR",
+    __FILE__,
+    __LINE__
+);
+
 testFloatEquals(
     test_solar_ptr->capital_cost,
     350118.723363,
