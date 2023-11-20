@@ -23,19 +23,18 @@
 #include "../header/ElectricalLoad.h"
 
 
+// ======== PUBLIC ================================================================== //
+
 // ---------------------------------------------------------------------------------- //
 
 ///
 /// \fn ElectricalLoad :: ElectricalLoad(void)
 ///
-/// \brief Constructor for the ElectricalLoad class.
+/// \brief Constructor (dummy) for the ElectricalLoad class.
 ///
-// \param [...]
 
 ElectricalLoad :: ElectricalLoad(void)
 {
-    //...
-    
     return;
 }   /* ElectricalLoad() */
 
@@ -45,7 +44,78 @@ ElectricalLoad :: ElectricalLoad(void)
 
 // ---------------------------------------------------------------------------------- //
 
-//...
+///
+/// \fn ElectricalLoad :: ElectricalLoad(std::string path_2_electrical_load_time_series)
+///
+/// \brief Constructor (intended) for the ElectricalLoad class.
+///
+/// \param path_2_electrical_load_time_series A string defining the path (either
+///     relative or absolute) to the given electrical load time series.
+///
+
+ElectricalLoad :: ElectricalLoad(std::string path_2_electrical_load_time_series)
+{
+    //  1. init CSV reader, record path
+    io::CSVReader<2> CSV(path_2_electrical_load_time_series);
+    
+    CSV.read_header(
+        io::ignore_extra_column,
+        "Time (since start of data) [hrs]",
+        "Electrical Load [kW]"
+    );
+    
+    this->path_2_electrical_load_time_series = path_2_electrical_load_time_series;
+    
+    //  2. read in time and load data, increment n_points, track min and max load
+    double time_hrs = 0;
+    double load_kW = 0;
+    double load_sum_kW = 0;
+    
+    this->n_points = 0;
+    
+    this->min_load_kW = std::numeric_limits<double>::infinity();
+    this->max_load_kW = -1 * std::numeric_limits<double>::infinity();
+    
+    while (CSV.read_row(time_hrs, load_kW)) {
+        this->time_vec_hrs.push_back(time_hrs);
+        this->load_vec_kW.push_back(load_kW);
+        
+        load_sum_kW += load_kW;
+        
+        this->n_points++;
+        
+        if (this->min_load_kW > load_kW) {
+            this->min_load_kW = load_kW;
+        }
+        
+        if (this->max_load_kW < load_kW) {
+            this->max_load_kW = load_kW;
+        }
+    }
+    
+    //  3. compute mean load
+    this->mean_load_kW = load_sum_kW / this->n_points;
+    
+    //  5. set number of years (assuming 8,760 hours per year)
+    this->n_years = this->time_vec_hrs[this->n_points - 1] / 8760;
+    
+    //  6. populate dt_vec_hrs
+    this->dt_vec_hrs.resize(n_points, 0);
+    
+    for (int i = 0; i < n_points; i++) {
+        if (i == n_points - 1) {
+            this->dt_vec_hrs[i] = this->dt_vec_hrs[i - 1];
+        }
+        
+        else {
+            double dt_hrs = this->time_vec_hrs[i + 1] - this->time_vec_hrs[i];
+            
+            this->dt_vec_hrs[i] = dt_hrs;
+        }
+    }
+    
+    return;
+}   /* ElectricalLoad() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -67,3 +137,5 @@ ElectricalLoad :: ~ElectricalLoad(void)
 }   /* ~ElectricalLoad() */
 
 // ---------------------------------------------------------------------------------- //
+
+// ======== END PUBLIC ============================================================== //

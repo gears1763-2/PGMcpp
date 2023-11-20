@@ -35,13 +35,25 @@
 class ElectricalLoad {
     public:
         //  1. attributes
-        //...
+        int n_points; ///< The number of points in the modelling time series.
+        
+        double n_years; ///< The number of years being modelled (inferred from time_vec_hrs).
+        
+        double min_load_kW; ///< The minimum [kW] of the given electrical load time series.
+        double mean_load_kW; ///< The mean, or average, [kW] of the given electrical load time series.
+        double max_load_kW; ///< The maximum [kW] of the given electrical load time series.
+        
+        std::string path_2_electrical_load_time_series; ///< A string defining the path (either relative or absolute) to the given electrical load time series.
+        
+        std::vector<double> time_vec_hrs; ///< A vector to hold a given sequence of model times [hrs]. This defines the modelling time series.
+        std::vector<double> dt_vec_hrs; ///< A vector to hold a sequence of model time deltas [hrs].
+        
+        std::vector<double> load_vec_kW; ///< A vector to hold a given sequence of electrical load values [kW].
         
         
         //  2. methods
         ElectricalLoad(void);
-        
-        //...
+        ElectricalLoad(std::string);
         
         ~ElectricalLoad(void);
         
