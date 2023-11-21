@@ -34,24 +34,63 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    try {
-        //...
-    }
-    
-    catch (...) {
-        //...
-        
-        printGold(" .............................. ");
-        printRed("FAIL");
-        std::cout << std::endl;
-        throw;
-    }
-    
-    
+try {
+
+// ======== CONSTRUCTION ============================================================ //
+
+Resources test_resources;
+
+// ======== END CONSTRUCTION ======================================================== //
+
+
+
+// ======== ATTRIBUTES ============================================================== //
+
+testFloatEquals(
+    test_resources.resource_map_1D.size(),
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_resources.path_map_1D.size(),
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_resources.resource_map_2D.size(),
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_resources.path_map_2D.size(),
+    0,
+    __FILE__,
+    __LINE__
+);
+
+// ======== END ATTRIBUTES ========================================================== //
+
+}   /* try */
+
+
+catch (...) {
     printGold(" .............................. ");
-    printGreen("PASS");
+    printRed("FAIL");
     std::cout << std::endl;
-    return 0;
+    throw;
+}
+
+
+printGold(" .............................. ");
+printGreen("PASS");
+std::cout << std::endl;
+return 0;
 }   /* main() */
 
 

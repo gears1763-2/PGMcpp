@@ -38,6 +38,21 @@
 
 
 ///
+/// \struct ModelInputs
+///
+/// \brief A structure which bundles the necessary inputs for the Model constructor.
+///     Provides default values for every necessary input (except
+///     path_2_electrical_load_time_series, for which a valid input must be provided).
+///
+
+struct ModelInputs {
+    std::string path_2_electrical_load_time_series = ""; ///< A string defining the path (either relative or absolute) to the given electrical load time series.
+    
+    ControlMode control_mode = ControlMode :: LOAD_FOLLOWING; ///< The control mode to be applied by the Controller object.
+};
+
+
+///
 /// \class Model
 ///
 /// \brief A container class which forms the centre of PGMcpp. The Model class is
@@ -46,6 +61,15 @@
 ///
 
 class Model {
+    private:
+        //  1. attributes
+        void __checkInputs(ModelInputs);
+        
+        
+        //  2. methods
+        //...
+        
+        
     public:
         //  1. attributes
         Controller controller;  ///< Controller component of Model
@@ -59,8 +83,10 @@ class Model {
         
         //  2. methods
         Model(void);
+        Model(ModelInputs);
         
-        //...
+        void reset(void);
+        void clear(void);
         
         ~Model(void);
         

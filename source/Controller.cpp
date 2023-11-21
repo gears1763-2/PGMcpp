@@ -23,6 +23,8 @@
 #include "../header/Controller.h"
 
 
+// ======== PUBLIC ================================================================== //
+
 // ---------------------------------------------------------------------------------- //
 
 ///
@@ -30,12 +32,9 @@
 ///
 /// \brief Constructor for the Controller class.
 ///
-// \param [...]
 
 Controller :: Controller(void)
 {
-    //...
-    
     return;
 }   /* Controller() */
 
@@ -45,7 +44,18 @@ Controller :: Controller(void)
 
 // ---------------------------------------------------------------------------------- //
 
-//...
+///
+/// \fn void Controller :: clear(void)
+///
+/// \brief Method to clear all attributes of the Controller object.
+///
+
+void Controller :: clear(void)
+{
+    //...
+    
+    return;
+}   /* clear() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -61,9 +71,11 @@ Controller :: Controller(void)
 
 Controller :: ~Controller(void)
 {
-    //...
+    this->clear();
     
     return;
 }   /* ~Controller() */
 
 // ---------------------------------------------------------------------------------- //
+
+// ======== END PUBLIC ============================================================== //

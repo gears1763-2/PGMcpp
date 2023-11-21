@@ -26,6 +26,19 @@
 
 
 ///
+/// \enum ControlMode
+///
+/// \brief An enumeration of the types of control modes supported by PGMcpp
+///
+
+enum ControlMode {
+    LOAD_FOLLOWING, ///< Load following control, with in-order dispatch of non-Combustion assets and optimal dispatch of Combustion assets.
+    CYCLE_CHARGING, ///< Cycle charging control, with in-order dispatch of non-Combustion assets and optimal dispatch of Combustion assets.
+    N_CONTROL_MODES ///< A simple hack to get the number of elements in ControlMode
+};
+
+
+///
 /// \class Controller
 ///
 /// \brief A class which contains a various dispatch control logic. Intended to serve
@@ -35,13 +48,13 @@
 class Controller {
     public:
         //  1. attributes
-        //...
+        ControlMode control_mode;
         
         
         //  2. methods
         Controller(void);
         
-        //...
+        void clear(void);
         
         ~Controller(void);
         

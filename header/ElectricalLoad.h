@@ -55,6 +55,9 @@ class ElectricalLoad {
         ElectricalLoad(void);
         ElectricalLoad(std::string);
         
+        void readLoadData(std::string);
+        void clear(void);
+        
         ~ElectricalLoad(void);
         
 };  /* ElectricalLoad */

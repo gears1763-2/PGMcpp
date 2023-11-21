@@ -35,13 +35,17 @@
 class Resources {
     public:
         //  1. attributes
-        //...
+        std::map<int, std::vector<double>> resource_map_1D;
+        std::map<int, std::string> path_map_1D;
+        
+        std::map<int, std::vector<std::vector<double>>> resource_map_2D;
+        std::map<int, std::string> path_map_2D;
         
         
         //  2. methods
         Resources(void);
         
-        //...
+        void clear(void);
         
         ~Resources(void);
         

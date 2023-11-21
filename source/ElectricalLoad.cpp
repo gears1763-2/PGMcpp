@@ -55,7 +55,32 @@ ElectricalLoad :: ElectricalLoad(void)
 
 ElectricalLoad :: ElectricalLoad(std::string path_2_electrical_load_time_series)
 {
-    //  1. init CSV reader, record path
+    this->readLoadData(path_2_electrical_load_time_series);
+    
+    return;
+}   /* ElectricalLoad() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void ElectricalLoad :: readLoadData(std::string path_2_electrical_load_time_series)
+///
+/// \brief Method to read electrical load data into an already existing ElectricalLoad
+///     object. Clears and overwrites any existing attribute values.
+///
+/// \param path_2_electrical_load_time_series A string defining the path (either
+///     relative or absolute) to the given electrical load time series.
+///
+
+void ElectricalLoad :: readLoadData(std::string path_2_electrical_load_time_series)
+{
+    //  1. clear
+    this->clear();
+    
+    //  2. init CSV reader, record path
     io::CSVReader<2> CSV(path_2_electrical_load_time_series);
     
     CSV.read_header(
@@ -66,7 +91,7 @@ ElectricalLoad :: ElectricalLoad(std::string path_2_electrical_load_time_series)
     
     this->path_2_electrical_load_time_series = path_2_electrical_load_time_series;
     
-    //  2. read in time and load data, increment n_points, track min and max load
+    //  3. read in time and load data, increment n_points, track min and max load
     double time_hrs = 0;
     double load_kW = 0;
     double load_sum_kW = 0;
@@ -93,7 +118,7 @@ ElectricalLoad :: ElectricalLoad(std::string path_2_electrical_load_time_series)
         }
     }
     
-    //  3. compute mean load
+    //  4. compute mean load
     this->mean_load_kW = load_sum_kW / this->n_points;
     
     //  5. set number of years (assuming 8,760 hours per year)
@@ -115,10 +140,36 @@ ElectricalLoad :: ElectricalLoad(std::string path_2_electrical_load_time_series)
     }
     
     return;
-}   /* ElectricalLoad() */
+}   /* readLoadData() */
 
 // ---------------------------------------------------------------------------------- //
 
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void ElectricalLoad :: clear(void)
+///
+/// \brief Method to clear all attributes of the ElectricalLoad object.
+///
+
+void ElectricalLoad :: clear(void)
+{
+    this->n_points = 0;
+    this->n_years = 0;
+    this->min_load_kW = 0;
+    this->mean_load_kW = 0;
+    this->max_load_kW = 0;
+    
+    this->path_2_electrical_load_time_series.clear();
+    this->time_vec_hrs.clear();
+    this->dt_vec_hrs.clear();
+    this->load_vec_kW.clear();
+    
+    return;
+}   /* clear() */
+
+// ---------------------------------------------------------------------------------- //
 
 
 // ---------------------------------------------------------------------------------- //
@@ -131,8 +182,7 @@ ElectricalLoad :: ElectricalLoad(std::string path_2_electrical_load_time_series)
 
 ElectricalLoad :: ~ElectricalLoad(void)
 {
-    //...
-    
+    this->clear();
     return;
 }   /* ~ElectricalLoad() */
 
