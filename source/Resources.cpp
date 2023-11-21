@@ -79,28 +79,111 @@ void Resources :: __checkResourceKey2D(int resource_key) {
 
 // ---------------------------------------------------------------------------------- //
 
-//void __readSolarResource(std::string, int, ElectricalLoad*);
+void Resources :: __checkTimePoint(double time_received_hrs, double time_expected_hrs)
+{
+    /*
+     *  Helper method (private) to check received time point against expected time
+     *  point.
+     */
+    
+    if (time_received_hrs != time_expected_hrs) {
+        std::string error_str = "ERROR: Resources::__checkTimePoint():\t";
+        error_str += "the given resource time series does not align with the ";
+        error_str += "previously given electrical load time series";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::runtime_error(error_str);
+    }
+    
+    return;
+}
 
 // ---------------------------------------------------------------------------------- //
 
 
 // ---------------------------------------------------------------------------------- //
 
-//void __readTidalResource(std::string, int, ElectricalLoad*);
+void Resources :: __readSolarResource(
+    std::string path_2_resource_data,
+    int resource_key,
+    ElectricalLoad* electrcial_load_ptr
+)
+{
+    /*
+     *  Helper method (private) to handle reading a solar resource time series into
+     *  Resources.
+     */
+    
+    //...
+    
+    return;
+}   /* __readSolarResource() */
 
 // ---------------------------------------------------------------------------------- //
 
 
 // ---------------------------------------------------------------------------------- //
 
-//void __readWaveResource(std::string, int, ElectricalLoad*);
+void Resources :: __readTidalResource(
+    std::string path_2_resource_data,
+    int resource_key,
+    ElectricalLoad* electrcial_load_ptr
+)
+{
+    /*
+     *  Helper method (private) to handle reading a tidal resource time series into
+     *  Resources.
+     */
+    
+    //...
+    
+    return;
+}   /* __readTidalResource() */
 
 // ---------------------------------------------------------------------------------- //
 
 
 // ---------------------------------------------------------------------------------- //
 
-//void __readWindResource(std::string, int, ElectricalLoad*);
+void Resources :: __readWaveResource(
+    std::string path_2_resource_data,
+    int resource_key,
+    ElectricalLoad* electrcial_load_ptr
+)
+{
+    /*
+     *  Helper method (private) to handle reading a wave resource time series into
+     *  Resources.
+     */
+    
+    //...
+    
+    return;
+}   /* __readWaveResource() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+// ---------------------------------------------------------------------------------- //
+
+void Resources :: __readWindResource(
+    std::string path_2_resource_data,
+    int resource_key,
+    ElectricalLoad* electrcial_load_ptr
+)
+{
+    /*
+     *  Helper method (private) to handle reading a wind resource time series into
+     *  Resources.
+     */
+    
+    //...
+    
+    return;
+}   /* __readWindResource() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -161,28 +244,48 @@ void Resources :: addResource(
     switch (renewable_type) {
         case (RenewableType :: SOLAR): {
             this->__checkResourceKey1D(resource_key);
-            //...
+            
+            this->__readSolarResource(
+                path_2_resource_data,
+                resource_key,
+                electrical_load_ptr
+            );
             
             break;
         }
         
         case (RenewableType :: TIDAL): {
             this->__checkResourceKey1D(resource_key);
-            //...
+            
+            this->__readTidalResource(
+                path_2_resource_data,
+                resource_key,
+                electrical_load_ptr
+            );
             
             break;
         }
         
         case (RenewableType :: WAVE): {
             this->__checkResourceKey2D(resource_key);
-            //...
+            
+            this->__readWaveResource(
+                path_2_resource_data,
+                resource_key,
+                electrical_load_ptr
+            );
             
             break;
         }
         
         case (RenewableType :: WIND): {
             this->__checkResourceKey1D(resource_key);
-            //...
+            
+            this->__readWindResource(
+                path_2_resource_data,
+                resource_key,
+                electrical_load_ptr
+            );
             
             break;
         }
