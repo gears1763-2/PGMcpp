@@ -90,6 +90,43 @@ Model :: Model(ModelInputs model_inputs)
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Model :: addResource(
+///         RenewableType renewable_type,
+///         std::string path_2_resource_data,
+///         int resource_key
+///     )
+///
+/// \brief A method to add a renewable resource time series to the Model.
+///
+/// \param renewable_type The type of renewable resource being added to the Model.
+///
+/// \param path_2_resource_data A string defining the path (either relative or absolute) to the given resource time series.
+///
+/// \param resource_key A key used to index into the Resources object, used to associate Renewable assets with the corresponding resource.
+///
+
+void Model :: addResource(
+    RenewableType renewable_type,
+    std::string path_2_resource_data,
+    int resource_key
+)
+{
+    resources.addResource(
+        renewable_type,
+        path_2_resource_data,
+        resource_key,
+        &(this->electrical_load)
+    );
+    
+    return;
+}   /* addResource() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn void Model :: reset(void)
 ///
 /// \brief Method which resets the model for use in assessing a new candidate microgrid

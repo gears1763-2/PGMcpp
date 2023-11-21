@@ -85,6 +85,8 @@ class Model {
         Model(void);
         Model(ModelInputs);
         
+        void addResource(RenewableType, std::string, int);
+        
         void reset(void);
         void clear(void);
         
