@@ -21,19 +21,19 @@
 #define MODEL_H
 
 
-//  Components
+//  components
 #include "Controller.h"
 #include "ElectricalLoad.h"
 #include "Resources.h"
 
-//  Production
+//  production
 #include "Production/Combustion/Diesel.h"
 #include "Production/Renewable/Solar.h"
 #include "Production/Renewable/Tidal.h"
 #include "Production/Renewable/Wave.h"
 #include "Production/Renewable/Wind.h"
 
-// Storage
+// storage
 #include "Storage/LiIon.h"
 
 

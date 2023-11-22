@@ -20,9 +20,18 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-
+// std and third-party
 #include "std_includes.h"
 #include "../third_party/fast-cpp-csv-parser/csv.h"
+
+//  components
+#include "ElectricalLoad.h"
+#include "Resources.h"
+
+// production and storage
+#include "Production/Combustion/Combustion.h"
+#include "Production/Renewable/Renewable.h"
+#include "Storage/Storage.h"
 
 
 ///
@@ -46,13 +55,33 @@ enum ControlMode {
 ///
 
 class Controller {
+    private:
+        //  1. attributes
+        //...
+        
+        
+        //  2. methods
+        void __computeNetLoad(ElectricalLoad*, std::vector<Renewable*>*, Resources*);
+        
+        double __getRenewableProduction(int, double, Renewable*, Resources*);
+        
+        
     public:
         //  1. attributes
         ControlMode control_mode;
         
+        std::vector<double> net_load_vec_kW;
+        
         
         //  2. methods
         Controller(void);
+        
+        void init(
+            ElectricalLoad*,
+            std::vector<Renewable*>*,
+            Resources*,
+            std::vector<Combustion*>*
+        );
         
         void clear(void);
         

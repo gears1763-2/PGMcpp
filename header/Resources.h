@@ -21,10 +21,15 @@
 #define RESOURCES_H
 
 
+// std and third-party
 #include "std_includes.h"
-#include "ElectricalLoad.h"
-#include "Production/Renewable/Renewable.h"
 #include "../third_party/fast-cpp-csv-parser/csv.h"
+
+// components
+#include "ElectricalLoad.h"
+
+// production
+#include "Production/Renewable/Renewable.h"
 
 
 ///
