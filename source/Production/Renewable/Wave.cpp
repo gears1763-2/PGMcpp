@@ -35,7 +35,7 @@ void Wave :: __checkInputs(WaveInputs wave_inputs)
     
     //  1. check design_significant_wave_height_m
     if (wave_inputs.design_significant_wave_height_m <= 0) {
-        std::string error_str = "ERROR: Wave():\t";
+        std::string error_str = "ERROR:  Wave():  ";
         error_str += "WaveInputs::design_significant_wave_height_m must be > 0";
         
         #ifdef _WIN32
@@ -47,7 +47,7 @@ void Wave :: __checkInputs(WaveInputs wave_inputs)
     
     //  2. check design_energy_period_s
     if (wave_inputs.design_energy_period_s <= 0) {
-        std::string error_str = "ERROR: Wave():\t";
+        std::string error_str = "ERROR:  Wave():  ";
         error_str += "WaveInputs::design_energy_period_s must be > 0";
         
         #ifdef _WIN32

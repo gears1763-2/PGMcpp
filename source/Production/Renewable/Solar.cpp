@@ -38,7 +38,7 @@ void Solar :: __checkInputs(SolarInputs solar_inputs)
         solar_inputs.derating < 0 or
         solar_inputs.derating > 1
     ) {
-        std::string error_str = "ERROR: Solar():\t";
+        std::string error_str = "ERROR:  Solar():  ";
         error_str += "SolarInputs::derating must be in the closed interval [0, 1]";
         
         #ifdef _WIN32

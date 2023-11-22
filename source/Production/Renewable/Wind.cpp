@@ -35,7 +35,7 @@ void Wind :: __checkInputs(WindInputs wind_inputs)
     
     //  1. check design_speed_ms
     if (wind_inputs.design_speed_ms <= 0) {
-        std::string error_str = "ERROR: Wind():\t";
+        std::string error_str = "ERROR:  Wind():  ";
         error_str += "WindInputs::design_speed_ms must be > 0";
         
         #ifdef _WIN32

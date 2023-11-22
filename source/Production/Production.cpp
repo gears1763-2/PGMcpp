@@ -35,7 +35,7 @@ void Production :: __checkInputs(int n_points, ProductionInputs production_input
     
     //  1. check n_points
     if (n_points <= 0) {
-        std::string error_str = "ERROR: Production():\tn_points must be > 0";
+        std::string error_str = "ERROR:  Production():  n_points must be > 0";
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;
@@ -46,7 +46,7 @@ void Production :: __checkInputs(int n_points, ProductionInputs production_input
     
     //  2. check capacity_kW
     if (production_inputs.capacity_kW <= 0) {
-        std::string error_str = "ERROR: Production():\t";
+        std::string error_str = "ERROR:  Production():  ";
         error_str += "ProductionInputs::capacity_kW must be > 0";
         
         #ifdef _WIN32
@@ -58,7 +58,7 @@ void Production :: __checkInputs(int n_points, ProductionInputs production_input
     
     //  3. check replace_running_hrs
     if (production_inputs.replace_running_hrs <= 0) {
-        std::string error_str = "ERROR: Production():\t";
+        std::string error_str = "ERROR:  Production():  ";
         error_str += "ProductionInputs::replace_running_hrs must be > 0";
         
         #ifdef _WIN32

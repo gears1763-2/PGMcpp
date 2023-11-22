@@ -35,7 +35,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  1. check fuel_cost_L
     if (diesel_inputs.fuel_cost_L < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::fuel_cost_L must be >= 0";
         
         #ifdef _WIN32
@@ -47,7 +47,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  2. check CO2_emissions_intensity_kgL
     if (diesel_inputs.CO2_emissions_intensity_kgL < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::CO2_emissions_intensity_kgL must be >= 0";
         
         #ifdef _WIN32
@@ -59,7 +59,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  3. check CO_emissions_intensity_kgL
         if (diesel_inputs.CO_emissions_intensity_kgL < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::CO_emissions_intensity_kgL must be >= 0";
         
         #ifdef _WIN32
@@ -71,7 +71,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  4. check NOx_emissions_intensity_kgL
     if (diesel_inputs.NOx_emissions_intensity_kgL < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::NOx_emissions_intensity_kgL must be >= 0";
         
         #ifdef _WIN32
@@ -83,7 +83,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  5. check SOx_emissions_intensity_kgL
     if (diesel_inputs.SOx_emissions_intensity_kgL < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::SOx_emissions_intensity_kgL must be >= 0";
         
         #ifdef _WIN32
@@ -95,7 +95,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  6. check CH4_emissions_intensity_kgL
     if (diesel_inputs.CH4_emissions_intensity_kgL < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::CH4_emissions_intensity_kgL must be >= 0";
         
         #ifdef _WIN32
@@ -107,7 +107,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  7. check PM_emissions_intensity_kgL
     if (diesel_inputs.PM_emissions_intensity_kgL < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::PM_emissions_intensity_kgL must be >= 0";
         
         #ifdef _WIN32
@@ -119,7 +119,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  8. check minimum_load_ratio
     if (diesel_inputs.minimum_load_ratio < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::minimum_load_ratio must be >= 0";
         
         #ifdef _WIN32
@@ -131,7 +131,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  9. check minimum_runtime_hrs
     if (diesel_inputs.minimum_runtime_hrs < 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::minimum_runtime_hrs must be >= 0";
         
         #ifdef _WIN32
@@ -143,7 +143,7 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
     
     //  10. check replace_running_hrs
     if (diesel_inputs.replace_running_hrs <= 0) {
-        std::string error_str = "ERROR: Diesel():\t";
+        std::string error_str = "ERROR:  Diesel():  ";
         error_str += "DieselInputs::replace_running_hrs must be > 0";
         
         #ifdef _WIN32

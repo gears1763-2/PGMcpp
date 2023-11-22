@@ -35,7 +35,7 @@ void Tidal :: __checkInputs(TidalInputs tidal_inputs)
     
     //  1. check design_speed_ms
     if (tidal_inputs.design_speed_ms <= 0) {
-        std::string error_str = "ERROR: Tidal():\t";
+        std::string error_str = "ERROR:  Tidal():  ";
         error_str += "TidalInputs::design_speed_ms must be > 0";
         
         #ifdef _WIN32

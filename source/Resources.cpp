@@ -143,8 +143,11 @@ void Resources :: __checkTimePoint(
     
     if (time_received_hrs != time_expected_hrs) {
         std::string error_str = "ERROR:  Resources::addResource():  ";
-        error_str += "the given resource time series does not align with the ";
-        error_str += "previously given electrical load time series";
+        error_str += "the given resource time series at ";
+        error_str += path_2_resource_data;
+        error_str += " does not align with the ";
+        error_str += "previously given electrical load time series at ";
+        error_str += electrical_load_ptr->path_2_electrical_load_time_series;
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;
@@ -171,8 +174,11 @@ void Resources :: __throwLengthError(
      */
     
     std::string error_str = "ERROR:  Resources::addResource():  ";
-    error_str += "the given resource time series is not the same length as the ";
-    error_str += "previously given electrical load time series";
+    error_str += "the given resource time series at ";
+    error_str += path_2_resource_data;
+    error_str += " is not the same length as the previously given electrical";
+    error_str += " load time series at ";
+    error_str += electrical_load_ptr->path_2_electrical_load_time_series;
     
     #ifdef _WIN32
         std::cout << error_str << std::endl;
