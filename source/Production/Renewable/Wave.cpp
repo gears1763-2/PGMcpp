@@ -358,7 +358,7 @@ double Wave :: computeProductionkW(
             break;
         }
         
-        default: {   // default to PARABOLOID
+        default: {   // default to WavePowerProductionModel :: PARABOLOID
             production_kW = this->__computeParaboloidProductionkW(
                 timestep,
                 dt_hrs,

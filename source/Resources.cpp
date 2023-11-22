@@ -27,14 +27,45 @@
 
 // ---------------------------------------------------------------------------------- //
 
-void Resources :: __checkResourceKey1D(int resource_key) {
+void Resources :: __checkResourceKey1D(
+    int resource_key,
+    RenewableType renewable_type
+)
+{
     /*
      *  Helper method (private) to check if given resource key (1D) is already in use.
      */
     
     if (this->resource_map_1D.count(resource_key) > 0) {
-        std::string error_str = "ERROR: Resources::__checkResourceKey1D():\t";
-        error_str += "resource key ";
+        std::string error_str = "ERROR:  Resources::addResource(";
+        
+        switch (renewable_type) {
+            case (RenewableType :: SOLAR): {
+                error_str += "SOLAR):  ";
+                
+                break;
+            }
+            
+            case (RenewableType :: TIDAL): {
+                error_str += "TIDAL):  ";
+                
+                break;
+            }
+            
+            case (RenewableType :: WIND): {
+                error_str += "WIND):  ";
+                
+                break;
+            }
+            
+            default: {
+                // do nothing!
+                
+                break;
+            }
+        }
+        
+        error_str += "resource key (1D) ";
         error_str += std::to_string(resource_key);
         error_str += " is already in use";
         
@@ -53,14 +84,33 @@ void Resources :: __checkResourceKey1D(int resource_key) {
 
 // ---------------------------------------------------------------------------------- //
 
-void Resources :: __checkResourceKey2D(int resource_key) {
+void Resources :: __checkResourceKey2D(
+    int resource_key,
+    RenewableType renewable_type
+)
+{
     /*
      *  Helper method (private) to check if given resource key (2D) is already in use.
      */
     
     if (this->resource_map_2D.count(resource_key) > 0) {
-        std::string error_str = "ERROR: Resources::__checkResourceKey2D():\t";
-        error_str += "resource key ";
+        std::string error_str = "ERROR:  Resources::addResource(";
+        
+        switch (renewable_type) {
+            case (RenewableType :: WAVE): {
+                error_str += "WAVE):  ";
+                
+                break;
+            }
+            
+            default: {
+                // do nothing!
+                
+                break;
+            }
+        }
+        
+        error_str += "resource key (2D) ";
         error_str += std::to_string(resource_key);
         error_str += " is already in use";
         
@@ -79,7 +129,12 @@ void Resources :: __checkResourceKey2D(int resource_key) {
 
 // ---------------------------------------------------------------------------------- //
 
-void Resources :: __checkTimePoint(double time_received_hrs, double time_expected_hrs)
+void Resources :: __checkTimePoint(
+    double time_received_hrs,
+    double time_expected_hrs,
+    std::string path_2_resource_data,
+    ElectricalLoad* electrical_load_ptr
+)
 {
     /*
      *  Helper method (private) to check received time point against expected time
@@ -87,7 +142,7 @@ void Resources :: __checkTimePoint(double time_received_hrs, double time_expecte
      */
     
     if (time_received_hrs != time_expected_hrs) {
-        std::string error_str = "ERROR: Resources::__checkTimePoint():\t";
+        std::string error_str = "ERROR:  Resources::addResource():  ";
         error_str += "the given resource time series does not align with the ";
         error_str += "previously given electrical load time series";
         
@@ -99,9 +154,34 @@ void Resources :: __checkTimePoint(double time_received_hrs, double time_expecte
     }
     
     return;
-}
+}   /* __checkTimePoint() */
 
 // ---------------------------------------------------------------------------------- //
+
+
+// ---------------------------------------------------------------------------------- //
+
+void Resources :: __throwLengthError(
+    std::string path_2_resource_data,
+    ElectricalLoad* electrical_load_ptr
+)
+{
+    /*
+     *  Helper method (private) to throw data length error.
+     */
+    
+    std::string error_str = "ERROR:  Resources::addResource():  ";
+    error_str += "the given resource time series is not the same length as the ";
+    error_str += "previously given electrical load time series";
+    
+    #ifdef _WIN32
+        std::cout << error_str << std::endl;
+    #endif
+
+    throw std::runtime_error(error_str);
+    
+    return;
+}   /* __throwLengthError() */
 
 
 // ---------------------------------------------------------------------------------- //
@@ -109,7 +189,7 @@ void Resources :: __checkTimePoint(double time_received_hrs, double time_expecte
 void Resources :: __readSolarResource(
     std::string path_2_resource_data,
     int resource_key,
-    ElectricalLoad* electrcial_load_ptr
+    ElectricalLoad* electrical_load_ptr
 )
 {
     /*
@@ -117,7 +197,54 @@ void Resources :: __readSolarResource(
      *  Resources.
      */
     
-    //...
+    //  1. init CSV reader, record path
+    io::CSVReader<2> CSV(path_2_resource_data);
+    
+    CSV.read_header(
+        io::ignore_extra_column,
+        "Time (since start of data) [hrs]",
+        "Solar GHI [kW/m2]"
+    );
+    
+    this->path_map_1D.insert(
+        std::pair<int, std::string>(resource_key, path_2_resource_data)
+    );
+    
+    //  2. init map element
+    this->resource_map_1D.insert(
+        std::pair<int, std::vector<double>>(resource_key, {})
+    );
+    this->resource_map_1D[resource_key].resize(electrical_load_ptr->n_points, 0);
+    
+    
+    //  3. read in resource data, check against time series (point-wise and length)
+    int n_points = 0;
+    double time_hrs = 0;
+    double time_expected_hrs = 0;
+    double solar_resource_kWm2 = 0;
+    
+    while (CSV.read_row(time_hrs, solar_resource_kWm2)) {
+        if (n_points > electrical_load_ptr->n_points) {
+            this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+        }
+        
+        time_expected_hrs = electrical_load_ptr->time_vec_hrs[n_points];
+        this->__checkTimePoint(
+            time_hrs,
+            time_expected_hrs,
+            path_2_resource_data,
+            electrical_load_ptr
+        );
+        
+        this->resource_map_1D[resource_key][n_points] = solar_resource_kWm2;
+        
+        n_points++;
+    }
+    
+    //  4. check data length
+    if (n_points != electrical_load_ptr->n_points) {
+        this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+    }
     
     return;
 }   /* __readSolarResource() */
@@ -130,7 +257,7 @@ void Resources :: __readSolarResource(
 void Resources :: __readTidalResource(
     std::string path_2_resource_data,
     int resource_key,
-    ElectricalLoad* electrcial_load_ptr
+    ElectricalLoad* electrical_load_ptr
 )
 {
     /*
@@ -138,7 +265,54 @@ void Resources :: __readTidalResource(
      *  Resources.
      */
     
-    //...
+    //  1. init CSV reader, record path
+    io::CSVReader<2> CSV(path_2_resource_data);
+    
+    CSV.read_header(
+        io::ignore_extra_column,
+        "Time (since start of data) [hrs]",
+        "Tidal Speed (hub depth) [m/s]"
+    );
+    
+    this->path_map_1D.insert(
+        std::pair<int, std::string>(resource_key, path_2_resource_data)
+    );
+    
+    //  2. init map element
+    this->resource_map_1D.insert(
+        std::pair<int, std::vector<double>>(resource_key, {})
+    );
+    this->resource_map_1D[resource_key].resize(electrical_load_ptr->n_points, 0);
+    
+    
+    //  3. read in resource data, check against time series (point-wise and length)
+    int n_points = 0;
+    double time_hrs = 0;
+    double time_expected_hrs = 0;
+    double tidal_resource_ms = 0;
+    
+    while (CSV.read_row(time_hrs, tidal_resource_ms)) {
+        if (n_points > electrical_load_ptr->n_points) {
+            this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+        }
+        
+        time_expected_hrs = electrical_load_ptr->time_vec_hrs[n_points];
+        this->__checkTimePoint(
+            time_hrs,
+            time_expected_hrs,
+            path_2_resource_data,
+            electrical_load_ptr
+        );
+        
+        this->resource_map_1D[resource_key][n_points] = tidal_resource_ms;
+        
+        n_points++;
+    }
+    
+    //  4. check data length
+    if (n_points != electrical_load_ptr->n_points) {
+        this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+    }
     
     return;
 }   /* __readTidalResource() */
@@ -151,7 +325,7 @@ void Resources :: __readTidalResource(
 void Resources :: __readWaveResource(
     std::string path_2_resource_data,
     int resource_key,
-    ElectricalLoad* electrcial_load_ptr
+    ElectricalLoad* electrical_load_ptr
 )
 {
     /*
@@ -159,7 +333,57 @@ void Resources :: __readWaveResource(
      *  Resources.
      */
     
-    //...
+    //  1. init CSV reader, record path
+    io::CSVReader<3> CSV(path_2_resource_data);
+    
+    CSV.read_header(
+        io::ignore_extra_column,
+        "Time (since start of data) [hrs]",
+        "Significant Wave Height [m]",
+        "Energy Period [s]"
+    );
+    
+    this->path_map_2D.insert(
+        std::pair<int, std::string>(resource_key, path_2_resource_data)
+    );
+    
+    //  2. init map element
+    this->resource_map_2D.insert(
+        std::pair<int, std::vector<std::vector<double>>>(resource_key, {})
+    );
+    this->resource_map_2D[resource_key].resize(electrical_load_ptr->n_points, {0, 0});
+    
+    
+    //  3. read in resource data, check against time series (point-wise and length)
+    int n_points = 0;
+    double time_hrs = 0;
+    double time_expected_hrs = 0;
+    double significant_wave_height_m = 0;
+    double energy_period_s = 0;
+    
+    while (CSV.read_row(time_hrs, significant_wave_height_m, energy_period_s)) {
+        if (n_points > electrical_load_ptr->n_points) {
+            this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+        }
+        
+        time_expected_hrs = electrical_load_ptr->time_vec_hrs[n_points];
+        this->__checkTimePoint(
+            time_hrs,
+            time_expected_hrs,
+            path_2_resource_data,
+            electrical_load_ptr
+        );
+        
+        this->resource_map_2D[resource_key][n_points][0] = significant_wave_height_m;
+        this->resource_map_2D[resource_key][n_points][1] = energy_period_s;
+        
+        n_points++;
+    }
+    
+    //  4. check data length
+    if (n_points != electrical_load_ptr->n_points) {
+        this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+    }
     
     return;
 }   /* __readWaveResource() */
@@ -172,7 +396,7 @@ void Resources :: __readWaveResource(
 void Resources :: __readWindResource(
     std::string path_2_resource_data,
     int resource_key,
-    ElectricalLoad* electrcial_load_ptr
+    ElectricalLoad* electrical_load_ptr
 )
 {
     /*
@@ -180,7 +404,54 @@ void Resources :: __readWindResource(
      *  Resources.
      */
     
-    //...
+    //  1. init CSV reader, record path
+    io::CSVReader<2> CSV(path_2_resource_data);
+    
+    CSV.read_header(
+        io::ignore_extra_column,
+        "Time (since start of data) [hrs]",
+        "Wind Speed (hub height) [m/s]"
+    );
+    
+    this->path_map_1D.insert(
+        std::pair<int, std::string>(resource_key, path_2_resource_data)
+    );
+    
+    //  2. init map element
+    this->resource_map_1D.insert(
+        std::pair<int, std::vector<double>>(resource_key, {})
+    );
+    this->resource_map_1D[resource_key].resize(electrical_load_ptr->n_points, 0);
+    
+    
+    //  3. read in resource data, check against time series (point-wise and length)
+    int n_points = 0;
+    double time_hrs = 0;
+    double time_expected_hrs = 0;
+    double wind_resource_ms = 0;
+    
+    while (CSV.read_row(time_hrs, wind_resource_ms)) {
+        if (n_points > electrical_load_ptr->n_points) {
+            this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+        }
+        
+        time_expected_hrs = electrical_load_ptr->time_vec_hrs[n_points];
+        this->__checkTimePoint(
+            time_hrs,
+            time_expected_hrs,
+            path_2_resource_data,
+            electrical_load_ptr
+        );
+        
+        this->resource_map_1D[resource_key][n_points] = wind_resource_ms;
+        
+        n_points++;
+    }
+    
+    //  4. check data length
+    if (n_points != electrical_load_ptr->n_points) {
+        this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+    }
     
     return;
 }   /* __readWindResource() */
@@ -243,7 +514,7 @@ void Resources :: addResource(
 {
     switch (renewable_type) {
         case (RenewableType :: SOLAR): {
-            this->__checkResourceKey1D(resource_key);
+            this->__checkResourceKey1D(resource_key, renewable_type);
             
             this->__readSolarResource(
                 path_2_resource_data,
@@ -255,7 +526,7 @@ void Resources :: addResource(
         }
         
         case (RenewableType :: TIDAL): {
-            this->__checkResourceKey1D(resource_key);
+            this->__checkResourceKey1D(resource_key, renewable_type);
             
             this->__readTidalResource(
                 path_2_resource_data,
@@ -267,7 +538,7 @@ void Resources :: addResource(
         }
         
         case (RenewableType :: WAVE): {
-            this->__checkResourceKey2D(resource_key);
+            this->__checkResourceKey2D(resource_key, renewable_type);
             
             this->__readWaveResource(
                 path_2_resource_data,
@@ -279,7 +550,7 @@ void Resources :: addResource(
         }
         
         case (RenewableType :: WIND): {
-            this->__checkResourceKey1D(resource_key);
+            this->__checkResourceKey1D(resource_key, renewable_type);
             
             this->__readWindResource(
                 path_2_resource_data,

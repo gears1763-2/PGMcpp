@@ -275,7 +275,7 @@ double Wind :: computeProductionkW(
             break;
         }
         
-        default: {   // default to WIND_POWER_EXPONENTIAL
+        default: {   // default to WindPowerProductionModel :: WIND_POWER_EXPONENTIAL
             production_kW = this->__computeExponentialProductionkW(
                 timestep,
                 dt_hrs,

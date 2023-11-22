@@ -41,9 +41,10 @@ class Resources {
         
         
         //  2. methods
-        void __checkResourceKey1D(int);
-        void __checkResourceKey2D(int);
-        void __checkTimePoint(double, double);
+        void __checkResourceKey1D(int, RenewableType);
+        void __checkResourceKey2D(int, RenewableType);
+        void __checkTimePoint(double, double, std::string, ElectricalLoad*);
+        void __throwLengthError(std::string, ElectricalLoad*);
         
         void __readSolarResource(std::string, int, ElectricalLoad*);
         void __readTidalResource(std::string, int, ElectricalLoad*);

@@ -339,7 +339,7 @@ double Tidal :: computeProductionkW(
             break;
         }
         
-        default: {   // default to CUBIC
+        default: {   // default to TidalPowerProductionModel :: CUBIC
             production_kW = this->__computeCubicProductionkW(
                 timestep,
                 dt_hrs,
