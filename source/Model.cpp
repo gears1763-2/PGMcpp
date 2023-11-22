@@ -26,6 +26,8 @@
 
 // ======== PRIVATE ================================================================= //
 
+// ---------------------------------------------------------------------------------- //
+
 void Model :: __checkInputs(ModelInputs)
 {
     /*
@@ -36,6 +38,8 @@ void Model :: __checkInputs(ModelInputs)
     
     return;
 }   /* __checkInputs() */
+
+// ---------------------------------------------------------------------------------- //
 
 // ======== END PRIVATE ============================================================= //
 
@@ -87,6 +91,28 @@ Model :: Model(ModelInputs model_inputs)
 // ---------------------------------------------------------------------------------- //
 
 
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: addDiesel(DieselInputs diesel_inputs)
+///
+/// \brief Method to add a Diesel asset to the Model.
+///
+
+void Model :: addDiesel(DieselInputs diesel_inputs)
+{
+    Combustion* diesel_ptr = new Diesel(this->electrical_load.n_points, diesel_inputs);
+    
+    this->combustion_ptr_vec.push_back(diesel_ptr);
+    
+    return;
+}   /* addDiesel() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
 // ---------------------------------------------------------------------------------- //
 
 ///
@@ -124,6 +150,118 @@ void Model :: addResource(
 // ---------------------------------------------------------------------------------- //
 
 
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: addSolar(SolarInputs solar_inputs)
+///
+/// \brief Method to add a Solar asset to the Model.
+///
+
+void Model :: addSolar(SolarInputs solar_inputs)
+{
+    Renewable* solar_ptr = new Solar(this->electrical_load.n_points, solar_inputs);
+    
+    this->renewable_ptr_vec.push_back(solar_ptr);
+    
+    return;
+}   /* addSolar() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: addTidal(TidalInputs tidal_inputs)
+///
+/// \brief Method to add a Tidal asset to the Model.
+///
+
+void Model :: addTidal(TidalInputs tidal_inputs)
+{
+    Renewable* tidal_ptr = new Tidal(this->electrical_load.n_points, tidal_inputs);
+    
+    this->renewable_ptr_vec.push_back(tidal_ptr);
+    
+    return;
+}   /* addTidal() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: addWave(WaveInputs wave_inputs)
+///
+/// \brief Method to add a Wave asset to the Model.
+///
+
+void Model :: addWave(WaveInputs wave_inputs)
+{
+    Renewable* wave_ptr = new Wave(this->electrical_load.n_points, wave_inputs);
+    
+    this->renewable_ptr_vec.push_back(wave_ptr);
+    
+    return;
+}   /* addWave() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: addWind(WindInputs wind_inputs)
+///
+/// \brief Method to add a Wind asset to the Model.
+///
+
+void Model :: addWind(WindInputs wind_inputs)
+{
+    Renewable* wind_ptr = new Wind(this->electrical_load.n_points, wind_inputs);
+    
+    this->renewable_ptr_vec.push_back(wind_ptr);
+    
+    return;
+}   /* addWind() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: run(void)
+///
+/// \brief A method to run the Model.
+///
+
+void Model :: run(void)
+{
+    // 1. init Controller
+    this->controller.init(
+        &(this->electrical_load),
+        &(this->renewable_ptr_vec),
+        &(this->resources),
+        &(this->combustion_ptr_vec)
+    );
+    
+    //...
+    
+    return;
+}   /* run() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
 // ---------------------------------------------------------------------------------- //
 
 ///
@@ -159,6 +297,7 @@ void Model :: reset(void)
 // ---------------------------------------------------------------------------------- //
 
 
+
 // ---------------------------------------------------------------------------------- //
 
 ///
@@ -172,7 +311,7 @@ void Model :: clear(void)
     //  1. reset
     this->reset();
     
-    //  2. clear remaining attributes
+    //  2. clear components
     controller.clear();
     electrical_load.clear();
     resources.clear();
@@ -181,6 +320,7 @@ void Model :: clear(void)
 }   /* clear() */
 
 // ---------------------------------------------------------------------------------- //
+
 
 
 // ---------------------------------------------------------------------------------- //

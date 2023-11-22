@@ -72,11 +72,11 @@ class Model {
         
     public:
         //  1. attributes
-        Controller controller;  ///< Controller component of Model
+        Controller controller; ///< Controller component of Model
         ElectricalLoad electrical_load; ///< ElectricalLoad component of Model
-        Resources resources;    ///< Resources component of Model
+        Resources resources; ///< Resources component of Model
         
-        std::vector<Combustion*> combustion_ptr_vec;    ///< A vector of pointers to the various Combustion assets in the Model
+        std::vector<Combustion*> combustion_ptr_vec; ///< A vector of pointers to the various Combustion assets in the Model
         std::vector<Renewable*> renewable_ptr_vec;  ///< A vector of pointers to the various Renewable assets in the Model
         std::vector<Storage*> storage_ptr_vec;  ///< A vector of pointers to the various Storage assets in the Model
         
@@ -85,7 +85,18 @@ class Model {
         Model(void);
         Model(ModelInputs);
         
+        void addDiesel(DieselInputs);
+        
         void addResource(RenewableType, std::string, int);
+        
+        void addSolar(SolarInputs);
+        void addTidal(TidalInputs);
+        void addWave(WaveInputs);
+        void addWind(WindInputs);
+        
+        //void addLiIon(LiIonInputs);
+        
+        void run(void);
         
         void reset(void);
         void clear(void);

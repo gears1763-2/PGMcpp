@@ -416,7 +416,7 @@ for (size_t i = 0; i < expected_significant_wave_height_vec_m.size(); i++) {
 }
 
 
-int wind_resource_key = 2;
+int wind_resource_key = 3;
 std::string path_2_wind_resource_data =
     "data/test/wind_speed_peak-25ms_1yr_dt-1hr.csv";
 

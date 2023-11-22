@@ -202,6 +202,221 @@ for (int i = 0; i < 48; i++) {
 
 // ======== METHODS ================================================================= //
 
+//  add Solar resource
+int solar_resource_key = 0;
+std::string path_2_solar_resource_data =
+    "data/test/solar_GHI_peak-1kWm2_1yr_dt-1hr.csv";
+
+test_model.addResource(
+    RenewableType :: SOLAR,
+    path_2_solar_resource_data,
+    solar_resource_key
+);
+
+std::vector<double> expected_solar_resource_vec_kWm2 = {
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8.51702662684015E-05,
+    0.000348341567045,
+    0.00213793728593,
+    0.004099863613322,
+    0.000997135230553,
+    0.009534527624657,
+    0.022927996790616,
+    0.0136071715294,
+    0.002535134127751,
+    0.005206897515821,
+    0.005627658648597,
+    0.000701186722215,
+    0.00017119827089,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0.000141055102242,
+    0.00084525014743,
+    0.024893647822702,
+    0.091245556190749,
+    0.158722176731637,
+    0.152859680515876,
+    0.149922903895116,
+    0.13049996570866,
+    0.03081254222795,
+    0.001218928911125,
+    0.000206092647423,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+};
+
+for (size_t i = 0; i < expected_solar_resource_vec_kWm2.size(); i++) {
+    testFloatEquals(
+        test_model.resources.resource_map_1D[solar_resource_key][i],
+        expected_solar_resource_vec_kWm2[i],
+        __FILE__,
+        __LINE__
+    );
+}
+
+
+//  add Tidal resource
+int tidal_resource_key = 1;
+std::string path_2_tidal_resource_data =
+    "data/test/tidal_speed_peak-3ms_1yr_dt-1hr.csv";
+
+test_model.addResource(
+    RenewableType :: TIDAL,
+    path_2_tidal_resource_data,
+    tidal_resource_key
+);
+
+
+//  add Wave resource
+int wave_resource_key = 2;
+std::string path_2_wave_resource_data =
+    "data/test/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr.csv";
+
+test_model.addResource(
+    RenewableType :: WAVE,
+    path_2_wave_resource_data,
+    wave_resource_key
+);
+
+
+//  add Wind resource
+int wind_resource_key = 3;
+std::string path_2_wind_resource_data =
+    "data/test/wind_speed_peak-25ms_1yr_dt-1hr.csv";
+
+test_model.addResource(
+    RenewableType :: WIND,
+    path_2_wind_resource_data,
+    wind_resource_key
+);
+
+
+//  add Diesel asset
+DieselInputs diesel_inputs;
+test_model.addDiesel(diesel_inputs);
+
+testFloatEquals(
+    test_model.combustion_ptr_vec.size(),
+    1,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.combustion_ptr_vec[0]->type,
+    CombustionType :: DIESEL,
+    __FILE__,
+    __LINE__
+);
+
+
+//  add Solar asset
+SolarInputs solar_inputs;
+solar_inputs.resource_key = solar_resource_key;
+
+test_model.addSolar(solar_inputs);
+
+testFloatEquals(
+    test_model.renewable_ptr_vec.size(),
+    1,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.renewable_ptr_vec[0]->type,
+    RenewableType :: SOLAR,
+    __FILE__,
+    __LINE__
+);
+
+
+//  add Tidal asset
+TidalInputs tidal_inputs;
+tidal_inputs.resource_key = tidal_resource_key;
+
+test_model.addTidal(tidal_inputs);
+
+testFloatEquals(
+    test_model.renewable_ptr_vec.size(),
+    2,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.renewable_ptr_vec[1]->type,
+    RenewableType :: TIDAL,
+    __FILE__,
+    __LINE__
+);
+
+
+//  add Wave asset
+WaveInputs wave_inputs;
+wave_inputs.resource_key = wave_resource_key;
+
+test_model.addWave(wave_inputs);
+
+testFloatEquals(
+    test_model.renewable_ptr_vec.size(),
+    3,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.renewable_ptr_vec[2]->type,
+    RenewableType :: WAVE,
+    __FILE__,
+    __LINE__
+);
+
+
+//  add Wind asset
+WindInputs wind_inputs;
+wind_inputs.resource_key = wind_resource_key;
+
+test_model.addWind(wind_inputs);
+
+testFloatEquals(
+    test_model.renewable_ptr_vec.size(),
+    4,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.renewable_ptr_vec[3]->type,
+    RenewableType :: WIND,
+    __FILE__,
+    __LINE__
+);
+
+
+//  run
+test_model.run();
+
+
 //...
 
 // ======== END METHODS ============================================================= //
