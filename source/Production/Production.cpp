@@ -27,12 +27,18 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Production :: __checkInputs(int n_points, ProductionInputs production_inputs)
+///
+/// \brief Helper method to check inputs to the Production constructor.
+///
+/// \param n_points The number of points in the modelling time series.
+///
+/// \param production_inputs A structure of Production constructor inputs.
+///
+
 void Production :: __checkInputs(int n_points, ProductionInputs production_inputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Production constructor.
-     */
-    
     //  1. check n_points
     if (n_points <= 0) {
         std::string error_str = "ERROR:  Production():  n_points must be > 0";
@@ -77,20 +83,31 @@ void Production :: __checkInputs(int n_points, ProductionInputs production_input
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Production :: __computeRealDiscountAnnual(
+///         double nominal_inflation_annual,
+///         double nominal_discount_annual
+///     )
+///
+/// \brief Helper method to compute the real, annual discount rate to be used
+///     in computing model economics. This enables application of the discount factor
+///     approach.
+///
+/// Ref: \cite HOMER_real_discount_rate\n
+/// Ref: \cite HOMER_discount_factor\n
+///
+/// \param nominal_inflation_annual The nominal, annual inflation rate to use in computing model economics.
+///
+/// \param nominal_discount_annual The nominal, annual discount rate to use in computing model economics.
+///
+/// \return The real, annual discount rate to use in computing model economics.
+///
+
 double Production :: __computeRealDiscountAnnual(
     double nominal_inflation_annual,
     double nominal_discount_annual
 )
 {
-    /*
-     *  Helper method (private) to compute the real, annual discount rate to be used
-     *  in computing model economics. This enables application of the discount factor
-     *  approach.
-     *
-     *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
-     *  ref: https://www.homerenergy.com/products/pro/docs/3.11/discount_factor.html
-     */
-    
     double real_discount_annual = nominal_discount_annual - nominal_inflation_annual;
     real_discount_annual /= 1 + nominal_inflation_annual;
     
@@ -103,13 +120,17 @@ double Production :: __computeRealDiscountAnnual(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Production :: __handleReplacement(int timestep)
+///
+/// \brief Helper method to handle asset replacement and capital cost incursion,
+///     if applicable.
+///
+/// \param timestep The current time step of the Model run.
+///
+
 void Production :: __handleReplacement(int timestep)
 {
-    /*
-     *  Helper method (private) to handle asset replacement and capital cost incursion,
-     *  if applicable.
-     */
-    
     if (
         this->running_hours >= (this->n_replacements + 1) * this->replace_running_hrs
     ) {

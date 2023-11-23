@@ -416,8 +416,14 @@ testFloatEquals(
 //  run
 test_model.run();
 
-
-//...
+for (int i = 0; i < test_model.electrical_load.n_points; i++) {
+    testLessThanOrEqualTo(
+        test_model.controller.net_load_vec_kW[i],
+        test_model.electrical_load.max_load_kW,
+        __FILE__,
+        __LINE__
+    );
+}
 
 // ======== END METHODS ============================================================= //
 

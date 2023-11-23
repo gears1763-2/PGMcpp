@@ -28,12 +28,16 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Model :: __checkInputs(ModelInputs)
+///
+/// \brief Helper method (private) to check inputs to the Model constructor.
+///
+/// \param model_inputs A structure of Model constructor inputs.
+///
+
 void Model :: __checkInputs(ModelInputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Model constructor.
-     */
-    
     //...
     
     return;
@@ -71,7 +75,7 @@ Model :: Model(void)
 ///
 /// \brief Constructor (intended) for the Model class.
 ///
-/// \param
+/// \param model_inputs A structure of Model constructor inputs.
 ///
 
 Model :: Model(ModelInputs model_inputs)
@@ -98,6 +102,8 @@ Model :: Model(ModelInputs model_inputs)
 /// \fn void Model :: addDiesel(DieselInputs diesel_inputs)
 ///
 /// \brief Method to add a Diesel asset to the Model.
+///
+/// \param diesel_inputs A structure of Diesel constructor inputs.
 ///
 
 void Model :: addDiesel(DieselInputs diesel_inputs)
@@ -158,6 +164,8 @@ void Model :: addResource(
 ///
 /// \brief Method to add a Solar asset to the Model.
 ///
+/// \param solar_inputs A structure of Solar constructor inputs.
+///
 
 void Model :: addSolar(SolarInputs solar_inputs)
 {
@@ -178,6 +186,8 @@ void Model :: addSolar(SolarInputs solar_inputs)
 /// \fn void Model :: addTidal(TidalInputs tidal_inputs)
 ///
 /// \brief Method to add a Tidal asset to the Model.
+///
+/// \param tidal_inputs A structure of Tidal constructor inputs.
 ///
 
 void Model :: addTidal(TidalInputs tidal_inputs)
@@ -200,6 +210,8 @@ void Model :: addTidal(TidalInputs tidal_inputs)
 ///
 /// \brief Method to add a Wave asset to the Model.
 ///
+/// \param wave_inputs A structure of Wave constructor inputs.
+///
 
 void Model :: addWave(WaveInputs wave_inputs)
 {
@@ -220,6 +232,8 @@ void Model :: addWave(WaveInputs wave_inputs)
 /// \fn void Model :: addWind(WindInputs wind_inputs)
 ///
 /// \brief Method to add a Wind asset to the Model.
+///
+/// \param wind_inputs A structure of Wind constructor inputs.
 ///
 
 void Model :: addWind(WindInputs wind_inputs)
@@ -253,7 +267,13 @@ void Model :: run(void)
         &(this->combustion_ptr_vec)
     );
     
-    //...
+    //  2. apply dispatch control
+    this->controller.applyDispatchControl(
+        &(this->electrical_load),
+        &(this->combustion_ptr_vec),
+        &(this->renewable_ptr_vec),
+        &(this->storage_ptr_vec)
+    );
     
     return;
 }   /* run() */

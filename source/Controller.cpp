@@ -28,16 +28,33 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Controller :: __computeNetLoad(
+///         ElectricalLoad* electrical_load_ptr,
+///         std::vector<Renewable*>* renewable_ptr_vec_ptr,
+///         Resources* resources_ptr
+///     )
+///
+/// \brief Helper method to compute and populate the net load vector.
+///
+/// The net load at a given point in time is defined as the load at that point in time,
+/// minus the sum of all Renewable production at that point in time. Therefore, a
+/// negative net load indicates a surplus of Renewable production, and a positive
+/// net load indicates a deficit of Renewable production.
+///
+/// \param electrical_load_ptr A pointer to the ElectricalLoad component of the Model.
+///
+/// \param renewable_ptr_vec_ptr A pointer to the Renewable pointer vector of the Model.
+///
+/// \param resources_ptr A pointer to the Resources component of the Model.
+///
+
 void Controller :: __computeNetLoad(
     ElectricalLoad* electrical_load_ptr,
     std::vector<Renewable*>* renewable_ptr_vec_ptr,
     Resources* resources_ptr
 )
 {
-    /*
-     *  Helper method (private) to compute and populate the net load vector.
-     */
-    
     //  1. init
     this->net_load_vec_kW.resize(electrical_load_ptr->n_points, 0);
     
@@ -86,6 +103,28 @@ void Controller :: __computeNetLoad(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Controller :: __getRenewableProduction(
+///         int timestep,
+///         double dt_hrs,
+///         Renewable* renewable_ptr,
+///         Resources* resources_ptr
+///     )
+///
+/// \brief Helper method to compute the production from the given Renewable asset at
+///     the given point in time.
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param renewable_ptr A pointer to the Renewable asset.
+///
+/// \param resources_ptr A pointer to the Resources component of the Model.
+///
+/// \return The production [kW] of the Renewable asset.
+///
+
 double Controller :: __getRenewableProduction(
     int timestep,
     double dt_hrs,
@@ -93,11 +132,6 @@ double Controller :: __getRenewableProduction(
     Resources* resources_ptr
 )
 {
-    /*
-     *  Helper method (private) to compute the production from the given Renewable
-     *  asset at the given point in time.
-     */
-    
     double production_kW = 0;
     
     switch (renewable_ptr->type) {
@@ -212,6 +246,63 @@ void Controller :: init(
     
     return;
 }   /* init() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Controller :: applyDispatchControl(
+///         ElectricalLoad* electrical_load_ptr,
+///         std::vector<Combustion*>* combustion_ptr_vec_ptr,
+///         std::vector<Renewable*>* renewable_ptr_vec_ptr,
+///         std::vector<Storage*>* storage_ptr_vec_ptr
+///     )
+///
+/// \brief Method to apply dispatch control at every point in the modelling time series.
+///
+/// \param electrical_load_ptr A pointer to the ElectricalLoad component of the Model.
+///
+/// \param combustion_ptr_vec_ptr A pointer to the Combustion pointer vector of the Model.
+///
+/// \param renewable_ptr_vec_ptr A pointer to the Renewable pointer vector of the Model.
+///
+/// \param storage_ptr_vec_ptr A pointer to the Storage pointer vector of the Model.
+///
+
+void Controller :: applyDispatchControl(
+    ElectricalLoad* electrical_load_ptr,
+    std::vector<Combustion*>* combustion_ptr_vec_ptr,
+    std::vector<Renewable*>* renewable_ptr_vec_ptr,
+    std::vector<Storage*>* storage_ptr_vec_ptr
+)
+{
+    for (int i = 0; i < electrical_load_ptr->n_points; i++) {
+        switch (this->control_mode) {
+            case (ControlMode :: LOAD_FOLLOWING): {
+                //this->__applyLoadFollowingControl();
+                
+                break;
+            }
+            
+            case (ControlMode :: CYCLE_CHARGING): {
+                //this->__applyCycleChargingControl();
+                
+                break;
+            }
+            
+            default: {
+                // do nothing!
+                
+                break;
+            }
+        }
+    }
+    
+    return;
+}   /* applyDispatchControl() */
 
 // ---------------------------------------------------------------------------------- //
 

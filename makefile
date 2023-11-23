@@ -27,7 +27,7 @@ OUT_PROJECT = bin/$(PROJECT_NAME).out
 CXX = g++
 
 CXXFLAGS = -std=c++17 -Wall -g -fPIC
-#CXXFLAGS = -O3 -std=c++17 -fPIC
+#CXXFLAGS = -O3 -std=c++17 -Wall -fPIC
 
 LIBS = -lpthread
 
@@ -428,6 +428,10 @@ docs:
 	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on docs/PGMcpp_manual_html.7z docs/html
 	rm -frv docs/html
 	rm -frv docs/latex
+	rm -frv docs/bibTmpDir
+	rm -frv docs/bib2xhtml.pl
+	rm -frv docs/doxygen.bst
+	rm -frv docs/citelist.doc
 
 
 .PHONY: PGMcpp

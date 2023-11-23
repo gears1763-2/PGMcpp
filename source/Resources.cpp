@@ -27,15 +27,22 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Resources :: __checkResourceKey1D(
+///         int resource_key,
+///         RenewableType renewable_type
+///     )
+///
+/// \brief Helper method to check if given resource key (1D) is already in use.
+///
+/// \param resource_key The key associated with the given renewable resource.
+///
+
 void Resources :: __checkResourceKey1D(
     int resource_key,
     RenewableType renewable_type
 )
 {
-    /*
-     *  Helper method (private) to check if given resource key (1D) is already in use.
-     */
-    
     if (this->resource_map_1D.count(resource_key) > 0) {
         std::string error_str = "ERROR:  Resources::addResource(";
         
@@ -84,15 +91,22 @@ void Resources :: __checkResourceKey1D(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Resources :: __checkResourceKey2D(
+///         int resource_key,
+///         RenewableType renewable_type
+///     )
+///
+/// \brief Helper method to check if given resource key (2D) is already in use.
+///
+/// \param resource_key The key associated with the given renewable resource.
+///
+
 void Resources :: __checkResourceKey2D(
     int resource_key,
     RenewableType renewable_type
 )
 {
-    /*
-     *  Helper method (private) to check if given resource key (2D) is already in use.
-     */
-    
     if (this->resource_map_2D.count(resource_key) > 0) {
         std::string error_str = "ERROR:  Resources::addResource(";
         
@@ -129,6 +143,27 @@ void Resources :: __checkResourceKey2D(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Resources :: __checkTimePoint(
+///         double time_received_hrs,
+///         double time_expected_hrs,
+///         std::string path_2_resource_data,
+///         ElectricalLoad* electrical_load_ptr
+///     )
+///
+/// \brief Helper method to check received time point against expected time point.
+///
+/// \param time_received_hrs The point in time received from the given data.
+///
+/// \param time_expected_hrs The point in time expected (this comes from the electrical
+///     load time series).
+///
+/// \param path_2_resource_data The path (either relative or absolute) to the given 
+///     resource time series.
+///
+/// \param electrical_load_ptr A pointer to the Model's ElectricalLoad object.
+///
+
 void Resources :: __checkTimePoint(
     double time_received_hrs,
     double time_expected_hrs,
@@ -136,11 +171,6 @@ void Resources :: __checkTimePoint(
     ElectricalLoad* electrical_load_ptr
 )
 {
-    /*
-     *  Helper method (private) to check received time point against expected time
-     *  point.
-     */
-    
     if (time_received_hrs != time_expected_hrs) {
         std::string error_str = "ERROR:  Resources::addResource():  ";
         error_str += "the given resource time series at ";
@@ -164,15 +194,25 @@ void Resources :: __checkTimePoint(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Resources :: __throwLengthError(
+///         std::string path_2_resource_data,
+///         ElectricalLoad* electrical_load_ptr
+///     )
+///
+/// \brief Helper method to throw data length error.
+///
+/// \param path_2_resource_data The path (either relative or absolute) to the given 
+///     resource time series.
+///
+/// \param electrical_load_ptr A pointer to the Model's ElectricalLoad object.
+///
+
 void Resources :: __throwLengthError(
     std::string path_2_resource_data,
     ElectricalLoad* electrical_load_ptr
 )
 {
-    /*
-     *  Helper method (private) to throw data length error.
-     */
-    
     std::string error_str = "ERROR:  Resources::addResource():  ";
     error_str += "the given resource time series at ";
     error_str += path_2_resource_data;
@@ -192,17 +232,29 @@ void Resources :: __throwLengthError(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Resources :: __readSolarResource(
+///         std::string path_2_resource_data,
+///         int resource_key,
+///         ElectricalLoad* electrical_load_ptr
+///     )
+///
+/// \brief Helper method to handle reading a solar resource time series into Resources.
+///
+/// \param path_2_resource_data The path (either relative or absolute) to the given 
+///     resource time series.
+///
+/// \param resource_key The key associated with the given renewable resource.
+///
+/// \param electrical_load_ptr A pointer to the Model's ElectricalLoad object.
+///
+
 void Resources :: __readSolarResource(
     std::string path_2_resource_data,
     int resource_key,
     ElectricalLoad* electrical_load_ptr
 )
 {
-    /*
-     *  Helper method (private) to handle reading a solar resource time series into
-     *  Resources.
-     */
-    
     //  1. init CSV reader, record path
     io::CSVReader<2> CSV(path_2_resource_data);
     
@@ -260,17 +312,29 @@ void Resources :: __readSolarResource(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Resources :: __readTidalResource(
+///         std::string path_2_resource_data,
+///         int resource_key,
+///         ElectricalLoad* electrical_load_ptr
+///     )
+///
+/// \brief Helper method to handle reading a tidal resource time series into Resources.
+///
+/// \param path_2_resource_data The path (either relative or absolute) to the given 
+///     resource time series.
+///
+/// \param resource_key The key associated with the given renewable resource.
+///
+/// \param electrical_load_ptr A pointer to the Model's ElectricalLoad object.
+///
+
 void Resources :: __readTidalResource(
     std::string path_2_resource_data,
     int resource_key,
     ElectricalLoad* electrical_load_ptr
 )
 {
-    /*
-     *  Helper method (private) to handle reading a tidal resource time series into
-     *  Resources.
-     */
-    
     //  1. init CSV reader, record path
     io::CSVReader<2> CSV(path_2_resource_data);
     
@@ -328,17 +392,29 @@ void Resources :: __readTidalResource(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Resources :: __readWaveResource(
+///         std::string path_2_resource_data,
+///         int resource_key,
+///         ElectricalLoad* electrical_load_ptr
+///     )
+///
+/// \brief Helper method to handle reading a wave resource time series into Resources.
+///
+/// \param path_2_resource_data The path (either relative or absolute) to the given 
+///     resource time series.
+///
+/// \param resource_key The key associated with the given renewable resource.
+///
+/// \param electrical_load_ptr A pointer to the Model's ElectricalLoad object.
+///
+
 void Resources :: __readWaveResource(
     std::string path_2_resource_data,
     int resource_key,
     ElectricalLoad* electrical_load_ptr
 )
 {
-    /*
-     *  Helper method (private) to handle reading a wave resource time series into
-     *  Resources.
-     */
-    
     //  1. init CSV reader, record path
     io::CSVReader<3> CSV(path_2_resource_data);
     
@@ -399,17 +475,29 @@ void Resources :: __readWaveResource(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Resources :: __readWindResource(
+///         std::string path_2_resource_data,
+///         int resource_key,
+///         ElectricalLoad* electrical_load_ptr
+///     )
+///
+/// \brief Helper method to handle reading a wind resource time series into Resources.
+///
+/// \param path_2_resource_data The path (either relative or absolute) to the given 
+///     resource time series.
+///
+/// \param resource_key The key associated with the given renewable resource.
+///
+/// \param electrical_load_ptr A pointer to the Model's ElectricalLoad object.
+///
+
 void Resources :: __readWindResource(
     std::string path_2_resource_data,
     int resource_key,
     ElectricalLoad* electrical_load_ptr
 )
 {
-    /*
-     *  Helper method (private) to handle reading a wind resource time series into
-     *  Resources.
-     */
-    
     //  1. init CSV reader, record path
     io::CSVReader<2> CSV(path_2_resource_data);
     

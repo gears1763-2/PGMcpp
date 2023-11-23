@@ -27,12 +27,16 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Wave :: __checkInputs(WaveInputs wave_inputs)
+///
+/// \brief Helper method to check inputs to the Wave constructor.
+///
+/// \param wave_inputs A structure of Wave constructor inputs.
+///
+
 void Wave :: __checkInputs(WaveInputs wave_inputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Wave constructor.
-     */
-    
     //  1. check design_significant_wave_height_m
     if (wave_inputs.design_significant_wave_height_m <= 0) {
         std::string error_str = "ERROR:  Wave():  ";
@@ -67,19 +71,20 @@ void Wave :: __checkInputs(WaveInputs wave_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wave :: __getGenericCapitalCost(void)
+///
+/// \brief Helper method to generate a generic wave energy converter capital cost.
+///
+/// Note that this model expresses cost in terms of Canadian dollars [CAD].
+///
+/// Ref: \cite MacDougall_2019\n
+///
+/// \return A generic capital cost for the wave energy converter [CAD].
+///
+
 double Wave :: __getGenericCapitalCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic wave energy converter capital cost.
-     *
-     *  ref:  Dr. S.L. MacDougall, Commercial Potential of Marine
-     *        Renewables in British Columbia, technical report
-     *        submitted to Natural Resources Canada, 
-     *        S.L. MacDougall Research & Consulting, 2019
-     *
-     *  Note that this model expresses cost in terms of Canadian dollars [CAD].
-     */
-    
     double capital_cost_per_kW = 7000 * pow(this->capacity_kW, -0.15) + 5000;
     
     return capital_cost_per_kW * this->capacity_kW;
@@ -91,20 +96,23 @@ double Wave :: __getGenericCapitalCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wave :: __getGenericOpMaintCost(void)
+///
+/// \brief Helper method to generate a generic wave energy converter operation and
+///     maintenance cost. This is a cost incurred per unit energy produced.
+///
+/// Note that this model expresses cost in terms of Canadian dollars [CAD/kWh].
+///
+/// Ref: \cite MacDougall_2019\n
+///
+/// \return A generic operation and maintenance cost, per unit energy produced, for
+///     the wave energy converter [CAD/kWh].
+///
+
+
 double Wave :: __getGenericOpMaintCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic wave energy converter operation
-     *  and maintenance cost. This is a cost incurred per unit energy produced.
-     *
-     *  ref:  Dr. S.L. MacDougall, Commercial Potential of Marine
-     *        Renewables in British Columbia, technical report
-     *        submitted to Natural Resources Canada, 
-     *        S.L. MacDougall Research & Consulting, 2019
-     *
-     *  Note that this model expresses cost in terms of Canadian dollars [CAD/kWh].
-     */
-    
     double operation_maintenance_cost_kWh = 0.05 * pow(this->capacity_kW, -0.2) + 0.05;
     
     return operation_maintenance_cost_kWh;
@@ -116,6 +124,33 @@ double Wave :: __getGenericOpMaintCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wave:: __computeGaussianProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double significant_wave_height_m,
+///         double energy_period_s
+///     )
+///
+/// \brief Helper method to compute wave energy converter production under a Gaussian
+///     production model.
+///
+/// Ref: docs/refs/wind_tidal_wave.pdf\n
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+/// 
+/// \param significant_wave_height_m The significant wave height [m] in the vicinity of
+///     the wave energy converter.
+///
+/// \param energy_period_s The energy period [s] in the vicinity of the wave energy
+///     converter
+///
+/// \return The production [kW] of the wave energy converter, under an exponential
+///     model.
+///
+
 double Wave:: __computeGaussianProductionkW(
     int timestep,
     double dt_hrs,
@@ -123,13 +158,6 @@ double Wave:: __computeGaussianProductionkW(
     double energy_period_s
 )
 {
-    /*
-     *  Helper method (private) to compute wave energy converter production under a
-     *  Gaussian production model.
-     *
-     *  ref: docs/refs/wind_tidal_wave.pdf
-     */
-    
     double H_s_nondim = 
         (significant_wave_height_m - this->design_significant_wave_height_m) / 
         this->design_significant_wave_height_m;
@@ -153,6 +181,33 @@ double Wave:: __computeGaussianProductionkW(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wave:: __computeParaboloidProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double significant_wave_height_m,
+///         double energy_period_s
+///     )
+///
+/// \brief Helper method to compute wave energy converter production under a paraboloid
+///     production model.
+///
+/// Ref: \cite Robertson_2021\n
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+/// 
+/// \param significant_wave_height_m The significant wave height [m] in the vicinity of
+///     the wave energy converter.
+///
+/// \param energy_period_s The energy period [s] in the vicinity of the wave energy
+///     converter
+///
+/// \return The production [kW] of the wave energy converter, under a paraboloid
+///     model.
+///
+
 double Wave:: __computeParaboloidProductionkW(
     int timestep,
     double dt_hrs,
@@ -160,18 +215,6 @@ double Wave:: __computeParaboloidProductionkW(
     double energy_period_s
 )
 {
-    /*
-     *  Helper method (private) to compute wave energy converter production under a
-     *  Paraboloid production model.
-     *
-     *  ref:  B. Robertson, H. Bailey, M. Leary, and B. Buckham,
-     *        “A methodology for architecture agnostic and
-     *        time flexible representations of wave energy
-     *        converter performance”,
-     *        Applied Energy, vol. 287, p. 116588, 2021,
-     *        doi:10.1016/j.apenergy.2021.116588
-     */
-    
     // first, check for idealized wave breaking (deep water)
     if (significant_wave_height_m >= 0.2184 * pow(energy_period_s, 2)) {
         return 0;
@@ -201,6 +244,30 @@ double Wave:: __computeParaboloidProductionkW(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wave:: __computeLookupProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double significant_wave_height_m,
+///         double energy_period_s
+///     )
+///
+/// \brief Helper method to compute wave energy converter production by way of
+///     looking up using given performance matrix.
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+/// 
+/// \param significant_wave_height_m The significant wave height [m] in the vicinity of
+///     the wave energy converter.
+///
+/// \param energy_period_s The energy period [s] in the vicinity of the wave energy
+///     converter
+///
+/// \return The interpolated production [kW] of the wave energy converter.
+///
+
 double Wave:: __computeLookupProductionkW(
     int timestep,
     double dt_hrs,
@@ -208,11 +275,6 @@ double Wave:: __computeLookupProductionkW(
     double energy_period_s
 )
 {
-    /*
-     *  Helper method (private) to compute wave energy converter production by way of
-     *  looking up using given performance matrix.
-     */
-    
     // *** WORK IN PROGRESS *** //
     
     return 0;

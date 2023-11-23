@@ -68,9 +68,9 @@ class Controller {
         
     public:
         //  1. attributes
-        ControlMode control_mode;
+        ControlMode control_mode; ///< The ControlMode that is active in the Model.
         
-        std::vector<double> net_load_vec_kW;
+        std::vector<double> net_load_vec_kW; ///< A vector of net load values [kW] at each point in the modelling time series. Net load is defined as load minus all available Renewable production.
         
         
         //  2. methods
@@ -81,6 +81,13 @@ class Controller {
             std::vector<Renewable*>*,
             Resources*,
             std::vector<Combustion*>*
+        );
+        
+        void applyDispatchControl(
+            ElectricalLoad*,
+            std::vector<Combustion*>*,
+            std::vector<Renewable*>*,
+            std::vector<Storage*>*
         );
         
         void clear(void);

@@ -27,12 +27,14 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Solar :: __checkInputs(SolarInputs solar_inputs)
+///
+/// \brief Helper method to check inputs to the Solar constructor.
+///
+
 void Solar :: __checkInputs(SolarInputs solar_inputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Solar constructor.
-     */
-    
     //  1. check derating
     if (
         solar_inputs.derating < 0 or
@@ -58,16 +60,20 @@ void Solar :: __checkInputs(SolarInputs solar_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Solar :: __getGenericCapitalCost(void)
+///
+/// \brief Helper method to generate a generic solar PV array capital cost.
+///
+/// This model was obtained by way of surveying an assortment of published solar PV
+/// costs, and then constructing a best fit model. Note that this model
+/// expresses cost in terms of Canadian dollars [CAD].
+///
+/// \return A generic capital cost for the solar PV array [CAD].
+///
+
 double Solar :: __getGenericCapitalCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic solar PV array capital cost.
-     *
-     *  This model was obtained by way of surveying an assortment of published solar PV
-     *  costs, and then constructing a best fit model. Note that this model
-     *  expresses cost in terms of Canadian dollars [CAD].
-     */
-    
     double capital_cost_per_kW = 1000 * pow(this->capacity_kW, -0.15) + 3000;
     
     return capital_cost_per_kW * this->capacity_kW;
@@ -79,17 +85,22 @@ double Solar :: __getGenericCapitalCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Solar :: __getGenericOpMaintCost(void)
+///
+/// \brief Helper method to generate a generic solar PV array operation and
+///     maintenance cost. This is a cost incurred per unit energy produced.
+///
+/// This model was obtained by way of surveying an assortment of published solar PV
+/// costs, and then constructing a best fit model. Note that this model
+/// expresses cost in terms of Canadian dollars [CAD/kWh].
+///
+/// \return A generic operation and maintenance cost, per unit energy produced, for the
+///     solar PV array [CAD/kWh].
+///
+
 double Solar :: __getGenericOpMaintCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic solar PV array operation and
-     *  maintenance cost. This is a cost incurred per unit energy produced.
-     *
-     *  This model was obtained by way of surveying an assortment of published solar PV
-     *  costs, and then constructing a best fit model. Note that this model
-     *  expresses cost in terms of Canadian dollars [CAD/kWh].
-     */
-    
     return 0.01;
 }   /* __getGenericOpMaintCost() */
 
@@ -182,7 +193,7 @@ Renewable(n_points, solar_inputs.renewable_inputs)
 /// \brief Method which takes in the solar resource at a particular point in time, and
 ///     then returns the solar PV production at that point in time.
 ///
-/// ref: https://www.homerenergy.com/products/pro/docs/3.11/how_homer_calculates_the_pv_array_power_output.html
+/// Ref: \cite HOMER_how_homer_calculates_the_pv_array_power_output\n
 ///
 /// \param timestep The timestep (i.e., time series index) for the request.
 ///

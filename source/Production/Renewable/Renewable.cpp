@@ -27,12 +27,14 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Renewable :: __checkInputs(RenewableInputs renewable_inputs)
+///
+/// \brief Helper method to check inputs to the Renewable constructor.
+///
+
 void Renewable :: __checkInputs(RenewableInputs renewable_inputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Renewable constructor.
-     */
-    
     //...
     
     return;
@@ -44,12 +46,14 @@ void Renewable :: __checkInputs(RenewableInputs renewable_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Renewable :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+///
+/// \brief Helper method to handle the starting/stopping of the renewable asset.
+///
+
 void Renewable :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
 {
-    /*
-     *  Helper method (private) to handle the starting/stopping of the renewable asset.
-     */
-    
     if (this->is_running) {
         // handle stopping
         if (production_kW <= 0) {

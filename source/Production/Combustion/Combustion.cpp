@@ -28,12 +28,16 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Combustion :: __checkInputs(CombustionInputs combustion_inputs)
+///
+/// \brief Helper method to check inputs to the Combustion constructor.
+///
+/// \param combustion_inputs A structure of Combustion constructor inputs.
+///
+
 void Combustion :: __checkInputs(CombustionInputs combustion_inputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Combustion constructor.
-     */
-    
     // ...
     
     return;
@@ -222,6 +226,7 @@ double Combustion :: getFuelConsumptionL(double dt_hrs, double production_kW)
 /// \param fuel_consumed_L The volume of fuel consumed [L].
 ///
 /// \return A structure containing the mass spectrum of resulting emissions.
+///
 
 Emissions Combustion :: getEmissionskg(double fuel_consumed_L) {
     Emissions emissions;

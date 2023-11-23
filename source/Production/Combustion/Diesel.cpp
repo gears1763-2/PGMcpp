@@ -27,12 +27,16 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Diesel :: __checkInputs(DieselInputs diesel_inputs)
+///
+/// \brief Helper method to check inputs to the Diesel constructor.
+///
+/// \param diesel_inputs A structure of Diesel constructor inputs.
+///
+
 void Diesel :: __checkInputs(DieselInputs diesel_inputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Diesel constructor.
-     */
-    
     //  1. check fuel_cost_L
     if (diesel_inputs.fuel_cost_L < 0) {
         std::string error_str = "ERROR:  Diesel():  ";
@@ -162,20 +166,23 @@ void Diesel :: __checkInputs(DieselInputs diesel_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
-double Diesel :: __getGenericFuelSlope()
+///
+/// \fn double Diesel :: __getGenericFuelSlope(void)
+///
+/// \brief Helper method to generate a generic, linearized fuel consumption
+///     slope for a diesel generator.
+///
+/// This model was obtained by way of surveying an assortment of published diesel
+/// generator fuel consumption data, and then constructing a best fit model.
+///
+/// Ref: \cite HOMER_fuel_curve\n
+/// Ref: \cite HOMER_generator_fuel_curve_slope\n
+///
+/// \return A generic fuel slope for the diesel generator [L/kWh].
+///
+
+double Diesel :: __getGenericFuelSlope(void)
 {
-    /*
-     *  Helper method (private) to generate a generic, linearized fuel consumption
-     *  slope for a diesel generator.
-     *
-     * ref: https://www.homerenergy.com/products/pro/docs/latest/fuel_curve.html
-     * ref: https://www.homerenergy.com/products/pro/docs/latest/generator_fuel_curve_intercept_coefficient.html
-     * ref: https://www.homerenergy.com/products/pro/docs/latest/generator_fuel_curve_slope.html
-     *
-     *  This model was obtained by way of surveying an assortment of published diesel
-     *  generator fuel consumption data, and then constructing a best fit model.
-     */
-    
     double linear_fuel_slope_LkWh = 0.4234 * pow(this->capacity_kW, -0.1012);
     
     return linear_fuel_slope_LkWh;
@@ -187,20 +194,23 @@ double Diesel :: __getGenericFuelSlope()
 
 // ---------------------------------------------------------------------------------- //
 
-double Diesel :: __getGenericFuelIntercept()
+///
+/// \fn double Diesel :: __getGenericFuelIntercept(void)
+///
+/// \brief Helper method to generate a generic, linearized fuel consumption
+///     intercept for a diesel generator.
+///
+/// This model was obtained by way of surveying an assortment of published diesel
+/// generator fuel consumption data, and then constructing a best fit model.
+///
+/// Ref: \cite HOMER_fuel_curve\n
+/// Ref: \cite HOMER_generator_fuel_curve_intercept_coefficient\n
+///
+/// \return A generic fuel intercept coefficient for the diesel generator [L/kWh].
+///
+
+double Diesel :: __getGenericFuelIntercept(void)
 {
-    /*
-     *  Helper method (private) to generate a generic, linearized fuel consumption
-     *  intercept for a diesel generator.
-     *
-     * ref: https://www.homerenergy.com/products/pro/docs/latest/fuel_curve.html
-     * ref: https://www.homerenergy.com/products/pro/docs/latest/generator_fuel_curve_intercept_coefficient.html
-     * ref: https://www.homerenergy.com/products/pro/docs/latest/generator_fuel_curve_slope.html
-     *
-     *  This model was obtained by way of surveying an assortment of published diesel
-     *  generator fuel consumption data, and then constructing a best fit model.
-     */
-    
     double linear_fuel_intercept_LkWh = 0.0940 * pow(this->capacity_kW, -0.2735);
     
     return linear_fuel_intercept_LkWh;
@@ -212,16 +222,20 @@ double Diesel :: __getGenericFuelIntercept()
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Diesel :: __getGenericCapitalCost(void)
+///
+/// \brief Helper method to generate a generic diesel generator capital cost.
+///
+/// This model was obtained by way of surveying an assortment of published diesel 
+/// generator costs, and then constructing a best fit model. Note that this model
+/// expresses cost in terms of Canadian dollars [CAD].
+///
+/// \return A generic capital cost for the diesel generator [CAD].
+///
+
 double Diesel :: __getGenericCapitalCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic diesel generator capital cost.
-     *
-     *  This model was obtained by way of surveying an assortment of published diesel 
-     *  generator costs, and then constructing a best fit model. Note that this model
-     *  expresses cost in terms of Canadian dollars [CAD].
-     */
-    
     double capital_cost_per_kW = 1000 * pow(this->capacity_kW, -0.425) + 800;
     
     return capital_cost_per_kW * this->capacity_kW;
@@ -233,18 +247,23 @@ double Diesel :: __getGenericCapitalCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Diesel :: __getGenericOpMaintCost(void)
+///
+/// \brief Helper method (private) to generate a generic diesel generator operation and
+///     maintenance cost. This is a cost incurred per unit energy produced.
+///
+/// This model was obtained by way of surveying an assortment of published diesel 
+/// generator costs, and then constructing a best fit model. Note that this model
+/// expresses cost in terms of Canadian dollars per kiloWatt-hour production
+/// [CAD/kWh].
+///
+/// \return A generic operation and maintenance cost, per unit energy produced, for the
+///     diesel generator [CAD/kWh].
+///
+
 double Diesel :: __getGenericOpMaintCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic diesel generator operation and
-     *  maintenance cost. This is a cost incurred per unit energy produced.
-     *
-     *  This model was obtained by way of surveying an assortment of published diesel 
-     *  generator costs, and then constructing a best fit model. Note that this model
-     *  expresses cost in terms of Canadian dollars per kiloWatt-hour production
-     *  [CAD/kWh].
-     */
-    
     double operation_maintenance_cost_kWh = 0.05 * pow(this->capacity_kW, -0.2) + 0.05;
     
     return operation_maintenance_cost_kWh;
@@ -255,6 +274,19 @@ double Diesel :: __getGenericOpMaintCost(void)
 
 
 // ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Diesel :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+///
+/// \brief Helper method (private) to handle the starting/stopping of the diesel
+///     generator. The minimum runtime constraint is enforced in this method.
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param production_kW The current rate of production [kW] of the generator.
+///
 
 void Diesel :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
 {
@@ -398,6 +430,8 @@ Combustion(n_points, diesel_inputs.combustion_inputs)
 ///
 /// \param request_kW The requested production [kW].
 ///
+/// \return The production [kW] delivered by the diesel generator.
+///
 
 double Diesel :: requestProductionkW(
     int timestep,
@@ -449,6 +483,8 @@ double Diesel :: requestProductionkW(
 /// \param production_kW The production [kW] of the asset in this timestep.
 ///
 /// \param load_kW The load [kW] passed to the asset in this timestep.
+///
+/// \return The load [kW] remaining after the dispatch is deducted from it.
 ///
 
 double Diesel :: commit(

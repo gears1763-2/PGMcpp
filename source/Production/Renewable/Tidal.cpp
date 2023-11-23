@@ -27,12 +27,14 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Tidal :: __checkInputs(TidalInputs tidal_inputs)
+///
+/// \brief Helper method to check inputs to the Tidal constructor.
+///
+
 void Tidal :: __checkInputs(TidalInputs tidal_inputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Tidal constructor.
-     */
-    
     //  1. check design_speed_ms
     if (tidal_inputs.design_speed_ms <= 0) {
         std::string error_str = "ERROR:  Tidal():  ";
@@ -55,19 +57,20 @@ void Tidal :: __checkInputs(TidalInputs tidal_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Tidal :: __getGenericCapitalCost(void)
+///
+/// \brief Helper method to generate a generic tidal turbine capital cost.
+///
+/// Note that this model expresses cost in terms of Canadian dollars [CAD].
+///
+/// Ref: \cite MacDougall_2019\n
+///
+/// \return A generic capital cost for the tidal turbine [CAD].
+///
+
 double Tidal :: __getGenericCapitalCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic tidal turbine capital cost.
-     *
-     *  ref:  Dr. S.L. MacDougall, Commercial Potential of Marine
-     *        Renewables in British Columbia, technical report
-     *        submitted to Natural Resources Canada, 
-     *        S.L. MacDougall Research & Consulting, 2019
-     *
-     *  Note that this model expresses cost in terms of Canadian dollars [CAD].
-     */
-    
     double capital_cost_per_kW = 2000 * pow(this->capacity_kW, -0.15) + 4000;
     
     return capital_cost_per_kW * this->capacity_kW;
@@ -79,20 +82,22 @@ double Tidal :: __getGenericCapitalCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Tidal :: __getGenericOpMaintCost(void)
+///
+/// \brief Helper method to generate a generic tidal turbine operation and
+///     maintenance cost. This is a cost incurred per unit energy produced.
+///
+/// Note that this model expresses cost in terms of Canadian dollars [CAD/kWh].
+///
+/// Ref: \cite MacDougall_2019\n
+///
+/// \return A generic operation and maintenance cost, per unit energy produced, for the
+///     tidal turbine [CAD/kWh].
+///
+
 double Tidal :: __getGenericOpMaintCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic tidal turbine operation and
-     *  maintenance cost. This is a cost incurred per unit energy produced.
-     *
-     *  ref:  Dr. S.L. MacDougall, Commercial Potential of Marine
-     *        Renewables in British Columbia, technical report
-     *        submitted to Natural Resources Canada, 
-     *        S.L. MacDougall Research & Consulting, 2019
-     *
-     *  Note that this model expresses cost in terms of Canadian dollars [CAD/kWh].
-     */
-    
     double operation_maintenance_cost_kWh = 0.05 * pow(this->capacity_kW, -0.2) + 0.05;
     
     return operation_maintenance_cost_kWh;
@@ -104,23 +109,33 @@ double Tidal :: __getGenericOpMaintCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Tidal :: __computeCubicProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double tidal_resource_ms
+///     )
+///
+/// \brief Helper method to compute tidal turbine production under a cubic
+///     production model.
+///
+/// Ref: \cite WeiWaiKum_2023\n
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param tidal_resource_ms The available tidal stream resource [m/s].
+///
+/// \return The production [kW] of the tidal turbine, under a cubic model.
+///
+
 double Tidal :: __computeCubicProductionkW(
     int timestep,
     double dt_hrs,
     double tidal_resource_ms
 )
 {
-    /*
-     *  Helper method (private) to compute tidal turbine production under a cubic
-     *  production model.
-     *
-     *  ref:  B. Buckham, C. Crawford, I. Beya Marshall, and
-     *        B. Whitby, "Wei Wai Kum Tidal Prefeasibility
-     *        Study - Tidal Resource Assessment", PRIMED
-     *        technical report, 2023,
-     *        P2202E_BRKLYG+WEI WAI KUM_R01_ V20230613v3
-     */
-    
     double production = 0;
     
     if (
@@ -151,19 +166,33 @@ double Tidal :: __computeCubicProductionkW(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Tidal :: __computeExponentialProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double tidal_resource_ms
+///     )
+///
+/// \brief Helper method to compute tidal turbine production under an exponential
+///     production model.
+///
+/// Ref: docs/refs/wind_tidal_wave.pdf\n
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param tidal_resource_ms The available tidal stream resource [m/s].
+///
+/// \return The production [kW] of the tidal turbine, under an exponential model.
+///
+
 double Tidal :: __computeExponentialProductionkW(
     int timestep,
     double dt_hrs,
     double tidal_resource_ms
 )
 {
-    /*
-     *  Helper method (private) to compute tidal turbine production under an exponential
-     *  production model.
-     *
-     *  ref: docs/refs/wind_tidal_wave.pdf
-     */
-    
     double production = 0;
     
     double turbine_speed =
@@ -190,17 +219,31 @@ double Tidal :: __computeExponentialProductionkW(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Tidal :: __computeLookupProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double tidal_resource_ms
+///     )
+///
+/// \brief Helper method to compute tidal turbine production by way of
+///     looking up using given power curve data.
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param tidal_resource_ms The available tidal stream resource [m/s].
+///
+/// \return The interpolated production [kW] of the tidal tubrine.
+///
+
 double Tidal :: __computeLookupProductionkW(
     int timestep,
     double dt_hrs,
     double tidal_resource_ms
 )
 {
-    /*
-     *  Helper method (private) to compute tidal turbine production by way of looking up
-     *  using given power curve data.
-     */
-    
     // *** WORK IN PROGRESS *** //
     
     return 0;

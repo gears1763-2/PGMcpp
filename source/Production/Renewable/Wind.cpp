@@ -27,12 +27,16 @@
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void Wind :: __checkInputs(WindInputs wind_inputs)
+///
+/// \brief  Helper method to check inputs to the Wind constructor.
+///
+/// \param wind_inputs A structure of Wind constructor inputs.
+///
+
 void Wind :: __checkInputs(WindInputs wind_inputs)
 {
-    /*
-     *  Helper method (private) to check inputs to the Wind constructor.
-     */
-    
     //  1. check design_speed_ms
     if (wind_inputs.design_speed_ms <= 0) {
         std::string error_str = "ERROR:  Wind():  ";
@@ -55,16 +59,20 @@ void Wind :: __checkInputs(WindInputs wind_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wind :: __getGenericCapitalCost(void)
+///
+/// \brief Helper method to generate a generic wind turbine capital cost.
+///
+/// This model was obtained by way of surveying an assortment of published wind
+/// turbine costs, and then constructing a best fit model. Note that this model
+/// expresses cost in terms of Canadian dollars [CAD].
+///
+/// \return A generic capital cost for the wind turbine [CAD].
+///
+
 double Wind :: __getGenericCapitalCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic wind turbine capital cost.
-     *
-     *  This model was obtained by way of surveying an assortment of published wind
-     *  turbine costs, and then constructing a best fit model. Note that this model
-     *  expresses cost in terms of Canadian dollars [CAD].
-     */
-    
     double capital_cost_per_kW = 3000 * pow(this->capacity_kW, -0.15) + 3000;
     
     return capital_cost_per_kW * this->capacity_kW;
@@ -76,17 +84,22 @@ double Wind :: __getGenericCapitalCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wind :: __getGenericOpMaintCost(void)
+///
+/// \brief Helper method to generate a generic wind turbine operation and
+///     maintenance cost. This is a cost incurred per unit energy produced.
+///
+/// This model was obtained by way of surveying an assortment of published wind
+/// turbine costs, and then constructing a best fit model. Note that this model
+/// expresses cost in terms of Canadian dollars [CAD/kWh].
+///
+/// \return A generic operation and maintenance cost, per unit energy produced, for the
+///     wind turbine [CAD/kWh].
+///
+
 double Wind :: __getGenericOpMaintCost(void)
 {
-    /*
-     *  Helper method (private) to generate a generic wind turbine operation and
-     *  maintenance cost. This is a cost incurred per unit energy produced.
-     *
-     *  This model was obtained by way of surveying an assortment of published wind
-     *  turbine costs, and then constructing a best fit model. Note that this model
-     *  expresses cost in terms of Canadian dollars [CAD/kWh].
-     */
-    
     double operation_maintenance_cost_kWh = 0.025 * pow(this->capacity_kW, -0.2) + 0.025;
     
     return operation_maintenance_cost_kWh;
@@ -98,19 +111,33 @@ double Wind :: __getGenericOpMaintCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wind :: __computeExponentialProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double wind_resource_ms
+///     )
+///
+/// \brief Helper method to compute wind turbine production under an exponential
+///     production model.
+///
+/// Ref: docs/refs/wind_tidal_wave.pdf\n
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param wind_resource_ms The available wind resource [m/s].
+///
+/// \return The production [kW] of the wind turbine, under an exponential model.
+///
+
 double Wind :: __computeExponentialProductionkW(
     int timestep,
     double dt_hrs,
     double wind_resource_ms
 )
 {
-    /*
-     *  Helper method (private) to compute wind turbine production under an exponential
-     *  production model.
-     *
-     *  ref: docs/refs/wind_tidal_wave.pdf
-     */
-    
     double production = 0;
     
     double turbine_speed = (wind_resource_ms - this->design_speed_ms) /
@@ -137,17 +164,31 @@ double Wind :: __computeExponentialProductionkW(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn double Wind :: __computeLookupProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double wind_resource_ms
+///     )
+///
+/// \brief Helper method to compute wind turbine production by way of looking up using
+///     given power curve data.
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param wind_resource_ms The available wind resource [m/s].
+///
+/// \return The interpolated production [kW] of the wind turbine.
+///
+
 double Wind :: __computeLookupProductionkW(
     int timestep,
     double dt_hrs,
     double wind_resource_ms
 )
 {
-    /*
-     *  Helper method (private) to compute tidal turbine production by way of looking up
-     *  using given power curve data.
-     */
-    
     // *** WORK IN PROGRESS *** //
     
     return 0;
