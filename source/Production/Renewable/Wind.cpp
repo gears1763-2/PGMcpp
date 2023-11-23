@@ -306,6 +306,16 @@ double Wind :: computeProductionkW(
     double production_kW = 0;
     
     switch (this->power_model) {
+        case (WindPowerProductionModel :: WIND_POWER_EXPONENTIAL): {
+            production_kW = this->__computeExponentialProductionkW(
+                timestep,
+                dt_hrs,
+                wind_resource_ms
+            );
+            
+            break;
+        }
+        
         case (WindPowerProductionModel :: WIND_POWER_LOOKUP): {
             production_kW = this->__computeLookupProductionkW(
                 timestep,
@@ -316,12 +326,17 @@ double Wind :: computeProductionkW(
             break;
         }
         
-        default: {   // default to WindPowerProductionModel :: WIND_POWER_EXPONENTIAL
-            production_kW = this->__computeExponentialProductionkW(
-                timestep,
-                dt_hrs,
-                wind_resource_ms
-            );
+        default: {
+            std::string error_str = "ERROR:  Wind::computeProductionkW():  ";
+            error_str += "power model ";
+            error_str += std::to_string(this->power_model);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }

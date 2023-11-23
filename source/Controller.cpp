@@ -100,6 +100,112 @@ void Controller :: __computeNetLoad(
 // ---------------------------------------------------------------------------------- //
 
 
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Controller :: __constructCombustionMap(
+///         std::vector<Combustion*>* combustion_ptr_vec_ptr
+///     )
+///
+/// \brief Helper method to construct a Combustion map, for use in determining
+//      the optimal dispatch of Combustion assets in each time step of the Model run.
+///
+/// \param combustion_ptr_vec_ptr A pointer to the Combustion pointer vector of the Model.
+///
+
+void Controller :: __constructCombustionMap(
+    std::vector<Combustion*>* combustion_ptr_vec_ptr
+)
+{
+    // get state table dimensions
+    int n_cols = combustion_ptr_vec_ptr->size();
+    int n_rows = pow(2, n_cols);
+    
+    // init state table (all possible on/off combinations)
+    std::vector<std::vector<bool>> state_table;
+    state_table.resize(n_rows, {});
+    
+    int x = 0;
+    for (int i = 0; i < n_rows; i++) {
+        state_table[i].resize(n_cols, false);
+        
+        x = i;
+        for (int j = 0; j < n_cols; j++) {
+            if (x % 2 == 0) {
+                state_table[i][j] = true;
+            }
+            x /= 2;
+        }
+    }
+    
+    // construct combustion map (handle duplicates by keeping rows with minimum trues)
+    double total_capacity_kW = 0;
+    int truth_count = 0;
+    int current_truth_count = 0;
+    
+    for (int i = 0; i < n_rows; i++) {
+        total_capacity_kW = 0;
+        truth_count = 0;
+        current_truth_count = 0;
+        
+        for (int j = 0; j < n_cols; j++) {
+            if (state_table[i][j]) {
+                total_capacity_kW += combustion_ptr_vec_ptr->at(j)->capacity_kW;
+                truth_count++;
+            }
+        }
+        
+        if (this->combustion_map.count(total_capacity_kW) > 0) {
+            for (int j = 0; j < n_cols; j++) {
+                if (this->combustion_map[total_capacity_kW][j]) {
+                    current_truth_count++;
+                }
+            }
+            
+            if (truth_count < current_truth_count) {
+                this->combustion_map.erase(total_capacity_kW);
+            }
+        }
+        
+        this->combustion_map.insert(
+            std::pair<double, std::vector<bool>> (
+                total_capacity_kW,
+                state_table[i]
+            )
+        );
+    }
+    
+    // test print
+    /*
+    std::cout << std::endl;
+    
+    std::cout << "\t\t";
+    for (size_t i = 0; i < combustion_ptr_vec_ptr->size(); i++) {
+        std::cout << combustion_ptr_vec_ptr->at(i)->capacity_kW << "\t";
+    }
+    std::cout << std::endl;
+    
+    std::map<double, std::vector<bool>>::iterator iter;
+    for (
+        iter = this->combustion_map.begin();
+        iter != this->combustion_map.end();
+        iter++
+    ) {
+        std::cout << iter->first << ":\t{\t";
+        
+        for (size_t i = 0; i < iter->second.size(); i++) {
+            std::cout << iter->second[i] << "\t";
+        }
+        std::cout << "}" << std::endl;
+    }
+    */
+    
+    return;
+}   /* __constructCombustionTable() */
+
+// ---------------------------------------------------------------------------------- //
+
+
 
 // ---------------------------------------------------------------------------------- //
 
@@ -177,7 +283,16 @@ double Controller :: __getRenewableProduction(
         }
         
         default: {
-            // do nothing!
+            std::string error_str = "ERROR:  Controller::__getRenewableProduction():  ";
+            error_str += "renewable type ";
+            error_str += std::to_string(renewable_ptr->type);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }
@@ -242,7 +357,8 @@ void Controller :: init(
     //  1. compute net load
     this->__computeNetLoad(electrical_load_ptr, renewable_ptr_vec_ptr, resources_ptr);
     
-    //...
+    //  2. construct Combustion table
+    this->__constructCombustionMap(combustion_ptr_vec_ptr);
     
     return;
 }   /* init() */
@@ -282,19 +398,44 @@ void Controller :: applyDispatchControl(
     for (int i = 0; i < electrical_load_ptr->n_points; i++) {
         switch (this->control_mode) {
             case (ControlMode :: LOAD_FOLLOWING): {
-                //this->__applyLoadFollowingControl();
+                /*
+                this->__applyLoadFollowingControl(
+                    i,
+                    electrical_load_ptr,
+                    combustion_ptr_vec_ptr,
+                    renewable_ptr_vec_ptr,
+                    storage_ptr_vec_ptr
+                );
+                */
                 
                 break;
             }
             
             case (ControlMode :: CYCLE_CHARGING): {
-                //this->__applyCycleChargingControl();
+                /*
+                this->__applyCycleChargingControl(
+                    i,
+                    electrical_load_ptr,
+                    combustion_ptr_vec_ptr,
+                    renewable_ptr_vec_ptr,
+                    storage_ptr_vec_ptr
+                );
+                */
                 
                 break;
             }
             
             default: {
-                // do nothing!
+                std::string error_str = "ERROR:  Controller :: applyDispatchControl():  ";
+                error_str += "control mode ";
+                error_str += std::to_string(this->control_mode);
+                error_str += " not recognized";
+                
+                #ifdef _WIN32
+                    std::cout << error_str << std::endl;
+                #endif
+
+                throw std::runtime_error(error_str);
                 
                 break;
             }
@@ -319,6 +460,7 @@ void Controller :: applyDispatchControl(
 void Controller :: clear(void)
 {
     this->net_load_vec_kW.clear();
+    this->combustion_map.clear();
     
     return;
 }   /* clear() */

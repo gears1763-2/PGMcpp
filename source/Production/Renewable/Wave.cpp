@@ -398,6 +398,17 @@ double Wave :: computeProductionkW(
     double production_kW = 0;
     
     switch (this->power_model) {
+        case (WavePowerProductionModel :: WAVE_POWER_PARABOLOID): {
+            production_kW = this->__computeParaboloidProductionkW(
+                timestep,
+                dt_hrs,
+                significant_wave_height_m,
+                energy_period_s
+            );
+            
+            break;
+        }
+        
         case (WavePowerProductionModel :: WAVE_POWER_GAUSSIAN): {
             production_kW = this->__computeGaussianProductionkW(
                 timestep,
@@ -420,13 +431,17 @@ double Wave :: computeProductionkW(
             break;
         }
         
-        default: {   // default to WavePowerProductionModel :: PARABOLOID
-            production_kW = this->__computeParaboloidProductionkW(
-                timestep,
-                dt_hrs,
-                significant_wave_height_m,
-                energy_period_s
-            );
+        default: {
+            std::string error_str = "ERROR:  Wave::computeProductionkW():  ";
+            error_str += "power model ";
+            error_str += std::to_string(this->power_model);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }

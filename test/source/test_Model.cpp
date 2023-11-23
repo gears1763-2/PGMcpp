@@ -310,8 +310,10 @@ test_model.addResource(
 );
 
 
-//  add Diesel asset
+//  add Diesel assets
 DieselInputs diesel_inputs;
+diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 100;
+
 test_model.addDiesel(diesel_inputs);
 
 testFloatEquals(
@@ -327,6 +329,38 @@ testFloatEquals(
     __FILE__,
     __LINE__
 );
+
+diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 150;
+
+test_model.addDiesel(diesel_inputs);
+
+diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 250;
+
+test_model.addDiesel(diesel_inputs);
+
+testFloatEquals(
+    test_model.combustion_ptr_vec.size(),
+    3,
+    __FILE__,
+    __LINE__
+);
+
+std::vector<int> expected_diesel_capacity_vec_kW = {100, 150, 250};
+
+for (int i = 0; i < 3; i++) {
+    testFloatEquals(
+        test_model.combustion_ptr_vec[i]->capacity_kW,
+        expected_diesel_capacity_vec_kW[i],
+        __FILE__,
+        __LINE__
+    );
+}
+
+diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 100;
+
+for (int i = 0; i < 2 * ((double)rand() / RAND_MAX); i++) {
+    test_model.addDiesel(diesel_inputs);
+}
 
 
 //  add Solar asset

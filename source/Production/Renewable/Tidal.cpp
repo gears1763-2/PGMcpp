@@ -362,6 +362,17 @@ double Tidal :: computeProductionkW(
     double production_kW = 0;
     
     switch (this->power_model) {
+        case (TidalPowerProductionModel :: TIDAL_POWER_CUBIC): {
+            production_kW = this->__computeCubicProductionkW(
+                timestep,
+                dt_hrs,
+                tidal_resource_ms
+            );
+            
+            break;
+        }
+        
+        
         case (TidalPowerProductionModel :: TIDAL_POWER_EXPONENTIAL): {
             production_kW = this->__computeExponentialProductionkW(
                 timestep,
@@ -382,12 +393,17 @@ double Tidal :: computeProductionkW(
             break;
         }
         
-        default: {   // default to TidalPowerProductionModel :: CUBIC
-            production_kW = this->__computeCubicProductionkW(
-                timestep,
-                dt_hrs,
-                tidal_resource_ms
-            );
+        default: {
+            std::string error_str = "ERROR:  Tidal::computeProductionkW():  ";
+            error_str += "power model ";
+            error_str += std::to_string(this->power_model);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }

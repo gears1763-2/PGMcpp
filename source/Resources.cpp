@@ -66,7 +66,7 @@ void Resources :: __checkResourceKey1D(
             }
             
             default: {
-                // do nothing!
+                error_str += "UNDEFINED_TYPE):  ";
                 
                 break;
             }
@@ -118,7 +118,7 @@ void Resources :: __checkResourceKey2D(
             }
             
             default: {
-                // do nothing!
+                error_str += "UNDEFINED_TYPE):  ";
                 
                 break;
             }
@@ -656,7 +656,16 @@ void Resources :: addResource(
         }
         
         default: {
-            // do nothing!
+            std::string error_str = "ERROR:  Resources :: addResource(:  ";
+            error_str += "renewable type ";
+            error_str += std::to_string(renewable_type);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }

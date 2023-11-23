@@ -62,6 +62,7 @@ class Controller {
         
         //  2. methods
         void __computeNetLoad(ElectricalLoad*, std::vector<Renewable*>*, Resources*);
+        void __constructCombustionMap(std::vector<Combustion*>*);
         
         double __getRenewableProduction(int, double, Renewable*, Resources*);
         
@@ -71,6 +72,8 @@ class Controller {
         ControlMode control_mode; ///< The ControlMode that is active in the Model.
         
         std::vector<double> net_load_vec_kW; ///< A vector of net load values [kW] at each point in the modelling time series. Net load is defined as load minus all available Renewable production.
+        
+        std::map<double, std::vector<bool>> combustion_map; ///< A map of all possible combustion states, for use in determining optimal dispatch.
         
         
         //  2. methods
