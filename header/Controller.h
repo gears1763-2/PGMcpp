@@ -64,7 +64,52 @@ class Controller {
         void __computeNetLoad(ElectricalLoad*, std::vector<Renewable*>*, Resources*);
         void __constructCombustionMap(std::vector<Combustion*>*);
         
+        void __applyLoadFollowingControl_CHARGING(
+            int,
+            ElectricalLoad*,
+            std::vector<Combustion*>*,
+            std::vector<Renewable*>*,
+            std::vector<Storage*>*
+        );
+        
+        void __applyLoadFollowingControl_DISCHARGING(
+            int,
+            ElectricalLoad*,
+            std::vector<Combustion*>*,
+            std::vector<Renewable*>*,
+            std::vector<Storage*>*
+        );
+        
+        void __applyCycleChargingControl_CHARGING(
+            int,
+            ElectricalLoad*,
+            std::vector<Combustion*>*,
+            std::vector<Renewable*>*,
+            std::vector<Storage*>*
+        );
+        
+        void __applyCycleChargingControl_DISCHARGING(
+            int,
+            ElectricalLoad*,
+            std::vector<Combustion*>*,
+            std::vector<Renewable*>*,
+            std::vector<Storage*>*
+        );
+        
+        void __handleStorageCharging(int, double, std::list<Storage*>);
+        void __handleStorageCharging(int, double, std::vector<Storage*>*);
+        
         double __getRenewableProduction(int, double, Renewable*, Resources*);
+        
+        double __handleCombustionDispatch(
+            int,
+            double,
+            double,
+            std::vector<Combustion*>*,
+            bool
+        );
+        
+        double __handleStorageDischarging(int, double, double, std::list<Storage*>);
         
         
     public:
@@ -72,6 +117,7 @@ class Controller {
         ControlMode control_mode; ///< The ControlMode that is active in the Model.
         
         std::vector<double> net_load_vec_kW; ///< A vector of net load values [kW] at each point in the modelling time series. Net load is defined as load minus all available Renewable production.
+        std::vector<double> missed_load_vec_kW; ///< A vector of missed load values [kW] at each point in the modelling time series.
         
         std::map<double, std::vector<bool>> combustion_map; ///< A map of all possible combustion states, for use in determining optimal dispatch.
         

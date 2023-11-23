@@ -27,6 +27,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <list>
 #include <map>
 #include <stdexcept>
 #include <sstream>

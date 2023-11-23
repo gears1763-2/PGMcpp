@@ -98,6 +98,9 @@ class Model {
         
         void run(void);
         
+        void computeFuelAndEmissions(void);
+        void computeEconomics(void);
+        
         void reset(void);
         void clear(void);
         
