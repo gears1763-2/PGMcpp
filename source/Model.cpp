@@ -219,7 +219,7 @@ void Model :: __computeEconomics(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn
+/// \fn void Model :: __writeSummary(std::string write_path)
 ///
 /// \brief Helper method to write summary results for Model.
 ///
@@ -236,31 +236,220 @@ void Model :: __writeSummary(std::string write_path)
     //  2. create filestream
     write_path += "summary_results.md";
     std::ofstream ofs;
-    ofs.open(write_path);
+    ofs.open(write_path, std::ofstream::out);
     
     //  3. write to summary results (markdown)
-    ofs << "# Model Summary Results\n\n";
+    ofs << "# Model Summary Results\n";
+    ofs << "\n--------\n\n";
     
-    ofs << "--------\n";
+    //  3.1. ElectricalLoad
     ofs << "## Electrical Load\n";
     ofs << "\n";
     ofs << "Path: " <<
-        this->electrical_load.path_2_electrical_load_time_series << "\n";
-    ofs << "Data Points: " << this->electrical_load.n_points << "\n";
-    ofs << "Years: " << this->electrical_load.n_years << "\n";
-    ofs << "Min: " << this->electrical_load.min_load_kW << " kW \n";
-    ofs << "Mean: " << this->electrical_load.mean_load_kW << " kW \n";
-    ofs << "Max: " << this->electrical_load.max_load_kW << " kW \n";
+        this->electrical_load.path_2_electrical_load_time_series << "  \n";
+    ofs << "Data Points: " << this->electrical_load.n_points << "  \n";
+    ofs << "Years: " << this->electrical_load.n_years << "  \n";
+    ofs << "Min: " << this->electrical_load.min_load_kW << " kW  \n";
+    ofs << "Mean: " << this->electrical_load.mean_load_kW << " kW  \n";
+    ofs << "Max: " << this->electrical_load.max_load_kW << " kW  \n";
+    ofs << "\n--------\n\n";
     
-    ofs << "--------\n";
+    //  3.2. Controller
     ofs << "## Controller\n";
     ofs << "\n";
-    ofs << "Control: " << this->controller.control_string << "\n";
+    ofs << "Control Mode: " << this->controller.control_string << "  \n";
+    ofs << "\n--------\n\n";
     
-    ofs << "--------\n";
+    //  3.3. Resources (1D)
+    ofs << "## 1D Renewable Resources\n";
+    ofs << "\n";
+    
+    std::map<int, std::string>::iterator string_map_1D_iter =
+        this->resources.string_map_1D.begin();
+    std::map<int, std::string>::iterator path_map_1D_iter =
+        this->resources.path_map_1D.begin();
+    
+    while (
+        string_map_1D_iter != this->resources.string_map_1D.end() and
+        path_map_1D_iter != this->resources.path_map_1D.end()
+    ) {
+        ofs << "Resource Key: " << string_map_1D_iter->first << "  \n";
+        ofs << "Type: " << string_map_1D_iter->second << "  \n";
+        ofs << "Path: " << path_map_1D_iter->second << "  \n";
+        ofs << "\n";
+        
+        string_map_1D_iter++;
+        path_map_1D_iter++;
+    }
+    
+    ofs << "\n--------\n\n";
+    
+    //  3.4. Resources (2D)
+    ofs << "## 2D Renewable Resources\n";
+    ofs << "\n";
+    
+    std::map<int, std::string>::iterator string_map_2D_iter =
+        this->resources.string_map_2D.begin();
+    std::map<int, std::string>::iterator path_map_2D_iter =
+        this->resources.path_map_2D.begin();
+    
+    while (
+        string_map_2D_iter != this->resources.string_map_2D.end() and
+        path_map_2D_iter != this->resources.path_map_2D.end()
+    ) {
+        ofs << "Resource Key: " << string_map_2D_iter->first << "  \n";
+        ofs << "Type: " << string_map_2D_iter->second << "  \n";
+        ofs << "Path: " << path_map_2D_iter->second << "  \n";
+        ofs << "\n";
+        
+        string_map_2D_iter++;
+        path_map_2D_iter++;
+    }
+    
+    ofs << "\n--------\n\n";
+    
+    //  3.5. Combustion
+    ofs << "## Combustion Assets\n";
+    ofs << "\n";
+    
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        ofs << "Asset Index: " << i << "  \n";
+        ofs << "Type: " << this->combustion_ptr_vec[i]->type_str << "  \n";
+        ofs << "Capacity: " << this->combustion_ptr_vec[i]->capacity_kW << " kW  \n";
+        ofs << "\n";
+    }
+    
+    ofs << "\n--------\n\n";
+    
+    //  3.6. Renewable
+    ofs << "## Renewable Assets\n";
+    ofs << "\n";
+    
+    for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
+        ofs << "Asset Index: " << i << "  \n";
+        ofs << "Type: " << this->renewable_ptr_vec[i]->type_str << "  \n";
+        ofs << "Capacity: " << this->renewable_ptr_vec[i]->capacity_kW << " kW  \n";
+        ofs << "\n";
+    }
+    
+    ofs << "\n--------\n\n";
+    
+    //  3.7. Storage
+    ofs << "## Storage Assets\n";
+    ofs << "\n";
+    
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        //...
+    }
+    
+    ofs << "\n--------\n\n";
+    
+    //  3.8. Model Results
+    ofs << "## Results\n";
+    ofs << "\n";
+    
+    ofs << "Net Present Cost: " << this->net_present_cost << "  \n";
+    ofs << "\n";
+    
+    ofs << "Total Dispatch + Discharge: " << this->total_dispatch_discharge_kWh
+        << " kWh  \n";
+        
+    ofs << "Levellized Cost of Energy: " << this->levellized_cost_of_energy_kWh
+        << " per kWh dispatched/discharged  \n";
+    ofs << "\n";
+    
+    ofs << "Total Fuel Consumed: " << this->total_fuel_consumed_L << " L "
+        << "(Annual Average: " <<
+            this->total_fuel_consumed_L / this->electrical_load.n_years
+        << " L/yr)  \n";
+        
+    ofs << "\n";
+    ofs << "Total Carbon Dioxide (CO2) Emissions: " <<
+        this->total_emissions.CO2_kg << " kg "
+        << "(Annual Average: " << 
+            this->total_emissions.CO2_kg / this->electrical_load.n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Carbon Monoxide (CO) Emissions: " <<
+        this->total_emissions.CO_kg << " kg "
+        << "(Annual Average: " << 
+            this->total_emissions.CO_kg / this->electrical_load.n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Nitrogen Oxides (NOx) Emissions: " <<
+        this->total_emissions.NOx_kg << " kg "
+        << "(Annual Average: " << 
+            this->total_emissions.NOx_kg / this->electrical_load.n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Sulfur Oxides (SOx) Emissions: " <<
+        this->total_emissions.SOx_kg << " kg "
+        << "(Annual Average: " << 
+            this->total_emissions.SOx_kg / this->electrical_load.n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Methane (CH4) Emissions: " << this->total_emissions.CH4_kg << " kg "
+        << "(Annual Average: " << 
+            this->total_emissions.CH4_kg / this->electrical_load.n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Particulate Matter (PM) Emissions: " <<
+        this->total_emissions.PM_kg << " kg "
+        << "(Annual Average: " << 
+            this->total_emissions.PM_kg / this->electrical_load.n_years
+        << " kg/yr)  \n";
+        
+    ofs << "\n--------\n\n";
+    
     ofs.close();
     return;
 }   /* __writeSummary() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: __writeTimeSeries(std::string write_path, int max_lines)
+///
+/// \brief Helper method to write time series results for Model.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+/// \param max_lines The maximum number of lines of output to write. If <0, then all
+///     available lines are written.
+///
+
+void Model :: __writeTimeSeries(std::string write_path, int max_lines)
+{
+    //  1. handle sentinel
+    if (max_lines < 0) {
+        max_lines = this->electrical_load.n_points;
+    }
+    
+    //  2. create filestream
+    write_path += "Model/time_series_results.csv";
+    std::ofstream ofs;
+    ofs.open(write_path, std::ofstream::out);
+    
+    //  3. write to time series results
+    ofs << "Time (since start of data) [hrs],";
+    ofs << "Electrical Load [kW],";
+    ofs << "Net Load [kW],";
+    ofs << "Missed Load [kW]\n";
+    
+    for (int i = 0; i < max_lines; i++) {
+        ofs << this->electrical_load.time_vec_hrs[i] << ",";
+        ofs << this->electrical_load.load_vec_kW[i] << ",";
+        ofs << this->controller.net_load_vec_kW[i] << ",";
+        ofs << this->controller.missed_load_vec_kW[i] << "\n";
+    }
+    
+    return;
+}   /* __writeTimeSeries() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -637,7 +826,7 @@ void Model :: writeResults(
     this->__writeSummary(write_path);
     
     //  4. write time series
-    //this->__writeTimeSeries(write_path, max_lines);
+    this->__writeTimeSeries(write_path, max_lines);
     
     //  5. call out to Combustion :: writeResults()
     for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {

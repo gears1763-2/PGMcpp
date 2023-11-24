@@ -319,6 +319,128 @@ void Diesel :: __handleStartStop(int timestep, double dt_hrs, double production_
 
 // ---------------------------------------------------------------------------------- //
 
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Diesel :: __writeSummary(std::string write_path)
+///
+/// \brief Helper method to write summary results for Model.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+
+void Diesel :: __writeSummary(std::string write_path)
+{
+    //  1. create filestream
+    write_path += "summary_results.md";
+    std::ofstream ofs;
+    ofs.open(write_path, std::ofstream::out);
+    
+    //  2. write to summary results (markdown)
+    ofs << "# ";
+    ofs << std::to_string(int(ceil(this->capacity_kW)));
+    ofs << " kW DIESEL Summary Results\n";
+    ofs << "\n--------\n\n";
+    
+    //  2.1. Production attributes
+    ofs << "## Production Attributes\n";
+    ofs << "\n";
+    ofs << "Capacity: " << this->capacity_kW << "kW  \n";
+    ofs << "\n";
+    ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
+    ofs << "Capital Cost: " << this->capital_cost << "  \n";
+    ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
+        << " per kWh produced  \n";
+    ofs << "Nominal Inflation Rate (annual): " << this->nominal_inflation_annual
+        << "  \n";
+    ofs << "Nominal Discount Rate (annual): " << this->nominal_discount_annual
+        << "  \n";
+    ofs << "Real Discount Rate (annual): " << this->real_discount_annual << "  \n";
+    ofs << "\n";
+    ofs << "Replacement Running Hours: " << this->replace_running_hrs << "  \n";
+    ofs << "\n--------\n\n";
+    
+    //  2.2. Combustion attributes
+    ofs << "## Combustion Attributes\n";
+    ofs << "\n";
+    //...
+    ofs << "\n--------\n\n";
+    
+    //  2.3. Diesel attributes
+    ofs << "## Diesel Attributes\n";
+    ofs << "\n";
+    //...
+    ofs << "\n--------\n\n";
+    
+    //  2.4. Diesel Results
+    ofs << "## Results\n";
+    ofs << "\n";
+    /*
+    double net_present_cost; ///< The net present cost of this asset.
+    double total_dispatch_kWh; ///< The total energy dispatched [kWh] over the Model run.
+    double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatched and stored energy.
+    double running_hours; ///< The number of hours for which the assset has been operating.
+    int n_starts; ///< The number of times the asset has been started.
+    int n_replacements; ///< The number of times the asset has been replaced.
+    */
+    ofs << "\n--------\n\n";
+
+    ofs.close();
+    return;
+}   /* __writeSummary() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Diesel :: __writeTimeSeries(std::string write_path, int max_lines)
+///
+/// \brief Helper method to write time series results for Model.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+/// \param max_lines The maximum number of lines of output to write. If <0, then all
+///     available lines are written.
+///
+
+void Diesel :: __writeTimeSeries(std::string write_path, int max_lines)
+{
+    //  1. handle sentinel
+    if (max_lines < 0) {
+        max_lines = this->n_points;
+    }
+    
+    //  2. create filestream
+    write_path += "time_series_results.csv";
+    std::ofstream ofs;
+    ofs.open(write_path, std::ofstream::out);
+    /*
+    //  3. write to time series results
+    ofs << "Time (since start of data) [hrs],";
+    ofs << "Electrical Load [kW],";
+    ofs << "Net Load [kW],";
+    ofs << "Missed Load [kW]\n";
+    
+    for (int i = 0; i < max_lines; i++) {
+        ofs << this->electrical_load.time_vec_hrs[i] << ",";
+        ofs << this->electrical_load.load_vec_kW[i] << ",";
+        ofs << this->controller.net_load_vec_kW[i] << ",";
+        ofs << this->controller.missed_load_vec_kW[i] << "\n";
+    }
+    */
+    return;
+}   /* __writeTimeSeries() */
+
+// ---------------------------------------------------------------------------------- //
+
 // ======== END PRIVATE ============================================================= //
 
 
@@ -395,7 +517,7 @@ Combustion(n_points, diesel_inputs.combustion_inputs)
         this->operation_maintenance_cost_kWh = this->__getGenericOpMaintCost();
     }
     
-    if (this->is_sunk) {
+    if (not this->is_sunk) {
         this->capital_cost_vec[0] = this->capital_cost;
     }
     
@@ -557,7 +679,30 @@ void Diesel :: writeResults(
         max_lines = this->n_points;
     }
     
-    //...
+    //  2. create subdirectories
+    write_path += "Production/";
+    if (not std::filesystem::is_directory(write_path)) {
+        std::filesystem::create_directory(write_path);
+    }
+    
+    write_path += "Combustion/";
+    if (not std::filesystem::is_directory(write_path)) {
+        std::filesystem::create_directory(write_path);
+    }
+    
+    write_path += this->type_str;
+    write_path += "_";
+    write_path += std::to_string(int(ceil(this->capacity_kW)));
+    write_path += "kW_idx";
+    write_path += std::to_string(combustion_index);
+    write_path += "/";
+    std::filesystem::create_directory(write_path);
+    
+    //  3. write summary
+    this->__writeSummary(write_path);
+    
+    //  4. write time series
+    this->__writeTimeSeries(write_path, max_lines);
     
     return;
 }   /* writeResults() */

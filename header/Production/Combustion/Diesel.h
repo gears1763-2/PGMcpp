@@ -79,6 +79,9 @@ class Diesel : public Combustion {
         void __checkInputs(DieselInputs);
         void __handleStartStop(int, double, double);
         
+        void __writeSummary(std::string);
+        void __writeTimeSeries(std::string, int = -1);
+        
         double __getGenericFuelSlope(void);
         double __getGenericFuelIntercept(void);
         double __getGenericCapitalCost(void);

@@ -165,7 +165,7 @@ Renewable(n_points, solar_inputs.renewable_inputs)
         this->operation_maintenance_cost_kWh = this->__getGenericOpMaintCost();
     }
     
-    if (this->is_sunk) {
+    if (not this->is_sunk) {
         this->capital_cost_vec[0] = this->capital_cost;
     }
     

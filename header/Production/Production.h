@@ -80,6 +80,8 @@ class Production {
         
         double capacity_kW; ///< The rated production capacity [kW] of the asset.
         
+        double nominal_inflation_annual; ///< The nominal, annual inflation rate to use in computing model economics.
+        double nominal_discount_annual; ///< The nominal, annual discount rate to use in computing model economics.
         double real_discount_annual; ///< The real, annual discount rate used in computing model economics. Is computed from the given nominal inflation and discount rates.
         double capital_cost; ///< The capital cost of the asset (undefined currency).
         double operation_maintenance_cost_kWh; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced.

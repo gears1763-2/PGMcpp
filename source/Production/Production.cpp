@@ -146,6 +146,7 @@ void Production :: __handleReplacement(int timestep)
 
 // ---------------------------------------------------------------------------------- //
 
+
 // ======== END PRIVATE ============================================================= //
 
 
@@ -192,6 +193,7 @@ Production :: Production(int n_points, ProductionInputs production_inputs)
     //  2. set attributes
     this->print_flag = production_inputs.print_flag;
     this->is_running = false;
+    this->is_sunk = production_inputs.is_sunk;
     
     this->n_points = n_points;
     this->n_starts = 0;
@@ -201,6 +203,8 @@ Production :: Production(int n_points, ProductionInputs production_inputs)
     
     this->capacity_kW = production_inputs.capacity_kW;
     
+    this->nominal_inflation_annual = production_inputs.nominal_inflation_annual;
+    this->nominal_discount_annual = production_inputs.nominal_discount_annual;
     this->real_discount_annual = this->__computeRealDiscountAnnual(
         production_inputs.nominal_inflation_annual,
         production_inputs.nominal_discount_annual

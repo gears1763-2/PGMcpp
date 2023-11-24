@@ -255,7 +255,7 @@ void Resources :: __readSolarResource(
     ElectricalLoad* electrical_load_ptr
 )
 {
-    //  1. init CSV reader, record path
+    //  1. init CSV reader, record path and type
     io::CSVReader<2> CSV(path_2_resource_data);
     
     CSV.read_header(
@@ -267,6 +267,8 @@ void Resources :: __readSolarResource(
     this->path_map_1D.insert(
         std::pair<int, std::string>(resource_key, path_2_resource_data)
     );
+    
+    this->string_map_1D.insert(std::pair<int, std::string>(resource_key, "SOLAR"));
     
     //  2. init map element
     this->resource_map_1D.insert(
@@ -335,7 +337,7 @@ void Resources :: __readTidalResource(
     ElectricalLoad* electrical_load_ptr
 )
 {
-    //  1. init CSV reader, record path
+    //  1. init CSV reader, record path and type
     io::CSVReader<2> CSV(path_2_resource_data);
     
     CSV.read_header(
@@ -347,6 +349,8 @@ void Resources :: __readTidalResource(
     this->path_map_1D.insert(
         std::pair<int, std::string>(resource_key, path_2_resource_data)
     );
+    
+    this->string_map_1D.insert(std::pair<int, std::string>(resource_key, "TIDAL"));
     
     //  2. init map element
     this->resource_map_1D.insert(
@@ -415,7 +419,7 @@ void Resources :: __readWaveResource(
     ElectricalLoad* electrical_load_ptr
 )
 {
-    //  1. init CSV reader, record path
+    //  1. init CSV reader, record path and type
     io::CSVReader<3> CSV(path_2_resource_data);
     
     CSV.read_header(
@@ -428,6 +432,8 @@ void Resources :: __readWaveResource(
     this->path_map_2D.insert(
         std::pair<int, std::string>(resource_key, path_2_resource_data)
     );
+    
+    this->string_map_2D.insert(std::pair<int, std::string>(resource_key, "WAVE"));
     
     //  2. init map element
     this->resource_map_2D.insert(
@@ -498,7 +504,7 @@ void Resources :: __readWindResource(
     ElectricalLoad* electrical_load_ptr
 )
 {
-    //  1. init CSV reader, record path
+    //  1. init CSV reader, record path and type
     io::CSVReader<2> CSV(path_2_resource_data);
     
     CSV.read_header(
@@ -510,6 +516,8 @@ void Resources :: __readWindResource(
     this->path_map_1D.insert(
         std::pair<int, std::string>(resource_key, path_2_resource_data)
     );
+    
+    this->string_map_1D.insert(std::pair<int, std::string>(resource_key, "WIND"));
     
     //  2. init map element
     this->resource_map_1D.insert(
@@ -688,9 +696,11 @@ void Resources :: addResource(
 void Resources :: clear(void)
 {
     this->resource_map_1D.clear();
+    this->string_map_1D.clear();
     this->path_map_1D.clear();
     
     this->resource_map_2D.clear();
+    this->string_map_2D.clear();
     this->path_map_2D.clear();
     
     return;

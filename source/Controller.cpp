@@ -338,7 +338,7 @@ void Controller :: __applyLoadFollowingControl_DISCHARGING(
     this->__handleStorageCharging(timestep, dt_hrs, depleted_storage_ptr_list);
     
     //  6. record any missed load
-    if (net_load_kW > 0) {
+    if (net_load_kW > 1e-6) {
         this->missed_load_vec_kW[timestep] = net_load_kW;
     }
     
@@ -483,7 +483,7 @@ void Controller :: __applyCycleChargingControl_DISCHARGING(
     this->__handleStorageCharging(timestep, dt_hrs, depleted_storage_ptr_list);
     
     //  6. record any missed load
-    if (net_load_kW > 0) {
+    if (net_load_kW > 1e-6) {
         this->missed_load_vec_kW[timestep] = net_load_kW;
     }
     

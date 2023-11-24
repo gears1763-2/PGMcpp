@@ -71,6 +71,7 @@ class Model {
         void __computeEconomics(void);
         
         void __writeSummary(std::string);
+        void __writeTimeSeries(std::string, int = -1);
         
         
         //  2. methods
@@ -84,7 +85,7 @@ class Model {
         
         double net_present_cost; ///< The net present cost of the Model (undefined currency).
         double total_dispatch_discharge_kWh; ///< The total energy dispatched/discharged [kWh] over the Model run.
-        double levellized_cost_of_energy_kWh; /// The levellized cost of energy, per unit energy dispatched/discharged, of the Model [1/kWh] (undefined currency).
+        double levellized_cost_of_energy_kWh; ///< The levellized cost of energy, per unit energy dispatched/discharged, of the Model [1/kWh] (undefined currency).
         
         Controller controller; ///< Controller component of Model
         ElectricalLoad electrical_load; ///< ElectricalLoad component of Model

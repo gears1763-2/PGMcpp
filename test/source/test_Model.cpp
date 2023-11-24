@@ -313,6 +313,7 @@ test_model.addResource(
 //  add Diesel assets
 DieselInputs diesel_inputs;
 diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 100;
+diesel_inputs.combustion_inputs.production_inputs.is_sunk = true;
 
 test_model.addDiesel(diesel_inputs);
 
