@@ -102,17 +102,31 @@ Renewable :: Renewable(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Renewable :: Renewable(void)
+/// \fn Renewable :: Renewable(
+///         int n_points,
+///         double n_years,
+///         RenewableInputs renewable_inputs
+///     )
 ///
 /// \brief Constructor (intended) for the Renewable class.
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
+/// \param n_years The number of years being modelled.
+///
 /// \param renewable_inputs A structure of Renewable constructor inputs.
 ///
 
-Renewable :: Renewable(int n_points, RenewableInputs renewable_inputs) :
-Production(n_points, renewable_inputs.production_inputs)
+Renewable :: Renewable(
+    int n_points,
+    double n_years,
+    RenewableInputs renewable_inputs
+) :
+Production(
+    n_points,
+    n_years,
+    renewable_inputs.production_inputs
+)
 {
     //  1. check inputs
     this->__checkInputs(renewable_inputs);

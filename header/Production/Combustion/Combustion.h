@@ -115,7 +115,7 @@ class Combustion : public Production {
         
         //  2. methods
         Combustion(void);
-        Combustion(int, CombustionInputs);
+        Combustion(int, double, CombustionInputs);
         
         void computeFuelAndEmissions(void);
         void computeEconomics(std::vector<double>*);

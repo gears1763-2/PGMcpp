@@ -45,7 +45,7 @@ try {
     WindInputs bad_wind_inputs;
     bad_wind_inputs.design_speed_ms = -1;
     
-    Wind bad_wind(8760, bad_wind_inputs);
+    Wind bad_wind(8760, 1, bad_wind_inputs);
     
     error_flag = false;
 } catch (...) {
@@ -57,7 +57,7 @@ if (not error_flag) {
 
 WindInputs wind_inputs;
 
-test_wind_ptr = new Wind(8760, wind_inputs);
+test_wind_ptr = new Wind(8760, 1, wind_inputs);
 
 // ======== END CONSTRUCTION ======================================================== //
 

@@ -93,7 +93,7 @@ class Tidal : public Renewable {
         
         //  2. methods
         Tidal(void);
-        Tidal(int, TidalInputs);
+        Tidal(int, double, TidalInputs);
         
         double computeProductionkW(int, double, double);
         double commit(int, double, double, double);

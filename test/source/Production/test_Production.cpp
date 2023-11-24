@@ -43,7 +43,7 @@ bool error_flag = true;
 try {
     ProductionInputs production_inputs;
     
-    Production bad_production(0, production_inputs);
+    Production bad_production(0, 1, production_inputs);
     
     error_flag = false;
 } catch (...) {
@@ -55,7 +55,7 @@ if (not error_flag) {
 
 ProductionInputs production_inputs;
 
-Production test_production(8760, production_inputs);
+Production test_production(8760, 1, production_inputs);
 
 // ======== END CONSTRUCTION ======================================================== //
 

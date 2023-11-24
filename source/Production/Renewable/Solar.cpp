@@ -134,17 +134,31 @@ Solar :: Solar(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Solar :: Solar(void)
+/// \fn Solar :: Solar(
+///         int n_points,
+///         double n_years,
+///         SolarInputs solar_inputs
+///     )
 ///
 /// \brief Constructor (intended) for the Solar class.
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
+/// \param n_years The number of years being modelled.
+///
 /// \param solar_inputs A structure of Solar constructor inputs.
 ///
 
-Solar :: Solar(int n_points, SolarInputs solar_inputs) :
-Renewable(n_points, solar_inputs.renewable_inputs)
+Solar :: Solar(
+    int n_points,
+    double n_years,
+    SolarInputs solar_inputs
+) :
+Renewable(
+    n_points,
+    n_years,
+    solar_inputs.renewable_inputs
+)
 {
     //  1. check inputs
     this->__checkInputs(solar_inputs);

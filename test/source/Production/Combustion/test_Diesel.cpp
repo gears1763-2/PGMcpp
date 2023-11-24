@@ -46,7 +46,7 @@ try {
     DieselInputs bad_diesel_inputs;
     bad_diesel_inputs.fuel_cost_L = -1;
     
-    Diesel bad_diesel(8760, bad_diesel_inputs);
+    Diesel bad_diesel(8760, 1, bad_diesel_inputs);
     
     error_flag = false;
 } catch (...) {
@@ -58,7 +58,7 @@ if (not error_flag) {
 
 DieselInputs diesel_inputs;
 
-test_diesel_ptr =  new Diesel(8760, diesel_inputs);
+test_diesel_ptr =  new Diesel(8760, 1, diesel_inputs);
 
 
 // ======== END CONSTRUCTION ======================================================== //

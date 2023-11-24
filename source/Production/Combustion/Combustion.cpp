@@ -71,17 +71,31 @@ Combustion :: Combustion(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Combustion :: Combustion(int n_points, CombustionInputs combustion_inputs)
+/// \fn Combustion :: Combustion(
+///         int n_points,
+///         double n_years,
+///         CombustionInputs combustion_inputs
+///     )
 ///
 /// \brief Constructor (intended) for the Combustion class.
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
+/// \param n_years The number of years being modelled.
+///
 /// \param combustion_inputs A structure of Combustion constructor inputs.
 ///
 
-Combustion :: Combustion(int n_points, CombustionInputs combustion_inputs) :
-Production(n_points, combustion_inputs.production_inputs)
+Combustion :: Combustion(
+    int n_points,
+    double n_years,
+    CombustionInputs combustion_inputs
+) :
+Production(
+    n_points,
+    n_years,
+    combustion_inputs.production_inputs
+)
 {
     //  1. check inputs
     this->__checkInputs(combustion_inputs);

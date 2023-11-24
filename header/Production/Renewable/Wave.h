@@ -96,7 +96,7 @@ class Wave : public Renewable {
         
         //  2. methods
         Wave(void);
-        Wave(int, WaveInputs);
+        Wave(int, double, WaveInputs);
         
         double computeProductionkW(int, double, double, double);
         double commit(int, double, double, double);

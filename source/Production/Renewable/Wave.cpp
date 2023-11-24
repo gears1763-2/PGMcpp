@@ -307,17 +307,31 @@ Wave :: Wave(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Wave :: Wave(void)
+/// \fn Wave :: Wave(
+///         int n_points,
+///         double n_years,
+///         WaveInputs wave_inputs
+///     )
 ///
 /// \brief Constructor (intended) for the Wave class.
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
+/// \param n_years The number of years being modelled.
+///
 /// \param wave_inputs A structure of Wave constructor inputs.
 ///
 
-Wave :: Wave(int n_points, WaveInputs wave_inputs) :
-Renewable(n_points, wave_inputs.renewable_inputs)
+Wave :: Wave(
+    int n_points,
+    double n_years,
+    WaveInputs wave_inputs
+) :
+Renewable(
+    n_points,
+    n_years,
+    wave_inputs.renewable_inputs
+)
 {
     //  1. check inputs
     this->__checkInputs(wave_inputs);

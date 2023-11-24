@@ -175,6 +175,7 @@ Production :: Production(void)
 ///
 /// \fn Production :: Production(
 ///     int n_points,
+///     double n_years,
 ///     ProductionInputs production_inputs
 ///     )
 ///
@@ -182,10 +183,16 @@ Production :: Production(void)
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
+/// \param n_years The number of years being modelled.
+///
 /// \param production_inputs A structure of Production constructor inputs.
 ///
 
-Production :: Production(int n_points, ProductionInputs production_inputs)
+Production :: Production(
+    int n_points,
+    double n_years,
+    ProductionInputs production_inputs
+)
 {
     //  1. check inputs
     this->__checkInputs(n_points, production_inputs);
@@ -197,6 +204,8 @@ Production :: Production(int n_points, ProductionInputs production_inputs)
     
     this->n_points = n_points;
     this->n_starts = 0;
+    
+    this->n_years = n_years;
     
     this->running_hours = 0;
     this->replace_running_hrs = production_inputs.replace_running_hrs;

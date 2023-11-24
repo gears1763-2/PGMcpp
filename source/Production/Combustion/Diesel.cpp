@@ -349,8 +349,10 @@ void Diesel :: __writeSummary(std::string write_path)
     //  2.1. Production attributes
     ofs << "## Production Attributes\n";
     ofs << "\n";
+    
     ofs << "Capacity: " << this->capacity_kW << "kW  \n";
     ofs << "\n";
+    
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
     ofs << "Capital Cost: " << this->capital_cost << "  \n";
     ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
@@ -361,32 +363,103 @@ void Diesel :: __writeSummary(std::string write_path)
         << "  \n";
     ofs << "Real Discount Rate (annual): " << this->real_discount_annual << "  \n";
     ofs << "\n";
+    
     ofs << "Replacement Running Hours: " << this->replace_running_hrs << "  \n";
     ofs << "\n--------\n\n";
     
     //  2.2. Combustion attributes
     ofs << "## Combustion Attributes\n";
     ofs << "\n";
-    //...
+    
+    ofs << "Fuel Cost: " << this->fuel_cost_L << " per L  \n";
+    ofs << "\n";
+    
+    ofs << "Linear Fuel Slope: " << this->linear_fuel_slope_LkWh << " L/kWh  \n";
+    ofs << "Linear Fuel Intercept Coefficient: " << this->linear_fuel_intercept_LkWh
+        << " L/kWh  \n";
+    ofs << "\n";
+    
+    ofs << "Carbon Dioxide (CO2) Emissions Intensity: "
+        << this->CO2_emissions_intensity_kgL << " kg/L  \n";
+    
+    ofs << "Carbon Monoxide (CO) Emissions Intensity: "
+        << this->CO_emissions_intensity_kgL << " kg/L  \n";
+        
+    ofs << "Nitrogen Oxides (NOx) Emissions Intensity: "
+        << this->NOx_emissions_intensity_kgL << " kg/L  \n";
+        
+    ofs << "Sulfur Oxides (SOx) Emissions Intensity: "
+        << this->SOx_emissions_intensity_kgL << " kg/L  \n";
+        
+    ofs << "Methane (CH4) Emissions Intensity: "
+        << this->CH4_emissions_intensity_kgL << " kg/L  \n";
+        
+    ofs << "Particulate Matter (PM) Emissions Intensity: "
+        << this->PM_emissions_intensity_kgL << " kg/L  \n";
+    
     ofs << "\n--------\n\n";
     
     //  2.3. Diesel attributes
     ofs << "## Diesel Attributes\n";
     ofs << "\n";
-    //...
+    
+    ofs << "Minimum Load Ratio: " << this->minimum_load_ratio << "  \n";
+    ofs << "Minimum Runtime: " << this->minimum_runtime_hrs << " hrs  \n";
+    
     ofs << "\n--------\n\n";
     
     //  2.4. Diesel Results
     ofs << "## Results\n";
     ofs << "\n";
-    /*
-    double net_present_cost; ///< The net present cost of this asset.
-    double total_dispatch_kWh; ///< The total energy dispatched [kWh] over the Model run.
-    double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatched and stored energy.
-    double running_hours; ///< The number of hours for which the assset has been operating.
-    int n_starts; ///< The number of times the asset has been started.
-    int n_replacements; ///< The number of times the asset has been replaced.
-    */
+    
+    ofs << "Net Present Cost: " << this->net_present_cost << "  \n";
+    ofs << "\n";
+    
+    ofs << "Total Dispatch + Discharge: " << this->total_dispatch_kWh
+        << " kWh  \n";
+        
+    ofs << "Levellized Cost of Energy: " << this->levellized_cost_of_energy_kWh
+        << " per kWh dispatched/discharged  \n";
+    ofs << "\n";
+    
+    ofs << "Running Hours: " << this->running_hours << "  \n";
+    ofs << "Starts: " << this->n_starts << "  \n";
+    ofs << "Replacements: " << this->n_replacements << "  \n";
+    
+    ofs << "Total Fuel Consumed: " << this->total_fuel_consumed_L << " L "
+        << "(Annual Average: " << this->total_fuel_consumed_L / this->n_years
+        << " L/yr)  \n";
+    ofs << "\n";
+    
+    ofs << "Total Carbon Dioxide (CO2) Emissions: " <<
+        this->total_emissions.CO2_kg << " kg "
+        << "(Annual Average: " <<  this->total_emissions.CO2_kg / this->n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Carbon Monoxide (CO) Emissions: " <<
+        this->total_emissions.CO_kg << " kg "
+        << "(Annual Average: " <<  this->total_emissions.CO_kg / this->n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Nitrogen Oxides (NOx) Emissions: " <<
+        this->total_emissions.NOx_kg << " kg "
+        << "(Annual Average: " <<  this->total_emissions.NOx_kg / this->n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Sulfur Oxides (SOx) Emissions: " <<
+        this->total_emissions.SOx_kg << " kg "
+        << "(Annual Average: " <<  this->total_emissions.SOx_kg / this->n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Methane (CH4) Emissions: " << this->total_emissions.CH4_kg << " kg "
+        << "(Annual Average: " <<  this->total_emissions.CH4_kg / this->n_years
+        << " kg/yr)  \n";
+        
+    ofs << "Total Particulate Matter (PM) Emissions: " <<
+        this->total_emissions.PM_kg << " kg "
+        << "(Annual Average: " <<  this->total_emissions.PM_kg / this->n_years
+        << " kg/yr)  \n";
+    
     ofs << "\n--------\n\n";
 
     ofs.close();
@@ -467,17 +540,31 @@ Diesel :: Diesel(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Diesel :: Diesel(void)
+/// \fn Diesel :: Diesel(
+///         int n_points,
+///         double n_years,
+///         DieselInputs diesel_inputs
+///     )
 ///
 /// \brief Constructor (intended) for the Diesel class.
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
+/// \param n_years The number of years being modelled.
+///
 /// \param diesel_inputs A structure of Diesel constructor inputs.
 ///
 
-Diesel :: Diesel(int n_points, DieselInputs diesel_inputs) :
-Combustion(n_points, diesel_inputs.combustion_inputs)
+Diesel :: Diesel(
+    int n_points,
+    double n_years,
+    DieselInputs diesel_inputs
+) :
+Combustion(
+    n_points,
+    n_years,
+    diesel_inputs.combustion_inputs
+)
 {
     //  1. check inputs
     this->__checkInputs(diesel_inputs);

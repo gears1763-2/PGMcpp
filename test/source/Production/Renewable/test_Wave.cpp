@@ -45,7 +45,7 @@ try {
     WaveInputs bad_wave_inputs;
     bad_wave_inputs.design_significant_wave_height_m = -1;
     
-    Wave bad_wave(8760, bad_wave_inputs);
+    Wave bad_wave(8760, 1, bad_wave_inputs);
     
     error_flag = false;
 } catch (...) {
@@ -57,7 +57,7 @@ if (not error_flag) {
 
 WaveInputs wave_inputs;
 
-test_wave_ptr = new Wave(8760, wave_inputs);
+test_wave_ptr = new Wave(8760, 1, wave_inputs);
 
 // ======== END CONSTRUCTION ======================================================== //
 

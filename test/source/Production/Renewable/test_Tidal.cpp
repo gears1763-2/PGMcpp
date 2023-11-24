@@ -45,7 +45,7 @@ try {
     TidalInputs bad_tidal_inputs;
     bad_tidal_inputs.design_speed_ms = -1;
     
-    Tidal bad_tidal(8760, bad_tidal_inputs);
+    Tidal bad_tidal(8760, 1, bad_tidal_inputs);
     
     error_flag = false;
 } catch (...) {
@@ -57,7 +57,7 @@ if (not error_flag) {
 
 TidalInputs tidal_inputs;
 
-test_tidal_ptr = new Tidal(8760, tidal_inputs);
+test_tidal_ptr = new Tidal(8760, 1, tidal_inputs);
 
 // ======== END CONSTRUCTION ======================================================== //
 

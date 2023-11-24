@@ -362,8 +362,8 @@ void Model :: __writeSummary(std::string write_path)
         << "(Annual Average: " <<
             this->total_fuel_consumed_L / this->electrical_load.n_years
         << " L/yr)  \n";
-        
     ofs << "\n";
+    
     ofs << "Total Carbon Dioxide (CO2) Emissions: " <<
         this->total_emissions.CO2_kg << " kg "
         << "(Annual Average: " << 
@@ -522,7 +522,11 @@ Model :: Model(ModelInputs model_inputs)
 
 void Model :: addDiesel(DieselInputs diesel_inputs)
 {
-    Combustion* diesel_ptr = new Diesel(this->electrical_load.n_points, diesel_inputs);
+    Combustion* diesel_ptr = new Diesel(
+        this->electrical_load.n_points,
+        this->electrical_load.n_years,
+        diesel_inputs
+    );
     
     this->combustion_ptr_vec.push_back(diesel_ptr);
     
@@ -583,7 +587,11 @@ void Model :: addResource(
 
 void Model :: addSolar(SolarInputs solar_inputs)
 {
-    Renewable* solar_ptr = new Solar(this->electrical_load.n_points, solar_inputs);
+    Renewable* solar_ptr = new Solar(
+        this->electrical_load.n_points,
+        this->electrical_load.n_years,
+        solar_inputs
+    );
     
     this->renewable_ptr_vec.push_back(solar_ptr);
     
@@ -606,7 +614,11 @@ void Model :: addSolar(SolarInputs solar_inputs)
 
 void Model :: addTidal(TidalInputs tidal_inputs)
 {
-    Renewable* tidal_ptr = new Tidal(this->electrical_load.n_points, tidal_inputs);
+    Renewable* tidal_ptr = new Tidal(
+        this->electrical_load.n_points,
+        this->electrical_load.n_years,
+        tidal_inputs
+    );
     
     this->renewable_ptr_vec.push_back(tidal_ptr);
     
@@ -629,7 +641,11 @@ void Model :: addTidal(TidalInputs tidal_inputs)
 
 void Model :: addWave(WaveInputs wave_inputs)
 {
-    Renewable* wave_ptr = new Wave(this->electrical_load.n_points, wave_inputs);
+    Renewable* wave_ptr = new Wave(
+        this->electrical_load.n_points,
+        this->electrical_load.n_years,
+        wave_inputs
+    );
     
     this->renewable_ptr_vec.push_back(wave_ptr);
     
@@ -652,7 +668,11 @@ void Model :: addWave(WaveInputs wave_inputs)
 
 void Model :: addWind(WindInputs wind_inputs)
 {
-    Renewable* wind_ptr = new Wind(this->electrical_load.n_points, wind_inputs);
+    Renewable* wind_ptr = new Wind(
+        this->electrical_load.n_points,
+        this->electrical_load.n_years,
+        wind_inputs
+    );
     
     this->renewable_ptr_vec.push_back(wind_ptr);
     

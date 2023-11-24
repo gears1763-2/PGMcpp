@@ -277,17 +277,31 @@ Tidal :: Tidal(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Tidal :: Tidal(void)
+/// \fn Tidal :: Tidal(
+///         int n_points,
+///         double n_years,
+///         TidalInputs tidal_inputs
+///     )
 ///
 /// \brief Constructor (intended) for the Tidal class.
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
+/// \param n_years The number of years being modelled.
+///
 /// \param tidal_inputs A structure of Tidal constructor inputs.
 ///
 
-Tidal :: Tidal(int n_points, TidalInputs tidal_inputs) :
-Renewable(n_points, tidal_inputs.renewable_inputs)
+Tidal :: Tidal(
+    int n_points,
+    double n_years,
+    TidalInputs tidal_inputs
+) :
+Renewable(
+    n_points,
+    n_years,
+    tidal_inputs.renewable_inputs
+)
 {
     //  1. check inputs
     this->__checkInputs(tidal_inputs);

@@ -97,7 +97,7 @@ class Diesel : public Combustion {
         
         //  2. methods
         Diesel(void);
-        Diesel (int, DieselInputs);
+        Diesel (int, double, DieselInputs);
         
         double requestProductionkW(int, double, double);
         double commit(int, double, double, double);

@@ -40,7 +40,7 @@ try {
 
 CombustionInputs combustion_inputs;
 
-Combustion test_combustion(8760, combustion_inputs);
+Combustion test_combustion(8760, 1, combustion_inputs);
 
 // ======== END CONSTRUCTION ======================================================== //
 

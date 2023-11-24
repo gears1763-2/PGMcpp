@@ -91,7 +91,7 @@ class Wind : public Renewable {
         
         //  2. methods
         Wind(void);
-        Wind(int, WindInputs);
+        Wind(int, double, WindInputs);
         
         double computeProductionkW(int, double, double);
         double commit(int, double, double, double);

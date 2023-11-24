@@ -45,7 +45,7 @@ try {
     SolarInputs bad_solar_inputs;
     bad_solar_inputs.derating = -1;
     
-    Solar bad_solar(8760, bad_solar_inputs);
+    Solar bad_solar(8760, 1, bad_solar_inputs);
     
     error_flag = false;
 } catch (...) {
@@ -57,7 +57,7 @@ if (not error_flag) {
 
 SolarInputs solar_inputs;
 
-test_solar_ptr = new Solar(8760, solar_inputs);
+test_solar_ptr = new Solar(8760, 1, solar_inputs);
 
 // ======== END CONSTRUCTION ======================================================== //
 

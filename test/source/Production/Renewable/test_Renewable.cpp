@@ -40,7 +40,7 @@ try {
 
 RenewableInputs renewable_inputs;
 
-Renewable test_renewable(8760, renewable_inputs);
+Renewable test_renewable(8760, 1, renewable_inputs);
 
 // ======== END CONSTRUCTION ======================================================== //
 

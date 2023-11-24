@@ -221,17 +221,31 @@ Wind :: Wind(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Wind :: Wind(void)
+/// \fn Wind :: Wind(
+///         int n_points,
+///         double n_years,
+///         WindInputs wind_inputs
+///     )
 ///
 /// \brief Constructor (intended) for the Wind class.
 ///
 /// \param n_points The number of points in the modelling time series.
 ///
+/// \param n_years The number of years being modelled.
+///
 /// \param wind_inputs A structure of Wind constructor inputs.
 ///
 
-Wind :: Wind(int n_points, WindInputs wind_inputs) :
-Renewable(n_points, wind_inputs.renewable_inputs)
+Wind :: Wind(
+    int n_points,
+    double n_years,
+    WindInputs wind_inputs
+) :
+Renewable(
+    n_points,
+    n_years,
+    wind_inputs.renewable_inputs
+)
 {
     //  1. check inputs
     this->__checkInputs(wind_inputs);

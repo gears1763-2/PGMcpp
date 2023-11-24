@@ -75,6 +75,8 @@ class Production {
         int n_starts; ///< The number of times the asset has been started.
         int n_replacements; ///< The number of times the asset has been replaced.
         
+        double n_years; ///< The number of years being modelled.
+        
         double running_hours; ///< The number of hours for which the assset has been operating.
         double replace_running_hrs; ///< The number of running hours after which the asset must be replaced.
         
@@ -105,7 +107,7 @@ class Production {
         
         //  2. methods
         Production(void);
-        Production(int, ProductionInputs);
+        Production(int, double, ProductionInputs);
         
         virtual void computeEconomics(std::vector<double>*);
         virtual double commit(int, double, double, double);

@@ -71,7 +71,7 @@ class Solar : public Renewable {
         
         //  2. methods
         Solar(void);
-        Solar(int, SolarInputs);
+        Solar(int, double, SolarInputs);
         
         double computeProductionkW(int, double, double);
         double commit(int, double, double, double);
