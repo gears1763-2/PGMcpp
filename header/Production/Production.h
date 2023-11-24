@@ -83,7 +83,9 @@ class Production {
         double real_discount_annual; ///< The real, annual discount rate used in computing model economics. Is computed from the given nominal inflation and discount rates.
         double capital_cost; ///< The capital cost of the asset (undefined currency).
         double operation_maintenance_cost_kWh; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced.
+        
         double net_present_cost; ///< The net present cost of this asset.
+        double total_dispatch_kWh; ///< The total energy dispatched [kWh] over the Model run.
         double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatched and stored energy.
         
         std::string type_str; ///< A string describing the type of the asset.
@@ -103,6 +105,7 @@ class Production {
         Production(void);
         Production(int, ProductionInputs);
         
+        virtual void computeEconomics(std::vector<double>*);
         virtual double commit(int, double, double, double);
         
         virtual ~Production(void);

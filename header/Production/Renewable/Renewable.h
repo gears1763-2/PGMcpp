@@ -81,6 +81,8 @@ class Renewable : public Production {
         Renewable(void);
         Renewable(int, RenewableInputs);
         
+        void computeEconomics(std::vector<double>*);
+        
         virtual double computeProductionkW(int, double, double) {return 0;}
         virtual double computeProductionkW(int, double, double, double) {return 0;}
         virtual double commit(int, double, double, double);

@@ -98,6 +98,9 @@ class Combustion : public Production {
         double SOx_emissions_intensity_kgL; ///< Sulfur oxide (SOx) emissions intensity [kg/L].
         double CH4_emissions_intensity_kgL; ///< Methane (CH4) emissions intensity [kg/L].
         double PM_emissions_intensity_kgL; ///< Particulate Matter (PM) emissions intensity [kg/L].
+        
+        double total_fuel_consumed_L; ///< The total fuel consumed [L] over a model run.
+        Emissions total_emissions; ///< An Emissions structure for holding total emissions [kg].
     
         std::vector<double> fuel_consumption_vec_L; ///< A vector of fuel consumed [L] over each modelling time step.
         std::vector<double> fuel_cost_vec; ///< A vector of fuel costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are nominal costs).
@@ -113,6 +116,9 @@ class Combustion : public Production {
         //  2. methods
         Combustion(void);
         Combustion(int, CombustionInputs);
+        
+        void computeFuelAndEmissions(void);
+        void computeEconomics(std::vector<double>*);
         
         virtual double requestProductionkW(int, double, double) {return 0;}
         virtual double commit(int, double, double, double);

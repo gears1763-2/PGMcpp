@@ -208,6 +208,7 @@ Production :: Production(int n_points, ProductionInputs production_inputs)
     this->capital_cost = 0;
     this->operation_maintenance_cost_kWh = 0;
     this->net_present_cost = 0;
+    this->total_dispatch_kWh = 0;
     this->levellized_cost_of_energy_kWh = 0;
     
     this->is_running_vec.resize(this->n_points, 0);
@@ -227,6 +228,63 @@ Production :: Production(int n_points, ProductionInputs production_inputs)
     
     return;
 }   /* Production() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Production :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
+///
+/// \brief Helper method to compute key economic metrics for the Model run.
+///
+/// Ref: \cite HOMER_discount_factor\n
+/// Ref: \cite HOMER_levelized_cost_of_energy\n
+/// Ref: \cite HOMER_total_annualized_cost\n
+/// Ref: \cite HOMER_capital_recovery_factor\n
+///
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+///
+
+void Production :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
+{
+    //  1. compute net present cost
+    double t_hrs = 0;
+    double real_discount_scalar = 0;
+    
+    for (int i = 0; i < this->n_points; i++) {
+        t_hrs = time_vec_hrs_ptr->at(i);
+        
+        real_discount_scalar = 1.0 / pow(
+            1 + this->real_discount_annual,
+            t_hrs / 8760
+        );
+        
+        this->net_present_cost += real_discount_scalar * this->capital_cost_vec[i];
+        
+        this->net_present_cost +=
+            real_discount_scalar * this->operation_maintenance_cost_vec[i];
+    }
+    
+    /// 2. compute levellized cost of energy (per unit dispatched)
+    //     assuming 8,760 hours per year
+    double n_years = time_vec_hrs_ptr->at(this->n_points - 1) / 8760;
+    
+    double capital_recovery_factor = 
+        (this->real_discount_annual * pow(1 + this->real_discount_annual, n_years)) / 
+        (pow(1 + this->real_discount_annual, n_years) - 1);
+
+    double total_annualized_cost = capital_recovery_factor *
+        this->net_present_cost;
+    
+    this->levellized_cost_of_energy_kWh =
+        (n_years * total_annualized_cost) /
+        total_dispatch_kWh;
+    
+    return;
+}   /* computeEconomics() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -280,6 +338,7 @@ double Production :: commit(
     }
     
     this->dispatch_vec_kW[timestep] = dispatch_kW;
+    this->total_dispatch_kWh += dispatch_kW * dt_hrs;
     this->curtailment_vec_kW[timestep] = curtailment_kW;
     
     //  3. update load

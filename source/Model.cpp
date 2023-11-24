@@ -45,6 +45,175 @@ void Model :: __checkInputs(ModelInputs)
 
 // ---------------------------------------------------------------------------------- //
 
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: __computeFuelAndEmissions(void)
+///
+/// \brief Helper method to compute the total fuel consumption and emissions over the
+///     Model run.
+///
+
+void Model :: __computeFuelAndEmissions(void)
+{
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        this->combustion_ptr_vec[i]->computeFuelAndEmissions();
+        
+        this->total_fuel_consumed_L +=
+            this->combustion_ptr_vec[i]->total_fuel_consumed_L;
+        
+        this->total_emissions.CO2_kg += 
+            this->combustion_ptr_vec[i]->total_emissions.CO2_kg;
+            
+        this->total_emissions.CO_kg += 
+            this->combustion_ptr_vec[i]->total_emissions.CO_kg;
+            
+        this->total_emissions.NOx_kg += 
+            this->combustion_ptr_vec[i]->total_emissions.NOx_kg;
+            
+        this->total_emissions.SOx_kg += 
+            this->combustion_ptr_vec[i]->total_emissions.SOx_kg;
+            
+        this->total_emissions.CH4_kg += 
+            this->combustion_ptr_vec[i]->total_emissions.CH4_kg;
+            
+        this->total_emissions.PM_kg += 
+            this->combustion_ptr_vec[i]->total_emissions.PM_kg;
+    }
+    
+    return;
+}   /* __computeFuelAndEmissions() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: __computeNetPresentCost(void)
+///
+/// \brief Helper method to compute the overall net present cost, for the Model
+///     run, from the asset-wise net present costs.
+///
+
+void Model :: __computeNetPresentCost(void)
+{
+    //  1. account for Combustion economics in net present cost
+    //     increment total dispatch
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        this->combustion_ptr_vec[i]->computeEconomics(
+            &(this->electrical_load.time_vec_hrs)
+        );
+        
+        this->net_present_cost += this->combustion_ptr_vec[i]->net_present_cost;
+        
+        this->total_dispatch_discharge_kWh +=
+            this->combustion_ptr_vec[i]->total_dispatch_kWh;
+    }
+    
+    //  2. account for Renewable economics in net present cost,
+    //     increment total dispatch
+    for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
+        this->renewable_ptr_vec[i]->computeEconomics(
+            &(this->electrical_load.time_vec_hrs)
+        );
+        
+        this->net_present_cost += this->renewable_ptr_vec[i]->net_present_cost;
+        
+        this->total_dispatch_discharge_kWh +=
+            this->renewable_ptr_vec[i]->total_dispatch_kWh;
+    }
+    
+    //  3. account for Storage economics in net present cost
+    //     increment total dispatch
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        /*
+        this->storage_ptr_vec[i]->computeEconomics(
+            &(this->electrical_load.time_vec_hrs)
+        );
+        
+        this->net_present_cost += this->storage_ptr_vec[i]->net_present_cost;
+        
+        this->total_dispatch_discharge_kWh +=
+            this->storage_ptr_vec[i]->total_discharge_kWh;
+        */
+    }
+    
+    return;
+}   /* __computeNetPresentCost() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: __computeLevellizedCostOfEnergy(void)
+///
+/// \brief Helper method to compute the overall levellized cost of energy, for the Model
+///     run, from the asset-wise levellized costs of energy.
+///
+
+void Model :: __computeLevellizedCostOfEnergy(void)
+{
+    //  1. account for Combustion economics in levellized cost of energy
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        this->levellized_cost_of_energy_kWh += 
+            (
+                this->combustion_ptr_vec[i]->levellized_cost_of_energy_kWh *
+                this->combustion_ptr_vec[i]->total_dispatch_kWh
+            ) / this->total_dispatch_discharge_kWh;
+    }
+    
+    //  2. account for Renewable economics in levellized cost of energy
+    for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
+        this->levellized_cost_of_energy_kWh += 
+            (
+                this->renewable_ptr_vec[i]->levellized_cost_of_energy_kWh *
+                this->renewable_ptr_vec[i]->total_dispatch_kWh
+            ) / this->total_dispatch_discharge_kWh;
+    }
+    
+    //  3. account for Storage economics in levellized cost of energy
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        /*
+        this->levellized_cost_of_energy_kWh += 
+            (
+                this->storage_ptr_vec[i]->levellized_cost_of_energy_kWh *
+                this->storage_ptr_vec[i]->total_discharge_kWh
+            ) / this->total_dispatch_discharge_kWh;
+        */
+    }
+    
+    return;
+}   /* __computeLevellizedCostOfEnergy() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: __computeEconomics(void)
+///
+/// \brief Helper method to compute key economic metrics for the Model run.
+///
+
+void Model :: __computeEconomics(void)
+{
+    this->__computeNetPresentCost();
+    this->__computeLevellizedCostOfEnergy();
+    
+    return;
+}   /* __computeEconomics() */
+
+// ---------------------------------------------------------------------------------- //
+
 // ======== END PRIVATE ============================================================= //
 
 
@@ -88,6 +257,12 @@ Model :: Model(ModelInputs model_inputs)
     
     //  3. set control mode
     this->controller.control_mode = model_inputs.control_mode;
+    
+    //  4. set public attributes
+    this->total_fuel_consumed_L = 0;
+    this->net_present_cost = 0;
+    this->total_dispatch_discharge_kWh = 0;
+    this->levellized_cost_of_energy_kWh = 0;
     
     return;
 }   /* Model() */
@@ -275,6 +450,12 @@ void Model :: run(void)
         &(this->storage_ptr_vec)
     );
     
+    //  3. compute total fuel consumption and emissions
+    this->__computeFuelAndEmissions();
+    
+    //  4. compute key economic metrics
+    this->__computeEconomics();
+    
     return;
 }   /* run() */
 
@@ -310,6 +491,20 @@ void Model :: reset(void)
         delete this->storage_ptr_vec[i];
     }
     this->storage_ptr_vec.clear();
+    
+    //  4. reset attributes
+    this->total_fuel_consumed_L = 0;
+    
+    this->total_emissions.CO2_kg = 0;
+    this->total_emissions.CO_kg = 0;
+    this->total_emissions.NOx_kg = 0;
+    this->total_emissions.SOx_kg = 0;
+    this->total_emissions.CH4_kg = 0;
+    this->total_emissions.PM_kg = 0;
+    
+    this->net_present_cost = 0;
+    this->total_dispatch_discharge_kWh = 0;
+    this->levellized_cost_of_energy_kWh = 0;
     
     return;
 }   /* reset() */

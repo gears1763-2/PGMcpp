@@ -65,6 +65,11 @@ class Model {
         //  1. attributes
         void __checkInputs(ModelInputs);
         
+        void __computeFuelAndEmissions(void);
+        void __computeNetPresentCost(void);
+        void __computeLevellizedCostOfEnergy(void);
+        void __computeEconomics(void);
+        
         
         //  2. methods
         //...
@@ -72,6 +77,13 @@ class Model {
         
     public:
         //  1. attributes
+        double total_fuel_consumed_L; ///< The total fuel consumed [L] over a model run.
+        Emissions total_emissions; ///< An Emissions structure for holding total emissions [kg].
+        
+        double net_present_cost; ///< The net present cost of the Model (undefined currency).
+        double total_dispatch_discharge_kWh; ///< The total energy dispatched/discharged [kWh] over the Model run.
+        double levellized_cost_of_energy_kWh; /// The levellized cost of energy, per unit energy dispatched/discharged, of the Model [1/kWh] (undefined currency).
+        
         Controller controller; ///< Controller component of Model
         ElectricalLoad electrical_load; ///< ElectricalLoad component of Model
         Resources resources; ///< Resources component of Model
@@ -97,9 +109,6 @@ class Model {
         //void addLiIon(LiIonInputs);
         
         void run(void);
-        
-        void computeFuelAndEmissions(void);
-        void computeEconomics(void);
         
         void reset(void);
         void clear(void);

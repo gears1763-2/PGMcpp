@@ -135,6 +135,28 @@ Production(n_points, renewable_inputs.production_inputs)
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Renewable :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
+///
+/// \brief Helper method to compute key economic metrics for the Model run.
+///
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+///
+
+void Renewable :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
+{
+    //  1. invoke base class method
+    Production :: computeEconomics(time_vec_hrs_ptr);
+    
+    return;
+}   /* computeEconomics() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn double Renewable :: commit(
 ///         int timestep,
 ///         double dt_hrs,

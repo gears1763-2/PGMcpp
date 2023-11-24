@@ -667,7 +667,8 @@ double Controller :: __getRenewableProduction(
 ///         int timestep,
 ///         double dt_hrs,
 ///         double net_load_kW,
-//          std::vector<Combustion*>* combustion_ptr_vec_ptr
+//          std::vector<Combustion*>* combustion_ptr_vec_ptr,
+///         bool is_cycle_charging
 ///     )
 ///
 /// \brief Helper method to handle the optimal dispatch of Combustion assets. Dispatches
@@ -713,17 +714,33 @@ double Controller :: __handleCombustionDispatch(
     //  2. share load proportionally (by rated capacity) over active diesels
     Combustion* combustion_ptr;
     double production_kW = 0;
+    double request_kW = 0;
     double _net_load_kW = net_load_kW;
     
     for (size_t i = 0; i < this->combustion_map[total_capacity_kW].size(); i++) {
         combustion_ptr = combustion_ptr_vec_ptr->at(i);
         
+        if (total_capacity_kW > 0) {
+            request_kW =
+                int(this->combustion_map[total_capacity_kW][i]) * 
+                net_load_kW *
+                (combustion_ptr->capacity_kW / total_capacity_kW);
+        }
+        
+        else {
+            request_kW = 0;
+        }
+        
+        if (is_cycle_charging and request_kW > 0) {
+            if (request_kW < 0.85 * combustion_ptr->capacity_kW) {
+                request_kW = 0.85 * combustion_ptr->capacity_kW;
+            }
+        }
+        
         production_kW = combustion_ptr->requestProductionkW(
             timestep,
             dt_hrs,
-            int(this->combustion_map[total_capacity_kW][i]) * 
-            net_load_kW *
-            (combustion_ptr->capacity_kW / total_capacity_kW)
+            request_kW
         );
         
         _net_load_kW = combustion_ptr->commit(

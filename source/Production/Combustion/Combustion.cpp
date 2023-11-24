@@ -99,6 +99,8 @@ Production(n_points, combustion_inputs.production_inputs)
     this->CH4_emissions_intensity_kgL = 0;
     this->PM_emissions_intensity_kgL = 0;
     
+    this->total_fuel_consumed_L = 0;
+    
     this->fuel_consumption_vec_L.resize(this->n_points, 0);
     this->fuel_cost_vec.resize(this->n_points, 0);
     
@@ -116,6 +118,72 @@ Production(n_points, combustion_inputs.production_inputs)
     
     return;
 }   /* Combustion() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Combustion :: computeFuelAndEmissions(void)
+///
+/// \brief Helper method to compute the total fuel consumption and emissions over the
+///     Model run.
+///
+
+void Combustion :: computeFuelAndEmissions(void)
+{
+    for (int i = 0; i < n_points; i++) {
+        this->total_fuel_consumed_L += this->fuel_consumption_vec_L[i];
+        
+        this->total_emissions.CO2_kg += this->CO2_emissions_vec_kg[i];
+        this->total_emissions.CO_kg += this->CO_emissions_vec_kg[i];
+        this->total_emissions.NOx_kg += this->NOx_emissions_vec_kg[i];
+        this->total_emissions.SOx_kg += this->SOx_emissions_vec_kg[i];
+        this->total_emissions.CH4_kg += this->CH4_emissions_vec_kg[i];
+        this->total_emissions.PM_kg += this->PM_emissions_vec_kg[i];
+    }
+    
+    return;
+}   /* computeFuelAndEmissions() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Combustion :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
+///
+/// \brief Helper method to compute key economic metrics for the Model run.
+///
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+///
+
+void Combustion :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
+{
+    //  1. account for fuel costs in net present cost
+    double t_hrs = 0;
+    double real_discount_scalar = 0;
+    
+    for (int i = 0; i < this->n_points; i++) {
+        t_hrs = time_vec_hrs_ptr->at(i);
+        
+        real_discount_scalar = 1.0 / pow(
+            1 + this->real_discount_annual,
+            t_hrs / 8760
+        );
+        
+        this->net_present_cost += real_discount_scalar * this->fuel_cost_vec[i];
+    }
+    
+    //  2. invoke base class method
+    Production :: computeEconomics(time_vec_hrs_ptr);
+    
+    return;
+}   /* computeEconomics() */
 
 // ---------------------------------------------------------------------------------- //
 

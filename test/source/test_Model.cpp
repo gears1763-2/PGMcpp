@@ -459,6 +459,76 @@ for (int i = 0; i < test_model.electrical_load.n_points; i++) {
     );
 }
 
+testGreaterThan(
+    test_model.net_present_cost,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.total_dispatch_discharge_kWh,
+    2263351.62026685,
+    __FILE__,
+    __LINE__
+);
+
+testGreaterThan(
+    test_model.levellized_cost_of_energy_kWh,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testGreaterThan(
+    test_model.total_fuel_consumed_L,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testGreaterThan(
+    test_model.total_emissions.CO2_kg,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testGreaterThan(
+    test_model.total_emissions.CO_kg,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testGreaterThan(
+    test_model.total_emissions.NOx_kg,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testGreaterThan(
+    test_model.total_emissions.SOx_kg,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testGreaterThan(
+    test_model.total_emissions.CH4_kg,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+testGreaterThan(
+    test_model.total_emissions.PM_kg,
+    0,
+    __FILE__,
+    __LINE__
+);
+
 // ======== END METHODS ============================================================= //
 
 }   /* try */

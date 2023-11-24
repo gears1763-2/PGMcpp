@@ -381,7 +381,6 @@ Combustion(n_points, diesel_inputs.combustion_inputs)
     
     if (diesel_inputs.linear_fuel_slope_LkWh < 0) {
         this->linear_fuel_slope_LkWh = this->__getGenericFuelSlope();
-        
     }
     
     if (diesel_inputs.linear_fuel_intercept_LkWh < 0) {
