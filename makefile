@@ -401,6 +401,7 @@ clean:
 	rm -frv object
 	rm -frv test/bin
 	rm -frv test/object
+	rm -frv test/test_results
 
 
 .PHONY: dirs

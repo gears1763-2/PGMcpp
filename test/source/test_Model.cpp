@@ -450,6 +450,12 @@ testFloatEquals(
 //  run
 test_model.run();
 
+
+//  write results
+test_model.writeResults("test/test_results/");
+
+
+//  test post-run attributes
 for (int i = 0; i < test_model.electrical_load.n_points; i++) {
     testLessThanOrEqualTo(
         test_model.controller.net_load_vec_kW[i],

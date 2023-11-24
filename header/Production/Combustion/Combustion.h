@@ -126,6 +126,8 @@ class Combustion : public Production {
         double getFuelConsumptionL(double, double);
         Emissions getEmissionskg(double);
         
+        virtual void writeResults(std::string, int, int = -1) {return;}
+        
         virtual ~Combustion(void);
         
 };  /* Combustion */

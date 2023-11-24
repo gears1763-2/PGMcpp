@@ -115,6 +115,7 @@ class Controller {
     public:
         //  1. attributes
         ControlMode control_mode; ///< The ControlMode that is active in the Model.
+        std::string control_string; ///< A string describing the active ControlMode.
         
         std::vector<double> net_load_vec_kW; ///< A vector of net load values [kW] at each point in the modelling time series. Net load is defined as load minus all available Renewable production.
         std::vector<double> missed_load_vec_kW; ///< A vector of missed load values [kW] at each point in the modelling time series.
@@ -124,6 +125,8 @@ class Controller {
         
         //  2. methods
         Controller(void);
+        
+        void setControlMode(ControlMode);
         
         void init(
             ElectricalLoad*,

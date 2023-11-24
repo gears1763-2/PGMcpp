@@ -214,6 +214,56 @@ void Model :: __computeEconomics(void)
 
 // ---------------------------------------------------------------------------------- //
 
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn
+///
+/// \brief Helper method to write summary results for Model.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+
+void Model :: __writeSummary(std::string write_path)
+{
+    //  1. create subdirectory
+    write_path += "Model/";
+    std::filesystem::create_directory(write_path);
+    
+    //  2. create filestream
+    write_path += "summary_results.md";
+    std::ofstream ofs;
+    ofs.open(write_path);
+    
+    //  3. write to summary results (markdown)
+    ofs << "# Model Summary Results\n\n";
+    
+    ofs << "--------\n";
+    ofs << "## Electrical Load\n";
+    ofs << "\n";
+    ofs << "Path: " <<
+        this->electrical_load.path_2_electrical_load_time_series << "\n";
+    ofs << "Data Points: " << this->electrical_load.n_points << "\n";
+    ofs << "Years: " << this->electrical_load.n_years << "\n";
+    ofs << "Min: " << this->electrical_load.min_load_kW << " kW \n";
+    ofs << "Mean: " << this->electrical_load.mean_load_kW << " kW \n";
+    ofs << "Max: " << this->electrical_load.max_load_kW << " kW \n";
+    
+    ofs << "--------\n";
+    ofs << "## Controller\n";
+    ofs << "\n";
+    ofs << "Control: " << this->controller.control_string << "\n";
+    
+    ofs << "--------\n";
+    ofs.close();
+    return;
+}   /* __writeSummary() */
+
+// ---------------------------------------------------------------------------------- //
+
 // ======== END PRIVATE ============================================================= //
 
 
@@ -256,7 +306,7 @@ Model :: Model(ModelInputs model_inputs)
     this->electrical_load.readLoadData(model_inputs.path_2_electrical_load_time_series);
     
     //  3. set control mode
-    this->controller.control_mode = model_inputs.control_mode;
+    this->controller.setControlMode(model_inputs.control_mode);
     
     //  4. set public attributes
     this->total_fuel_consumed_L = 0;
@@ -533,6 +583,79 @@ void Model :: clear(void)
     
     return;
 }   /* clear() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: writeResults(
+///         std::string write_path,
+///         int max_lines
+///     )
+///
+/// \brief Method which writes Model results to an output directory. Also calls out to
+///     writeResults() for each contained asset.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+/// \param max_lines The maximum number of lines of output to write. If <0, then all
+///     available lines are written.
+///
+
+void Model :: writeResults(
+    std::string write_path,
+    int max_lines
+)
+{
+    //  1. handle sentinel
+    if (max_lines < 0) {
+        max_lines = this->electrical_load.n_points;
+    }
+    
+    //  2. check for pre-existing, warn (and remove), then create
+    if (write_path.back() != '/') {
+        write_path += '/';
+    }
+    
+    if (std::filesystem::is_directory(write_path)) {
+        std::string warning_str = "WARNING:  Model::writeResults():  ";
+        warning_str += write_path;
+        warning_str += " already exists, contents will be overwritten!";
+        
+        std::cout << warning_str << std::endl;
+        
+        std::filesystem::remove_all(write_path);
+    }
+    
+    std::filesystem::create_directory(write_path);
+    
+    //  3. write summary
+    this->__writeSummary(write_path);
+    
+    //  4. write time series
+    //this->__writeTimeSeries(write_path, max_lines);
+    
+    //  5. call out to Combustion :: writeResults()
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        this->combustion_ptr_vec[i]->writeResults(write_path, i, max_lines);
+    }
+    
+    //  6. call out to Renewable :: writeResults()
+    for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
+        //this->renewable_ptr_vec[i]->writeResults(write_path, i, max_lines);
+    }
+    
+    //  7. call out to Storage :: writeResults()
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        //this->storage_ptr_vec[i]->writeResults(write_path, i, max_lines);
+    }
+    
+    return;
+}   /* writeResults() */
 
 // ---------------------------------------------------------------------------------- //
 

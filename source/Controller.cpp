@@ -820,6 +820,54 @@ Controller :: Controller(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Controller :: setControlMode(ControlMode control_mode)
+///
+/// \param control_mode The ControlMode which is to be active in the Controller.
+///
+
+void Controller :: setControlMode(ControlMode control_mode)
+{
+    this->control_mode = control_mode;
+    
+    switch(control_mode) {
+        case (ControlMode :: LOAD_FOLLOWING): {
+            this->control_string = "LOAD_FOLLOWING";
+            
+            break;
+        }
+        
+        case (ControlMode :: CYCLE_CHARGING): {
+            this->control_string = "CYCLE_CHARGING";
+            
+            break;
+        }
+        
+        default: {
+            std::string error_str = "ERROR:  Controller :: setControlMode():  ";
+                error_str += "control mode ";
+                error_str += std::to_string(control_mode);
+                error_str += " not recognized";
+                
+                #ifdef _WIN32
+                    std::cout << error_str << std::endl;
+                #endif
+
+                throw std::runtime_error(error_str);
+            
+            break;
+        }
+    }
+    
+    return;
+}   /* setControlMode() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 ///  \fn void Controller :: init(
 ///         ElectricalLoad* electrical_load_ptr,
 ///         std::vector<Renewable*>* renewable_ptr_vec_ptr,

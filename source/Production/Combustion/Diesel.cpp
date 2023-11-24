@@ -528,6 +528,47 @@ double Diesel :: commit(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Diesel :: writeResults(
+///         std::string write_path,
+///         int combustion_index,
+///         int max_lines
+///     )
+///
+/// \brief Method which writes Diesel results to an output directory.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+/// \param combustion_index An integer which corresponds to the index of the diesel 
+///     generator in the containing Model's combustion pointer vector.
+///
+/// \param max_lines The maximum number of lines of output to write. If <0, then all
+///     available lines are written.
+///
+
+void Diesel :: writeResults(
+    std::string write_path,
+    int combustion_index,
+    int max_lines
+)
+{
+    //  1. handle sentinel
+    if (max_lines < 0) {
+        max_lines = this->n_points;
+    }
+    
+    //...
+    
+    return;
+}   /* writeResults() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn Diesel :: ~Diesel(void)
 ///
 /// \brief Destructor for the Diesel class.

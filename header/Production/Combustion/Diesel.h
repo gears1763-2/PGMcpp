@@ -99,6 +99,8 @@ class Diesel : public Combustion {
         double requestProductionkW(int, double, double);
         double commit(int, double, double, double);
         
+        void writeResults(std::string, int, int =- 1);
+        
         ~Diesel(void);
         
 };  /* Diesel */

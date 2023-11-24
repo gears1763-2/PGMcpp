@@ -70,6 +70,8 @@ class Model {
         void __computeLevellizedCostOfEnergy(void);
         void __computeEconomics(void);
         
+        void __writeSummary(std::string);
+        
         
         //  2. methods
         //...
@@ -112,6 +114,8 @@ class Model {
         
         void reset(void);
         void clear(void);
+        
+        void writeResults(std::string, int = -1);
         
         ~Model(void);
         
