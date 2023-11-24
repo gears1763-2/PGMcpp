@@ -82,12 +82,22 @@ class Wind : public Renewable {
         double __computeExponentialProductionkW(int, double, double);
         double __computeLookupProductionkW(int, double, double);
         
+        void __writeSummary(std::string);
+        void __writeTimeSeries(
+            std::string,
+            std::vector<double>*,
+            std::map<int, std::vector<double>>*,
+            std::map<int, std::vector<std::vector<double>>>*,
+            int = -1
+        );
+        
         
     public:
         //  1. attributes
         double design_speed_ms; ///< The wind speed [m/s] at which the wind turbine achieves its rated capacity.
         
         WindPowerProductionModel power_model; ///< The wind power production model to be applied.
+        std::string power_model_string; ///< A string describing the active power production model.
         
         //  2. methods
         Wind(void);

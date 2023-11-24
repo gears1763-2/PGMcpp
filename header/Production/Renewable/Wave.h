@@ -85,6 +85,15 @@ class Wave : public Renewable {
         double __computeParaboloidProductionkW(int, double, double, double);
         double __computeLookupProductionkW(int, double, double, double);
         
+        void __writeSummary(std::string);
+        void __writeTimeSeries(
+            std::string,
+            std::vector<double>*,
+            std::map<int, std::vector<double>>*,
+            std::map<int, std::vector<std::vector<double>>>*,
+            int = -1
+        );
+        
         
     public:
         //  1. attributes
@@ -92,6 +101,7 @@ class Wave : public Renewable {
         double design_energy_period_s; ///< The energy period [s] at which the wave energy converter achieves its rated capacity.
         
         WavePowerProductionModel power_model; ///< The wave power production model to be applied.
+        std::string power_model_string; ///< A string describing the active power production model.
         
         
         //  2. methods

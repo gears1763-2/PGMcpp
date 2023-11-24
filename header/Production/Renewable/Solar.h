@@ -63,6 +63,15 @@ class Solar : public Renewable {
         double __getGenericCapitalCost(void);
         double __getGenericOpMaintCost(void);
         
+        void __writeSummary(std::string);
+        void __writeTimeSeries(
+            std::string,
+            std::vector<double>*,
+            std::map<int, std::vector<double>>*,
+            std::map<int, std::vector<std::vector<double>>>*,
+            int = -1
+        );
+        
         
     public:
         //  1. attributes

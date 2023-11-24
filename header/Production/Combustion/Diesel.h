@@ -79,13 +79,17 @@ class Diesel : public Combustion {
         void __checkInputs(DieselInputs);
         void __handleStartStop(int, double, double);
         
-        void __writeSummary(std::string);
-        void __writeTimeSeries(std::string, int = -1);
-        
         double __getGenericFuelSlope(void);
         double __getGenericFuelIntercept(void);
         double __getGenericCapitalCost(void);
         double __getGenericOpMaintCost(void);
+        
+        void __writeSummary(std::string);
+        void __writeTimeSeries(
+            std::string,
+            std::vector<double>*,
+            int = -1
+        );
         
         
     public:
@@ -101,8 +105,6 @@ class Diesel : public Combustion {
         
         double requestProductionkW(int, double, double);
         double commit(int, double, double, double);
-        
-        void writeResults(std::string, int, int =- 1);
         
         ~Diesel(void);
         

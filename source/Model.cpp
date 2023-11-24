@@ -238,7 +238,7 @@ void Model :: __writeSummary(std::string write_path)
     std::ofstream ofs;
     ofs.open(write_path, std::ofstream::out);
     
-    //  3. write to summary results (markdown)
+    //  3. write summary results (markdown)
     ofs << "# Model Summary Results\n";
     ofs << "\n--------\n\n";
     
@@ -419,35 +419,32 @@ void Model :: __writeSummary(std::string write_path)
 /// \param write_path A path (either relative or absolute) to the directory location 
 ///     where results are to be written. If already exists, will overwrite.
 ///
-/// \param max_lines The maximum number of lines of output to write. If <0, then all
-///     available lines are written.
+/// \param max_lines The maximum number of lines of output to write.
 ///
 
 void Model :: __writeTimeSeries(std::string write_path, int max_lines)
 {
-    //  1. handle sentinel
-    if (max_lines < 0) {
-        max_lines = this->electrical_load.n_points;
-    }
-    
-    //  2. create filestream
+    //  1. create filestream
     write_path += "Model/time_series_results.csv";
     std::ofstream ofs;
     ofs.open(write_path, std::ofstream::out);
     
-    //  3. write to time series results
+    //  2. write time series results (comma separated value)
     ofs << "Time (since start of data) [hrs],";
     ofs << "Electrical Load [kW],";
     ofs << "Net Load [kW],";
-    ofs << "Missed Load [kW]\n";
+    ofs << "Missed Load [kW],";
+    ofs << "\n";
     
     for (int i = 0; i < max_lines; i++) {
         ofs << this->electrical_load.time_vec_hrs[i] << ",";
         ofs << this->electrical_load.load_vec_kW[i] << ",";
         ofs << this->controller.net_load_vec_kW[i] << ",";
-        ofs << this->controller.missed_load_vec_kW[i] << "\n";
+        ofs << this->controller.missed_load_vec_kW[i] << ",";
+        ofs << "\n";
     }
     
+    ofs.close();
     return;
 }   /* __writeTimeSeries() */
 
@@ -812,7 +809,7 @@ void Model :: clear(void)
 ///     where results are to be written. If already exists, will overwrite.
 ///
 /// \param max_lines The maximum number of lines of output to write. If <0, then all
-///     available lines are written.
+///     available lines are written. If =0, then only summary results are written.
 ///
 
 void Model :: writeResults(
@@ -846,21 +843,46 @@ void Model :: writeResults(
     this->__writeSummary(write_path);
     
     //  4. write time series
-    this->__writeTimeSeries(write_path, max_lines);
+    if (max_lines > this->electrical_load.n_points) {
+        max_lines = this->electrical_load.n_points;
+    }
+    
+    if (max_lines > 0) {
+        this->__writeTimeSeries(write_path, max_lines);
+    }
     
     //  5. call out to Combustion :: writeResults()
     for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
-        this->combustion_ptr_vec[i]->writeResults(write_path, i, max_lines);
+        this->combustion_ptr_vec[i]->writeResults(
+            write_path,
+            &(this->electrical_load.time_vec_hrs),
+            i,
+            max_lines
+        );
     }
     
     //  6. call out to Renewable :: writeResults()
     for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
-        //this->renewable_ptr_vec[i]->writeResults(write_path, i, max_lines);
+        this->renewable_ptr_vec[i]->writeResults(
+            write_path,
+            &(this->electrical_load.time_vec_hrs),
+            &(this->resources.resource_map_1D),
+            &(this->resources.resource_map_2D),
+            i,
+            max_lines
+        );
     }
     
     //  7. call out to Storage :: writeResults()
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
-        //this->storage_ptr_vec[i]->writeResults(write_path, i, max_lines);
+        /*
+        this->storage_ptr_vec[i]->writeResults(
+            write_path,
+            &(this->electrical_load.time_vec_hrs),
+            i,
+            max_lines
+        );
+        */
     }
     
     return;

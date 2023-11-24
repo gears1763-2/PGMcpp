@@ -69,6 +69,15 @@ class Renewable : public Production {
         void __checkInputs(RenewableInputs);
         void __handleStartStop(int, double, double);
         
+        virtual void __writeSummary(std::string) {return;}
+        virtual void __writeTimeSeries(
+            std::string,
+            std::vector<double>*,
+            std::map<int, std::vector<double>>*,
+            std::map<int, std::vector<std::vector<double>>>*,
+            int = -1
+        ) {return;}
+        
         
     public:
         //  1. attributes
@@ -86,6 +95,15 @@ class Renewable : public Production {
         virtual double computeProductionkW(int, double, double) {return 0;}
         virtual double computeProductionkW(int, double, double, double) {return 0;}
         virtual double commit(int, double, double, double);
+        
+        void writeResults(
+            std::string,
+            std::vector<double>*,
+            std::map<int, std::vector<double>>*,
+            std::map<int, std::vector<std::vector<double>>>*,
+            int,
+            int = -1
+        );
         
         virtual ~Renewable(void);
         

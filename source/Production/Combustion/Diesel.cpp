@@ -327,7 +327,7 @@ void Diesel :: __handleStartStop(int timestep, double dt_hrs, double production_
 ///
 /// \fn void Diesel :: __writeSummary(std::string write_path)
 ///
-/// \brief Helper method to write summary results for Model.
+/// \brief Helper method to write summary results for Diesel.
 ///
 /// \param write_path A path (either relative or absolute) to the directory location 
 ///     where results are to be written. If already exists, will overwrite.
@@ -415,11 +415,11 @@ void Diesel :: __writeSummary(std::string write_path)
     ofs << "Net Present Cost: " << this->net_present_cost << "  \n";
     ofs << "\n";
     
-    ofs << "Total Dispatch + Discharge: " << this->total_dispatch_kWh
+    ofs << "Total Dispatch: " << this->total_dispatch_kWh
         << " kWh  \n";
         
     ofs << "Levellized Cost of Energy: " << this->levellized_cost_of_energy_kWh
-        << " per kWh dispatched/discharged  \n";
+        << " per kWh dispatched  \n";
     ofs << "\n";
     
     ofs << "Running Hours: " << this->running_hours << "  \n";
@@ -473,42 +473,73 @@ void Diesel :: __writeSummary(std::string write_path)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void Diesel :: __writeTimeSeries(std::string write_path, int max_lines)
+/// \fn void Diesel :: __writeTimeSeries(
+///         std::string write_path,
+///         std::vector<double>* time_vec_hrs_ptr,
+///         int max_lines
+///     )
 ///
-/// \brief Helper method to write time series results for Model.
+/// \brief Helper method to write time series results for Diesel.
 ///
 /// \param write_path A path (either relative or absolute) to the directory location 
 ///     where results are to be written. If already exists, will overwrite.
 ///
-/// \param max_lines The maximum number of lines of output to write. If <0, then all
-///     available lines are written.
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+///
+/// \param max_lines The maximum number of lines of output to write.
 ///
 
-void Diesel :: __writeTimeSeries(std::string write_path, int max_lines)
+void Diesel :: __writeTimeSeries(
+    std::string write_path,
+    std::vector<double>* time_vec_hrs_ptr,
+    int max_lines
+)
 {
-    //  1. handle sentinel
-    if (max_lines < 0) {
-        max_lines = this->n_points;
-    }
-    
-    //  2. create filestream
+    //  1. create filestream
     write_path += "time_series_results.csv";
     std::ofstream ofs;
     ofs.open(write_path, std::ofstream::out);
-    /*
-    //  3. write to time series results
+    
+    //  2. write time series results (comma separated value)
     ofs << "Time (since start of data) [hrs],";
-    ofs << "Electrical Load [kW],";
-    ofs << "Net Load [kW],";
-    ofs << "Missed Load [kW]\n";
+    ofs << "Production [kW],";
+    ofs << "Dispatch [kW],";
+    ofs << "Storage [kW],";
+    ofs << "Curtailment [kW],";
+    ofs << "Is Running (N = 0 / Y = 1),";
+    ofs << "Fuel Consumption [L],";
+    ofs << "Fuel Cost (actual),";
+    ofs << "Carbon Dioxide (CO2) Emissions [kg],";
+    ofs << "Carbon Monoxide (CO) Emissions [kg],";
+    ofs << "Nitrogen Oxides (NOx) Emissions [kg],";
+    ofs << "Sulfur Oxides (SOx) Emissions [kg],";
+    ofs << "Methane (CH4) Emissions [kg],";
+    ofs << "Particulate Matter (PM) Emissions [kg],";
+    ofs << "Capital Cost (actual),";
+    ofs << "Operation and Maintenance Cost (actual),";
+    ofs << "\n";
     
     for (int i = 0; i < max_lines; i++) {
-        ofs << this->electrical_load.time_vec_hrs[i] << ",";
-        ofs << this->electrical_load.load_vec_kW[i] << ",";
-        ofs << this->controller.net_load_vec_kW[i] << ",";
-        ofs << this->controller.missed_load_vec_kW[i] << "\n";
+        ofs << time_vec_hrs_ptr->at(i) << ",";
+        ofs << this->production_vec_kW[i] << ",";
+        ofs << this->dispatch_vec_kW[i] << ",";
+        ofs << this->storage_vec_kW[i] << ",";
+        ofs << this->curtailment_vec_kW[i] << ",";
+        ofs << this->is_running_vec[i] << ",";
+        ofs << this->fuel_consumption_vec_L[i] << ",";
+        ofs << this->fuel_cost_vec[i] << ",";
+        ofs << this->CO2_emissions_vec_kg[i] << ",";
+        ofs << this->CO_emissions_vec_kg[i] << ",";
+        ofs << this->NOx_emissions_vec_kg[i] << ",";
+        ofs << this->SOx_emissions_vec_kg[i] << ",";
+        ofs << this->CH4_emissions_vec_kg[i] << ",";
+        ofs << this->PM_emissions_vec_kg[i] << ",";
+        ofs << this->capital_cost_vec[i] << ",";
+        ofs << this->operation_maintenance_cost_vec[i] << ",";
+        ofs << "\n";
     }
-    */
+
+    ofs.close();
     return;
 }   /* __writeTimeSeries() */
 
@@ -729,70 +760,6 @@ double Diesel :: commit(
     
     return load_kW;
 }   /* commit() */
-
-// ---------------------------------------------------------------------------------- //
-
-
-
-// ---------------------------------------------------------------------------------- //
-
-///
-/// \fn void Diesel :: writeResults(
-///         std::string write_path,
-///         int combustion_index,
-///         int max_lines
-///     )
-///
-/// \brief Method which writes Diesel results to an output directory.
-///
-/// \param write_path A path (either relative or absolute) to the directory location 
-///     where results are to be written. If already exists, will overwrite.
-///
-/// \param combustion_index An integer which corresponds to the index of the diesel 
-///     generator in the containing Model's combustion pointer vector.
-///
-/// \param max_lines The maximum number of lines of output to write. If <0, then all
-///     available lines are written.
-///
-
-void Diesel :: writeResults(
-    std::string write_path,
-    int combustion_index,
-    int max_lines
-)
-{
-    //  1. handle sentinel
-    if (max_lines < 0) {
-        max_lines = this->n_points;
-    }
-    
-    //  2. create subdirectories
-    write_path += "Production/";
-    if (not std::filesystem::is_directory(write_path)) {
-        std::filesystem::create_directory(write_path);
-    }
-    
-    write_path += "Combustion/";
-    if (not std::filesystem::is_directory(write_path)) {
-        std::filesystem::create_directory(write_path);
-    }
-    
-    write_path += this->type_str;
-    write_path += "_";
-    write_path += std::to_string(int(ceil(this->capacity_kW)));
-    write_path += "kW_idx";
-    write_path += std::to_string(combustion_index);
-    write_path += "/";
-    std::filesystem::create_directory(write_path);
-    
-    //  3. write summary
-    this->__writeSummary(write_path);
-    
-    //  4. write time series
-    this->__writeTimeSeries(write_path, max_lines);
-    
-    return;
-}   /* writeResults() */
 
 // ---------------------------------------------------------------------------------- //
 

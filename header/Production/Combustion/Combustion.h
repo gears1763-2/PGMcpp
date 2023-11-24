@@ -82,6 +82,13 @@ class Combustion : public Production {
         //  2. methods
         void __checkInputs(CombustionInputs);
         
+        virtual void __writeSummary(std::string) {return;}
+        virtual void __writeTimeSeries(
+            std::string,
+            std::vector<double>*,
+            int = -1
+        ) {return;}
+        
         
     public:
         //  1. attributes
@@ -126,7 +133,12 @@ class Combustion : public Production {
         double getFuelConsumptionL(double, double);
         Emissions getEmissionskg(double);
         
-        virtual void writeResults(std::string, int, int = -1) {return;}
+        void writeResults(
+            std::string,
+            std::vector<double>*,
+            int,
+            int = -1
+        );
         
         virtual ~Combustion(void);
         

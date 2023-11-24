@@ -84,12 +84,23 @@ class Tidal : public Renewable {
         double __computeExponentialProductionkW(int, double, double);
         double __computeLookupProductionkW(int, double, double);
         
+        void __writeSummary(std::string);
+        void __writeTimeSeries(
+            std::string,
+            std::vector<double>*,
+            std::map<int, std::vector<double>>*,
+            std::map<int, std::vector<std::vector<double>>>*,
+            int = -1
+        );
+        
         
     public:
         //  1. attributes
         double design_speed_ms; ///< The tidal stream speed [m/s] at which the tidal turbine achieves its rated capacity.
         
         TidalPowerProductionModel power_model; ///< The tidal power production model to be applied.
+        std::string power_model_string; ///< A string describing the active power production model.
+        
         
         //  2. methods
         Tidal(void);

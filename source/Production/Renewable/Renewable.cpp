@@ -223,6 +223,94 @@ double Renewable :: commit(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Renewable :: writeResults(
+///         std::string write_path,
+///         std::vector<double>* time_vec_hrs_ptr,
+///         std::map<int, std::vector<double>>* resource_map_1D_ptr,
+///         std::map<int, std::vector<std::vector<double>>>* resource_map_2D_ptr,
+///         int renewable_index,
+///         int max_lines
+///     )
+///
+/// \brief Method which writes Renewable results to an output directory.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+///
+/// \param resource_map_1D_ptr A pointer to the 1D map of Resources.
+///
+/// \param resource_map_2D_ptr A pointer to the 2D map of Resources.
+///
+/// \param renewable_index An integer which corresponds to the index of the Renewable
+///     asset in the Model.
+///
+/// \param max_lines The maximum number of lines of output to write. If <0, then all
+///     available lines are written. If =0, then only summary results are written.
+///
+
+void Renewable :: writeResults(
+    std::string write_path,
+    std::vector<double>* time_vec_hrs_ptr,
+    std::map<int, std::vector<double>>* resource_map_1D_ptr,
+    std::map<int, std::vector<std::vector<double>>>* resource_map_2D_ptr,
+    int renewable_index,
+    int max_lines
+)
+{
+    //  1. handle sentinel
+    if (max_lines < 0) {
+        max_lines = this->n_points;
+    }
+    
+    //  2. create subdirectories
+    write_path += "Production/";
+    if (not std::filesystem::is_directory(write_path)) {
+        std::filesystem::create_directory(write_path);
+    }
+    
+    write_path += "Renewable/";
+    if (not std::filesystem::is_directory(write_path)) {
+        std::filesystem::create_directory(write_path);
+    }
+    
+    write_path += this->type_str;
+    write_path += "_";
+    write_path += std::to_string(int(ceil(this->capacity_kW)));
+    write_path += "kW_idx";
+    write_path += std::to_string(renewable_index);
+    write_path += "/";
+    std::filesystem::create_directory(write_path);
+    
+    //  3. write summary
+    this->__writeSummary(write_path);
+    
+    //  4. write time series
+    if (max_lines > this->n_points) {
+        max_lines = this->n_points;
+    }
+    
+    if (max_lines > 0) {
+        this->__writeTimeSeries(
+            write_path,
+            time_vec_hrs_ptr,
+            resource_map_1D_ptr,
+            resource_map_2D_ptr,
+            max_lines
+        );
+    }
+    
+    return;
+}   /* writeResults() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn Renewable :: ~Renewable(void)
 ///
 /// \brief Destructor for the Renewable class.

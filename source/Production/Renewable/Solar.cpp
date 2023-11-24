@@ -106,6 +106,163 @@ double Solar :: __getGenericOpMaintCost(void)
 
 // ---------------------------------------------------------------------------------- //
 
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Solar :: __writeSummary(std::string write_path)
+///
+/// \brief Helper method to write summary results for Solar.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+
+void Solar :: __writeSummary(std::string write_path)
+{
+    //  1. create filestream
+    write_path += "summary_results.md";
+    std::ofstream ofs;
+    ofs.open(write_path, std::ofstream::out);
+    
+    //  2. write summary results (markdown)
+    ofs << "# ";
+    ofs << std::to_string(int(ceil(this->capacity_kW)));
+    ofs << " kW SOLAR Summary Results\n";
+    ofs << "\n--------\n\n";
+    
+    //  2.1. Production attributes
+    ofs << "## Production Attributes\n";
+    ofs << "\n";
+    
+    ofs << "Capacity: " << this->capacity_kW << "kW  \n";
+    ofs << "\n";
+    
+    ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
+    ofs << "Capital Cost: " << this->capital_cost << "  \n";
+    ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
+        << " per kWh produced  \n";
+    ofs << "Nominal Inflation Rate (annual): " << this->nominal_inflation_annual
+        << "  \n";
+    ofs << "Nominal Discount Rate (annual): " << this->nominal_discount_annual
+        << "  \n";
+    ofs << "Real Discount Rate (annual): " << this->real_discount_annual << "  \n";
+    ofs << "\n";
+    
+    ofs << "Replacement Running Hours: " << this->replace_running_hrs << "  \n";
+    ofs << "\n--------\n\n";
+    
+    //  2.2. Renewable attributes
+    ofs << "## Renewable Attributes\n";
+    ofs << "\n";
+    
+    ofs << "Resource Key (1D): " << this->resource_key << "  \n";
+    
+    ofs << "\n--------\n\n";
+    
+    //  2.3. Solar attributes
+    ofs << "## Solar Attributes\n";
+    ofs << "\n";
+    
+    ofs << "Derating Factor: " << this->derating << "  \n";
+    
+    ofs << "\n--------\n\n";
+    
+    //  2.4. Solar Results
+    ofs << "## Results\n";
+    ofs << "\n";
+    
+    ofs << "Net Present Cost: " << this->net_present_cost << "  \n";
+    ofs << "\n";
+    
+    ofs << "Total Dispatch: " << this->total_dispatch_kWh
+        << " kWh  \n";
+        
+    ofs << "Levellized Cost of Energy: " << this->levellized_cost_of_energy_kWh
+        << " per kWh dispatched  \n";
+    ofs << "\n";
+    
+    ofs << "Running Hours: " << this->running_hours << "  \n";
+    ofs << "Replacements: " << this->n_replacements << "  \n";
+    
+    ofs << "\n--------\n\n";
+    
+    ofs.close();
+    return;
+}   /* __writeSummary() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Solar :: __writeTimeSeries(
+///         std::string write_path,
+///         std::vector<double>* time_vec_hrs_ptr,
+///         std::map<int, std::vector<double>>* resource_map_1D_ptr,
+///         std::map<int, std::vector<std::vector<double>>>* resource_map_2D_ptr,
+///         int max_lines
+///     )
+///
+/// \brief Helper method to write time series results for Solar.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+///
+/// \param resource_map_1D_ptr A pointer to the 1D map of Resources.
+///
+/// \param resource_map_2D_ptr A pointer to the 2D map of Resources.
+///
+/// \param max_lines The maximum number of lines of output to write.
+///
+
+void Solar :: __writeTimeSeries(
+    std::string write_path,
+    std::vector<double>* time_vec_hrs_ptr,
+    std::map<int, std::vector<double>>* resource_map_1D_ptr,
+    std::map<int, std::vector<std::vector<double>>>* resource_map_2D_ptr,
+    int max_lines
+)
+{
+    //  1. create filestream
+    write_path += "time_series_results.csv";
+    std::ofstream ofs;
+    ofs.open(write_path, std::ofstream::out);
+    
+    //  2. write time series results (comma separated value)
+    ofs << "Time (since start of data) [hrs],";
+    ofs << "Solar Resource [kW/m2],";
+    ofs << "Production [kW],";
+    ofs << "Dispatch [kW],";
+    ofs << "Storage [kW],";
+    ofs << "Curtailment [kW],";
+    ofs << "Capital Cost (actual),";
+    ofs << "Operation and Maintenance Cost (actual),";
+    ofs << "\n";
+    
+    for (int i = 0; i < max_lines; i++) {
+        ofs << time_vec_hrs_ptr->at(i) << ",";
+        ofs << resource_map_1D_ptr->at(this->resource_key)[i] << ",";
+        ofs << this->production_vec_kW[i] << ",";
+        ofs << this->dispatch_vec_kW[i] << ",";
+        ofs << this->storage_vec_kW[i] << ",";
+        ofs << this->curtailment_vec_kW[i] << ",";
+        ofs << this->capital_cost_vec[i] << ",";
+        ofs << this->operation_maintenance_cost_vec[i] << ",";
+        ofs << "\n";
+    }
+    
+    ofs.close();
+    return;
+}   /* __writeTimeSeries() */
+
+// ---------------------------------------------------------------------------------- //
+
 // ======== END PRIVATE ============================================================= //
 
 

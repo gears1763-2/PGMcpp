@@ -204,6 +204,7 @@ Production :: Production(
     
     this->n_points = n_points;
     this->n_starts = 0;
+    this->n_replacements = 0;
     
     this->n_years = n_years;
     
