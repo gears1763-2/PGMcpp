@@ -176,7 +176,7 @@ double Tidal :: __computeCubicProductionkW(
 /// \brief Helper method to compute tidal turbine production under an exponential
 ///     production model.
 ///
-/// Ref: docs/refs/wind_tidal_wave.pdf\n
+/// Ref: \cite WindTidalWave_2019 \n
 ///
 /// \param timestep The current time step of the Model run.
 ///

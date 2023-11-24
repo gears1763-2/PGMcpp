@@ -121,7 +121,7 @@ double Wind :: __getGenericOpMaintCost(void)
 /// \brief Helper method to compute wind turbine production under an exponential
 ///     production model.
 ///
-/// Ref: docs/refs/wind_tidal_wave.pdf\n
+/// Ref: \cite WindTidalWave_2019 \n
 ///
 /// \param timestep The current time step of the Model run.
 ///

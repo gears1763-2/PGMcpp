@@ -135,7 +135,7 @@ double Wave :: __getGenericOpMaintCost(void)
 /// \brief Helper method to compute wave energy converter production under a Gaussian
 ///     production model.
 ///
-/// Ref: docs/refs/wind_tidal_wave.pdf\n
+/// Ref: \cite WindTidalWave_2019 \n
 ///
 /// \param timestep The current time step of the Model run.
 ///

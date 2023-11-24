@@ -34,8 +34,8 @@
 /// Ref: \cite HOMER_fuel_curve\n
 /// Ref: \cite HOMER_generator_fuel_curve_intercept_coefficient\n
 /// Ref: \cite HOMER_generator_fuel_curve_slope\n
-/// Ref: docs/refs/diesel_emissions_ref_1.pdf\n
-/// Ref: docs/refs/diesel_emissions_ref_2.pdf\n
+/// Ref: \cite DieselEmissions_2014\n
+/// Ref: \cite DieselEmissions_2008\n
 ///
 
 struct DieselInputs {

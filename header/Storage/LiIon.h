@@ -14,6 +14,7 @@
 /// \file LiIon.h
 ///
 /// \brief Header file the LiIon class.
+///
 
 
 #ifndef LIION_H
@@ -28,6 +29,7 @@
 ///
 /// \brief A derived class of Storage which models energy storage by way of lithium-ion
 ///     batteries.
+///
 
 class LiIon : public Storage {
     public:

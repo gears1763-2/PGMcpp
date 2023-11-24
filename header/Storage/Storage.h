@@ -14,6 +14,7 @@
 /// \file Storage.h
 ///
 /// \brief Header file the Storage class.
+///
 
 
 #ifndef STORAGE_H
@@ -29,6 +30,7 @@
 ///
 /// \brief The base class of the Storage hierarchy. This hierarchy contains derived
 ///     classes which model the storage of energy.
+///
 
 class Storage {
     public:
