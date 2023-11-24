@@ -174,9 +174,9 @@ Production :: Production(void)
 
 ///
 /// \fn Production :: Production(
-///     int n_points,
-///     double n_years,
-///     ProductionInputs production_inputs
+///         int n_points,
+///         double n_years,
+///         ProductionInputs production_inputs
 ///     )
 ///
 /// \brief Constructor (intended) for the Production class.

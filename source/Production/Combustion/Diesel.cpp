@@ -276,7 +276,11 @@ double Diesel :: __getGenericOpMaintCost(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void Diesel :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+/// \fn void Diesel :: __handleStartStop(
+///         int timestep,
+///         double dt_hrs,
+///         double production_kW
+///     )
 ///
 /// \brief Helper method (private) to handle the starting/stopping of the diesel
 ///     generator. The minimum runtime constraint is enforced in this method.
@@ -288,7 +292,11 @@ double Diesel :: __getGenericOpMaintCost(void)
 /// \param production_kW The current rate of production [kW] of the generator.
 ///
 
-void Diesel :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+void Diesel :: __handleStartStop(
+    int timestep,
+    double dt_hrs,
+    double production_kW
+)
 {
     /*
      *  Helper method (private) to handle the starting/stopping of the diesel 

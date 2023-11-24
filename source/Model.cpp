@@ -725,8 +725,10 @@ void Model :: run(void)
 /// \fn void Model :: reset(void)
 ///
 /// \brief Method which resets the model for use in assessing a new candidate microgrid
-///     design. This method only clears the asset pointer vectors; it leaves the 
-///     Controller, ElectricalLoad, and Resources objects of the Model alone.
+///     design. This method only clears the asset pointer vectors and resets select
+///     Model attribues. It leaves the Controller, ElectricalLoad, and Resources
+///     objects of the Model alone.
+///
 
 void Model :: reset(void)
 {
