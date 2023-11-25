@@ -130,7 +130,6 @@ void Model :: __computeNetPresentCost(void)
     //  3. account for Storage economics in net present cost
     //     increment total dispatch
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
-        /*
         this->storage_ptr_vec[i]->computeEconomics(
             &(this->electrical_load.time_vec_hrs)
         );
@@ -139,7 +138,6 @@ void Model :: __computeNetPresentCost(void)
         
         this->total_dispatch_discharge_kWh +=
             this->storage_ptr_vec[i]->total_discharge_kWh;
-        */
     }
     
     return;

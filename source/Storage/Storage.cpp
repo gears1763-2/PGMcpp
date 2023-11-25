@@ -23,18 +23,202 @@
 #include "../../header/Storage/Storage.h"
 
 
+// ======== PRIVATE ================================================================= //
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Storage :: __checkInputs(int n_points, StorageInputs storage_inputs)
+///
+/// \brief Helper method to check inputs to the Storage constructor.
+///
+/// \param n_points The number of points in the modelling time series.
+///
+/// \param storage_inputs A structure of Storage constructor inputs.
+///
+
+void Storage :: __checkInputs(
+    int n_points, 
+    double n_years, 
+    StorageInputs storage_inputs
+)
+{
+    //  1. check n_points
+    if (n_points <= 0) {
+        std::string error_str = "ERROR:  Storage():  n_points must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  2. check n_years
+    if (n_years <= 0) {
+        std::string error_str = "ERROR:  Storage():  n_years must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  3. check capacity_kW
+    if (storage_inputs.capacity_kW <= 0) {
+        std::string error_str = "ERROR:  Storage():  ";
+        error_str += "StorageInputs::capacity_kW must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  4. check capacity_kWh
+    if (storage_inputs.capacity_kWh <= 0) {
+        std::string error_str = "ERROR:  Storage():  ";
+        error_str += "StorageInputs::capacity_kWh must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    return;
+}   /* __checkInputs() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double Storage :: __computeRealDiscountAnnual(
+///         double nominal_inflation_annual,
+///         double nominal_discount_annual
+///     )
+///
+/// \brief Helper method to compute the real, annual discount rate to be used
+///     in computing model economics. This enables application of the discount factor
+///     approach.
+///
+/// Ref: \cite HOMER_real_discount_rate\n
+/// Ref: \cite HOMER_discount_factor\n
+///
+/// \param nominal_inflation_annual The nominal, annual inflation rate to use in computing model economics.
+///
+/// \param nominal_discount_annual The nominal, annual discount rate to use in computing model economics.
+///
+/// \return The real, annual discount rate to use in computing model economics.
+///
+
+double Storage :: __computeRealDiscountAnnual(
+    double nominal_inflation_annual,
+    double nominal_discount_annual
+)
+{
+    double real_discount_annual = nominal_discount_annual - nominal_inflation_annual;
+    real_discount_annual /= 1 + nominal_inflation_annual;
+    
+    return real_discount_annual;
+}   /* __computeRealDiscountAnnual() */
+
+// ---------------------------------------------------------------------------------- //
+
+// ======== END PRIVATE ============================================================= //
+
+
+
+// ======== PUBLIC ================================================================= //
+
 // ---------------------------------------------------------------------------------- //
 
 ///
 /// \fn Storage :: Storage(void)
 ///
-/// \brief Constructor for the Storage class.
+/// \brief Constructor (dummy) for the Storage class.
 ///
-// \param [...]
 
 Storage :: Storage(void)
 {
-    //...
+    return;
+}   /* Storage() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn Storage :: Storage(
+///         int n_points,
+///         double n_years,
+///         StorageInputs storage_inputs
+///     )
+///
+/// \brief Constructor (intended) for the Storage class.
+///
+/// \param n_points The number of points in the modelling time series.
+///
+/// \param n_years The number of years being modelled.
+///
+/// \param storage_inputs A structure of Storage constructor inputs.
+///
+
+Storage :: Storage(
+    int n_points,
+    double n_years,
+    StorageInputs storage_inputs
+)
+{
+    //  1. check inputs
+    this->__checkInputs(n_points, n_years, storage_inputs);
+    
+    //  2. set attributes
+    this->print_flag = storage_inputs.print_flag;
+    this->is_sunk = storage_inputs.is_sunk;
+    
+    this->n_points = n_points;
+    this->n_replacements = 0;
+    
+    this->n_years = n_years;
+    
+    this->capacity_kW = storage_inputs.capacity_kW;
+    this->capacity_kWh = storage_inputs.capacity_kWh;
+    
+    this->charge_kWh = 0;
+    this->power_kW = 0;
+    
+    this->nominal_inflation_annual = storage_inputs.nominal_inflation_annual;
+    this->nominal_discount_annual = storage_inputs.nominal_discount_annual;
+    this->real_discount_annual = this->__computeRealDiscountAnnual(
+        storage_inputs.nominal_inflation_annual,
+        storage_inputs.nominal_discount_annual
+    );
+    this->capital_cost = 0;
+    this->operation_maintenance_cost_kWh = 0;
+    this->net_present_cost = 0;
+    this->total_discharge_kWh = 0;
+    this->levellized_cost_of_energy_kWh = 0;
+    
+    this->charge_vec_kWh.resize(this->n_points, 0);
+    this->charging_power_vec_kW.resize(this->n_points, 0);
+    this->discharging_power_vec_kW.resize(this->n_points, 0);
+    
+    this->capital_cost_vec.resize(this->n_points, 0);
+    this->operation_maintenance_cost_vec.resize(this->n_points, 0);
+    
+    //  3. construction print
+    if (this->print_flag) {
+        std::cout << "Storage object constructed at " << this << std::endl;
+    }
     
     return;
 }   /* Storage() */
@@ -45,7 +229,86 @@ Storage :: Storage(void)
 
 // ---------------------------------------------------------------------------------- //
 
-//...
+///
+/// \fn void Storage :: handleReplacement(int timestep)
+///
+/// \brief Method to handle asset replacement and capital cost incursion,
+///     if applicable.
+///
+/// \param timestep The current time step of the Model run.
+///
+
+void Storage :: handleReplacement(int timestep)
+{
+    //  1. reset attributes
+    this->charge_kWh = 0;
+    this->power_kW = 0;
+    
+    //  2. log replacement
+    this->n_replacements++;
+    
+    //  3. incur capital cost in timestep
+    this->capital_cost_vec[timestep] = this->capital_cost;
+    
+    return;
+}   /* __handleReplacement() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Storage :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
+///
+/// \brief Helper method to compute key economic metrics for the Model run.
+///
+/// Ref: \cite HOMER_discount_factor\n
+/// Ref: \cite HOMER_levelized_cost_of_energy\n
+/// Ref: \cite HOMER_total_annualized_cost\n
+/// Ref: \cite HOMER_capital_recovery_factor\n
+///
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+///
+
+void Storage :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
+{
+    //  1. compute net present cost
+    double t_hrs = 0;
+    double real_discount_scalar = 0;
+    
+    for (int i = 0; i < this->n_points; i++) {
+        t_hrs = time_vec_hrs_ptr->at(i);
+        
+        real_discount_scalar = 1.0 / pow(
+            1 + this->real_discount_annual,
+            t_hrs / 8760
+        );
+        
+        this->net_present_cost += real_discount_scalar * this->capital_cost_vec[i];
+        
+        this->net_present_cost +=
+            real_discount_scalar * this->operation_maintenance_cost_vec[i];
+    }
+    
+    /// 2. compute levellized cost of energy (per unit discharged)
+    //     assuming 8,760 hours per year
+    double n_years = time_vec_hrs_ptr->at(this->n_points - 1) / 8760;
+    
+    double capital_recovery_factor = 
+        (this->real_discount_annual * pow(1 + this->real_discount_annual, n_years)) / 
+        (pow(1 + this->real_discount_annual, n_years) - 1);
+
+    double total_annualized_cost = capital_recovery_factor *
+        this->net_present_cost;
+    
+    this->levellized_cost_of_energy_kWh =
+        (n_years * total_annualized_cost) /
+        this->total_discharge_kWh;
+    
+    return;
+}   /* computeEconomics() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -61,9 +324,14 @@ Storage :: Storage(void)
 
 Storage :: ~Storage(void)
 {
-    //...
+    //  1. destruction print
+    if (this->print_flag) {
+        std::cout << "Storage object at " << this << " destroyed" << std::endl;
+    }
     
     return;
 }   /* ~Storage() */
 
 // ---------------------------------------------------------------------------------- //
+
+// ======== END PUBLIC ============================================================== //

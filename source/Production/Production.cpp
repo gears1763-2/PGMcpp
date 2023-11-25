@@ -37,7 +37,11 @@
 /// \param production_inputs A structure of Production constructor inputs.
 ///
 
-void Production :: __checkInputs(int n_points, ProductionInputs production_inputs)
+void Production :: __checkInputs(
+    int n_points, 
+    double n_years, 
+    ProductionInputs production_inputs
+)
 {
     //  1. check n_points
     if (n_points <= 0) {
@@ -50,7 +54,18 @@ void Production :: __checkInputs(int n_points, ProductionInputs production_input
         throw std::invalid_argument(error_str);
     }
     
-    //  2. check capacity_kW
+    //  2. check n_years
+    if (n_years <= 0) {
+        std::string error_str = "ERROR:  Production():  n_years must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  3. check capacity_kW
     if (production_inputs.capacity_kW <= 0) {
         std::string error_str = "ERROR:  Production():  ";
         error_str += "ProductionInputs::capacity_kW must be > 0";
@@ -62,7 +77,7 @@ void Production :: __checkInputs(int n_points, ProductionInputs production_input
         throw std::invalid_argument(error_str);
     }
     
-    //  3. check replace_running_hrs
+    //  4. check replace_running_hrs
     if (production_inputs.replace_running_hrs <= 0) {
         std::string error_str = "ERROR:  Production():  ";
         error_str += "ProductionInputs::replace_running_hrs must be > 0";
@@ -116,37 +131,6 @@ double Production :: __computeRealDiscountAnnual(
 
 // ---------------------------------------------------------------------------------- //
 
-
-
-// ---------------------------------------------------------------------------------- //
-
-///
-/// \fn void Production :: __handleReplacement(int timestep)
-///
-/// \brief Helper method to handle asset replacement and capital cost incursion,
-///     if applicable.
-///
-/// \param timestep The current time step of the Model run.
-///
-
-void Production :: __handleReplacement(int timestep)
-{
-    if (
-        this->running_hours >= (this->n_replacements + 1) * this->replace_running_hrs
-    ) {
-        //  1. log replacement
-        this->n_replacements++;
-        
-        //  2. incur capital cost in timestep
-        this->capital_cost_vec[timestep] = this->capital_cost;
-    }
-    
-    return;
-}   /* __handleReplacement() */
-
-// ---------------------------------------------------------------------------------- //
-
-
 // ======== END PRIVATE ============================================================= //
 
 
@@ -195,7 +179,7 @@ Production :: Production(
 )
 {
     //  1. check inputs
-    this->__checkInputs(n_points, production_inputs);
+    this->__checkInputs(n_points, n_years, production_inputs);
     
     //  2. set attributes
     this->print_flag = production_inputs.print_flag;
@@ -250,6 +234,35 @@ Production :: Production(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Production :: handleReplacement(int timestep)
+///
+/// \brief Method to handle asset replacement and capital cost incursion,
+///     if applicable.
+///
+/// \param timestep The current time step of the Model run.
+///
+
+void Production :: handleReplacement(int timestep)
+{
+    //  1. reset attributes
+    this->is_running = false;
+    
+    //  2. log replacement
+    this->n_replacements++;
+    
+    //  3. incur capital cost in timestep
+    this->capital_cost_vec[timestep] = this->capital_cost;
+    
+    return;
+}   /* __handleReplacement() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn void Production :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief Helper method to compute key economic metrics for the Model run.
@@ -295,7 +308,7 @@ void Production :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
     
     this->levellized_cost_of_energy_kWh =
         (n_years * total_annualized_cost) /
-        total_dispatch_kWh;
+        this->total_dispatch_kWh;
     
     return;
 }   /* computeEconomics() */
@@ -358,22 +371,24 @@ double Production :: commit(
     //  3. update load
     load_kW -= dispatch_kW;
     
+    //  4. update and log running attributes
     if (this->is_running) {
-        //  4. log running state, running hours
+        //  4.1. log running state, running hours
         this->is_running_vec[timestep] = this->is_running;
         this->running_hours += dt_hrs;
         
-        //  5. incur operation and maintenance costs
+        //  4.2. incur operation and maintenance costs
         double produced_kWh = production_kW * dt_hrs;
         
         double operation_maintenance_cost =
             this->operation_maintenance_cost_kWh * produced_kWh;
         this->operation_maintenance_cost_vec[timestep] = operation_maintenance_cost;
-        
-        //  6. incur capital costs (i.e., handle replacement)
-        this->__handleReplacement(timestep);
     }
-
+    
+    //  5. trigger replacement, if applicable
+    if (this->running_hours >= (this->n_replacements + 1) * this->replace_running_hrs) {
+        this->handleReplacement(timestep);
+    }
     
     return load_kW;
 }   /* commit() */

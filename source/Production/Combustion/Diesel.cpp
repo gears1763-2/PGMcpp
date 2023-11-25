@@ -662,6 +662,32 @@ Combustion(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Diesel :: handleReplacement(int timestep)
+///
+/// \brief Method to handle asset replacement and capital cost incursion,
+///     if applicable.
+///
+/// \param timestep The current time step of the Model run.
+///
+
+void Diesel :: handleReplacement(int timestep)
+{
+    //  1. reset attributes
+    this->time_since_last_start_hrs = 0;
+    
+    //  2. invoke base class method
+    Combustion :: handleReplacement(timestep);
+    
+    return;
+}   /* __handleReplacement() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn double Diesel :: requestProductionkW(
 ///         int timestep,
 ///         double dt_hrs,

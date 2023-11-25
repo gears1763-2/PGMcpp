@@ -110,7 +110,7 @@ class Combustion : public Production {
         Emissions total_emissions; ///< An Emissions structure for holding total emissions [kg].
     
         std::vector<double> fuel_consumption_vec_L; ///< A vector of fuel consumed [L] over each modelling time step.
-        std::vector<double> fuel_cost_vec; ///< A vector of fuel costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are nominal costs).
+        std::vector<double> fuel_cost_vec; ///< A vector of fuel costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are actual costs).
         
         std::vector<double> CO2_emissions_vec_kg; ///< A vector of carbon dioxide (CO2) emitted [kg] over each modelling time step.
         std::vector<double> CO_emissions_vec_kg; ///< A vector of carbon monoxide (CO) emitted [kg] over each modelling time step.
@@ -123,6 +123,7 @@ class Combustion : public Production {
         //  2. methods
         Combustion(void);
         Combustion(int, double, CombustionInputs);
+        virtual void handleReplacement(int);
         
         void computeFuelAndEmissions(void);
         void computeEconomics(std::vector<double>*);

@@ -140,6 +140,32 @@ Production(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Combustion :: handleReplacement(int timestep)
+///
+/// \brief Method to handle asset replacement and capital cost incursion,
+///     if applicable.
+///
+/// \param timestep The current time step of the Model run.
+///
+
+void Combustion :: handleReplacement(int timestep)
+{
+    //  1. reset attributes
+    //...
+    
+    //  2. invoke base class method
+    Production :: handleReplacement(timestep);
+    
+    return;
+}   /* __handleReplacement() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn void Combustion :: computeFuelAndEmissions(void)
 ///
 /// \brief Helper method to compute the total fuel consumption and emissions over the

@@ -355,6 +355,32 @@ Renewable(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Solar :: handleReplacement(int timestep)
+///
+/// \brief Method to handle asset replacement and capital cost incursion,
+///     if applicable.
+///
+/// \param timestep The current time step of the Model run.
+///
+
+void Solar :: handleReplacement(int timestep)
+{
+    //  1. reset attributes
+    //...
+    
+    //  2. invoke base class method
+    Renewable :: handleReplacement(timestep);
+    
+    return;
+}   /* __handleReplacement() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn double Solar :: computeProductionkW(
 ///         int timestep,
 ///         double dt_hrs,

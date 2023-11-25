@@ -59,8 +59,7 @@ class Production {
         
         
         //  2. methods
-        void __checkInputs(int, ProductionInputs);
-        void __handleReplacement(int);
+        void __checkInputs(int, double, ProductionInputs);
         
         double __computeRealDiscountAnnual(double, double);
         
@@ -90,7 +89,7 @@ class Production {
         
         double net_present_cost; ///< The net present cost of this asset.
         double total_dispatch_kWh; ///< The total energy dispatched [kWh] over the Model run.
-        double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatched and stored energy.
+        double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatch.
         
         std::string type_str; ///< A string describing the type of the asset.
         
@@ -101,13 +100,14 @@ class Production {
         std::vector<double> storage_vec_kW; ///< A vector of storage [kW] at each point in the modelling time series. Storage is the amount of production that is sent to storage.
         std::vector<double> curtailment_vec_kW; ///< A vector of curtailment [kW] at each point in the modelling time series. Curtailment is the amount of production that can be neither dispatched nor stored, and is hence curtailed.
         
-        std::vector<double> capital_cost_vec; ///< A vector of capital costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are nominal costs).
-        std::vector<double> operation_maintenance_cost_vec; ///< A vector of operation and maintenance costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are nominal costs).
+        std::vector<double> capital_cost_vec; ///< A vector of capital costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are actual costs).
+        std::vector<double> operation_maintenance_cost_vec; ///< A vector of operation and maintenance costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are actual costs).
         
         
         //  2. methods
         Production(void);
         Production(int, double, ProductionInputs);
+        virtual void handleReplacement(int);
         
         virtual void computeEconomics(std::vector<double>*);
         virtual double commit(int, double, double, double);

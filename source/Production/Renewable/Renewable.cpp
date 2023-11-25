@@ -149,6 +149,32 @@ Production(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Renewable :: handleReplacement(int timestep)
+///
+/// \brief Method to handle asset replacement and capital cost incursion,
+///     if applicable.
+///
+/// \param timestep The current time step of the Model run.
+///
+
+void Renewable :: handleReplacement(int timestep)
+{
+    //  1. reset attributes
+    //...
+    
+    //  2. invoke base class method
+    Production :: handleReplacement(timestep);
+    
+    return;
+}   /* __handleReplacement() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn void Renewable :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief Helper method to compute key economic metrics for the Model run.
