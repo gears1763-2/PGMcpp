@@ -557,13 +557,67 @@ void Controller :: __handleStorageCharging(
     std::vector<Renewable*>* renewable_ptr_vec_ptr
 )
 {
+    double acceptable_kW = 0;
+    double curtailment_kW = 0;
+    
+    Storage* storage_ptr;
+    Combustion* combustion_ptr;
+    Renewable* renewable_ptr;
+    
     std::list<Storage*>::iterator iter;
     for (
         iter = storage_ptr_list.begin();
         iter != storage_ptr_list.end();
         iter++
     ){
-        //...
+        storage_ptr = (*iter);
+        
+        //  1. attempt to charge from Combustion curtailment first
+        for (size_t i = 0; i < combustion_ptr_vec_ptr->size(); i++) {
+            combustion_ptr = combustion_ptr_vec_ptr->at(i);
+            curtailment_kW = combustion_ptr->curtailment_vec_kW[timestep];
+            
+            if (curtailment_kW <= 0) {
+                continue;
+            }
+            
+            acceptable_kW = storage_ptr->getAcceptablekW(dt_hrs);
+            
+            if (acceptable_kW > curtailment_kW) {
+                acceptable_kW = curtailment_kW;
+            }
+            
+            combustion_ptr->curtailment_vec_kW[timestep] -= acceptable_kW;
+            combustion_ptr->storage_vec_kW[timestep] += acceptable_kW;
+            storage_ptr->power_kW += acceptable_kW;
+        }
+        
+        //  2. attempt to charge from Renewable curtailment second
+        for (size_t i = 0; i < renewable_ptr_vec_ptr->size(); i++) {
+            renewable_ptr = renewable_ptr_vec_ptr->at(i);
+            curtailment_kW = renewable_ptr->curtailment_vec_kW[timestep];
+            
+            if (curtailment_kW <= 0) {
+                continue;
+            }
+            
+            acceptable_kW = storage_ptr->getAcceptablekW(dt_hrs);
+            
+            if (acceptable_kW > curtailment_kW) {
+                acceptable_kW = curtailment_kW;
+            }
+            
+            renewable_ptr->curtailment_vec_kW[timestep] -= acceptable_kW;
+            renewable_ptr->storage_vec_kW[timestep] += acceptable_kW;
+            storage_ptr->power_kW += acceptable_kW;
+        }
+        
+        //  3. commit charge
+        storage_ptr->commitCharge(
+            timestep,
+            dt_hrs,
+            storage_ptr->power_kW
+        );
     }
     
     return;
@@ -606,8 +660,62 @@ void Controller :: __handleStorageCharging(
     std::vector<Renewable*>* renewable_ptr_vec_ptr
 )
 {
-    for (size_t i = 0; i < storage_ptr_vec_ptr->size(); i++) {
-        //...
+    double acceptable_kW = 0;
+    double curtailment_kW = 0;
+    
+    Storage* storage_ptr;
+    Combustion* combustion_ptr;
+    Renewable* renewable_ptr;
+    
+    for (size_t j = 0; j < storage_ptr_vec_ptr->size(); j++) {
+        storage_ptr = storage_ptr_vec_ptr->at(j);
+        
+        //  1. attempt to charge from Combustion curtailment first
+        for (size_t i = 0; i < combustion_ptr_vec_ptr->size(); i++) {
+            combustion_ptr = combustion_ptr_vec_ptr->at(i);
+            curtailment_kW = combustion_ptr->curtailment_vec_kW[timestep];
+            
+            if (curtailment_kW <= 0) {
+                continue;
+            }
+            
+            acceptable_kW = storage_ptr->getAcceptablekW(dt_hrs);
+            
+            if (acceptable_kW > curtailment_kW) {
+                acceptable_kW = curtailment_kW;
+            }
+            
+            combustion_ptr->curtailment_vec_kW[timestep] -= acceptable_kW;
+            combustion_ptr->storage_vec_kW[timestep] += acceptable_kW;
+            storage_ptr->power_kW += acceptable_kW;
+        }
+        
+        //  2. attempt to charge from Renewable curtailment second
+        for (size_t i = 0; i < renewable_ptr_vec_ptr->size(); i++) {
+            renewable_ptr = renewable_ptr_vec_ptr->at(i);
+            curtailment_kW = renewable_ptr->curtailment_vec_kW[timestep];
+            
+            if (curtailment_kW <= 0) {
+                continue;
+            }
+            
+            acceptable_kW = storage_ptr->getAcceptablekW(dt_hrs);
+            
+            if (acceptable_kW > curtailment_kW) {
+                acceptable_kW = curtailment_kW;
+            }
+            
+            renewable_ptr->curtailment_vec_kW[timestep] -= acceptable_kW;
+            renewable_ptr->storage_vec_kW[timestep] += acceptable_kW;
+            storage_ptr->power_kW += acceptable_kW;
+        }
+        
+        //  3. commit charge
+        storage_ptr->commitCharge(
+            timestep,
+            dt_hrs,
+            storage_ptr->power_kW
+        );
     }
     
     return;
@@ -842,13 +950,30 @@ double Controller :: __handleStorageDischarging(
     std::list<Storage*> storage_ptr_list
 )
 {
+    double discharging_kW = 0;
+    
+    Storage* storage_ptr;
+    
     std::list<Storage*>::iterator iter;
     for (
         iter = storage_ptr_list.begin();
         iter != storage_ptr_list.end();
         iter++
     ){
-        //...
+        storage_ptr = (*iter);
+        
+        discharging_kW = storage_ptr->getAvailablekW(dt_hrs);
+        
+        if (discharging_kW > net_load_kW) {
+            discharging_kW = net_load_kW;
+        }
+        
+        net_load_kW = storage_ptr->commitDischarge(
+            timestep,
+            dt_hrs,
+            discharging_kW,
+            net_load_kW
+        );
     }
     
     return net_load_kW;

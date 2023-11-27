@@ -477,10 +477,72 @@ test_model.writeResults("test/test_results/");
 
 
 //  test post-run attributes
+double net_load_kW;
+
+Combustion* combustion_ptr;
+Renewable* renewable_ptr;
+Storage* storage_ptr;
+
 for (int i = 0; i < test_model.electrical_load.n_points; i++) {
+    net_load_kW = test_model.controller.net_load_vec_kW[i];
+    
     testLessThanOrEqualTo(
         test_model.controller.net_load_vec_kW[i],
         test_model.electrical_load.max_load_kW,
+        __FILE__,
+        __LINE__
+    );
+    
+    for (size_t j = 0; j < test_model.combustion_ptr_vec.size(); j++) {
+        combustion_ptr = test_model.combustion_ptr_vec[j];
+        
+        testFloatEquals(
+            combustion_ptr->production_vec_kW[i] -
+            combustion_ptr->dispatch_vec_kW[i] -
+            combustion_ptr->curtailment_vec_kW[i] -
+            combustion_ptr->storage_vec_kW[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        net_load_kW -= combustion_ptr->production_vec_kW[i];
+    }
+    
+    for (size_t j = 0; j < test_model.renewable_ptr_vec.size(); j++) {
+        renewable_ptr = test_model.renewable_ptr_vec[j];
+        
+        testFloatEquals(
+            renewable_ptr->production_vec_kW[i] -
+            renewable_ptr->dispatch_vec_kW[i] -
+            renewable_ptr->curtailment_vec_kW[i] -
+            renewable_ptr->storage_vec_kW[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        net_load_kW -= renewable_ptr->production_vec_kW[i];
+    }
+    
+    for (size_t j = 0; j < test_model.storage_ptr_vec.size(); j++) {
+        storage_ptr = test_model.storage_ptr_vec[j];
+        
+        testTruth(
+            not (
+                storage_ptr->charging_power_vec_kW[i] > 0 and
+                storage_ptr->discharging_power_vec_kW[i] > 0
+            ),
+            __FILE__,
+            __LINE__
+        );
+        
+        net_load_kW -= storage_ptr->discharging_power_vec_kW[i];
+    }
+    
+    testLessThanOrEqualTo(
+        net_load_kW,
+        0,
         __FILE__,
         __LINE__
     );
