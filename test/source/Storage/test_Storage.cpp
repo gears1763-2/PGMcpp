@@ -42,7 +42,7 @@ bool error_flag = true;
 
 try {
     StorageInputs bad_storage_inputs;
-    bad_storage_inputs.capacity_kWh = 0;
+    bad_storage_inputs.energy_capacity_kWh = 0;
     
     Storage bad_storage(8760, 1, bad_storage_inputs);
     
@@ -65,14 +65,14 @@ Storage test_storage(8760, 1, storage_inputs);
 // ======== ATTRIBUTES ============================================================== //
 
 testFloatEquals(
-    test_storage.capacity_kW,
+    test_storage.power_capacity_kW,
     100,
     __FILE__,
     __LINE__
 );
 
 testFloatEquals(
-    test_storage.capacity_kWh,
+    test_storage.energy_capacity_kWh,
     1000,
     __FILE__,
     __LINE__

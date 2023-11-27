@@ -48,8 +48,8 @@ struct StorageInputs {
     bool print_flag = false; ///< A flag which indicates whether or not object construct/destruction should be verbose.
     bool is_sunk = false; ///< A boolean which indicates whether or not the asset should be considered a sunk cost (i.e., capital cost incurred at the start of the model, or no).
     
-    double capacity_kW = 100; ///< The rated power capacity [kW] of the asset.
-    double capacity_kWh = 1000; ///< The rated energy capacity [kWh] of the asset.
+    double power_capacity_kW = 100; ///< The rated power capacity [kW] of the asset.
+    double energy_capacity_kWh = 1000; ///< The rated energy capacity [kWh] of the asset.
     
     double nominal_inflation_annual = 0.02; ///< The nominal, annual inflation rate to use in computing model economics.
     double nominal_discount_annual = 0.04; ///< The nominal, annual discount rate to use in computing model economics.
@@ -91,8 +91,8 @@ class Storage {
         
         double n_years; ///< The number of years being modelled.
         
-        double capacity_kW; ///< The rated power capacity [kW] of the asset.
-        double capacity_kWh; ///< The rated energy capacity [kWh] of the asset.
+        double power_capacity_kW; ///< The rated power capacity [kW] of the asset.
+        double energy_capacity_kWh; ///< The rated energy capacity [kWh] of the asset.
         
         double charge_kWh; ///< The energy [kWh] stored in the asset.
         double power_kW; ///< The power [kW] currently being charged/discharged by the asset.

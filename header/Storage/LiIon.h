@@ -35,6 +35,9 @@
 struct LiIonInputs {
     StorageInputs storage_inputs; ///< An encapsulated StorageInputs instance.
     
+    double capital_cost = -1; ///< The capital cost of the asset (undefined currency). -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD].
+    double operation_maintenance_cost_kWh = -1; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy charged/discharged. -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD/kWh].
+    
     double init_SOC = 0.5; ///< The initial state of charge of the asset.
     
     double min_SOC = 0.15; ///< The minimum state of charge of the asset. Will toggle is_depleted when reached.
@@ -63,6 +66,10 @@ class LiIon : public Storage {
         
         //  2. methods
         void __checkInputs(LiIonInputs);
+        
+        double __getGenericCapitalCost(void);
+        double __getGenericOpMaintCost(void);
+        
         void __toggleDepleted(void);
         
         void __writeSummary(std::string);
@@ -71,7 +78,7 @@ class LiIon : public Storage {
         
     public:
         //  1. attributes
-        double dynamic_capacity_kWh; ///< The dynamic (i.e. degrading) energy capacity [kWh] of the asset.
+        double dynamic_energy_capacity_kWh; ///< The dynamic (i.e. degrading) energy capacity [kWh] of the asset.
         double SOH; ///< The state of health of the asset.
         double replace_SOH; ///< The state of health at which the asset is considered "dead" and must be replaced.
         
@@ -83,6 +90,8 @@ class LiIon : public Storage {
         
         double charging_efficiency; ///< The charging efficiency of the asset.
         double discharging_efficiency; ///< The discharging efficiency of the asset.
+        
+        std::vector<double> SOH_vec; ///< A vector of the state of health of the asset at each point in the modelling time series.
         
         //  2. methods
         LiIon(void);

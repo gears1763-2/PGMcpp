@@ -110,7 +110,10 @@ void LiIon :: __checkInputs(LiIonInputs liion_inputs)
     }
     
     //  7. check discharging_efficiency
-    if (liion_inputs.discharging_efficiency <= 0 or liion_inputs.discharging_efficiency > 1) {
+    if (
+        liion_inputs.discharging_efficiency <= 0 or
+        liion_inputs.discharging_efficiency > 1
+    ) {
         std::string error_str = "ERROR:  LiIon():  discharging_efficiency must be in the ";
         error_str += "half-open interval (0, 1]";
         
@@ -131,6 +134,59 @@ void LiIon :: __checkInputs(LiIonInputs liion_inputs)
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn double LiIon :: __getGenericCapitalCost(void)
+///
+/// \brief Helper method to generate a generic lithium ion battery energy storage system
+///      capital cost.
+///
+/// This model was obtained by way of surveying an assortment of published lithium ion
+/// battery energy storage system costs, and then constructing a best fit model. Note
+/// that this model expresses cost in terms of Canadian dollars [CAD].
+///
+/// \return A generic capital cost for the lithium ion battery energy storage system
+///     [CAD].
+///
+
+double LiIon :: __getGenericCapitalCost(void)
+{
+    double capital_cost_per_kWh = 250 * pow(this->energy_capacity_kWh, -0.15) + 650;
+    
+    return capital_cost_per_kWh * this->energy_capacity_kWh;
+}   /* __getGenericCapitalCost() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double LiIon :: __getGenericOpMaintCost(void)
+///
+/// \brief Helper method to generate a generic lithium ion battery energy storage system
+///     operation and maintenance cost. This is a cost incurred per unit energy
+///     charged/discharged.
+///
+/// This model was obtained by way of surveying an assortment of published lithium ion
+/// battery energy storage system costs, and then constructing a best fit model. Note
+/// that this model expresses cost in terms of Canadian dollars [CAD/kWh].
+///
+/// \return A generic operation and maintenance cost, per unit energy
+///     charged/discharged, for the lithium ion battery energy storage system [CAD/kWh].
+///
+
+double LiIon :: __getGenericOpMaintCost(void)
+{
+    return 0.01;
+}   /* __getGenericOpMaintCost() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn void LiIon :: __toggleDepleted(void)
 ///
 /// \brief Helper method to toggle the is_depleted attribute of LiIon.
@@ -139,10 +195,10 @@ void LiIon :: __checkInputs(LiIonInputs liion_inputs)
 void LiIon :: __toggleDepleted(void)
 {
     if (this->is_depleted) {
-        double hysteresis_charge_kWh = this->hysteresis_SOC * this->capacity_kWh;
+        double hysteresis_charge_kWh = this->hysteresis_SOC * this->energy_capacity_kWh;
     
-        if (hysteresis_charge_kWh > this->dynamic_capacity_kWh) {
-            hysteresis_charge_kWh = this->dynamic_capacity_kWh;
+        if (hysteresis_charge_kWh > this->dynamic_energy_capacity_kWh) {
+            hysteresis_charge_kWh = this->dynamic_energy_capacity_kWh;
         }
         
         if (this->charge_kWh >= hysteresis_charge_kWh) {
@@ -151,7 +207,7 @@ void LiIon :: __toggleDepleted(void)
     }
     
     else {
-        double min_charge_kWh = this->min_SOC * this->capacity_kWh;
+        double min_charge_kWh = this->min_SOC * this->energy_capacity_kWh;
         
         if (this->charge_kWh <= min_charge_kWh) {
             this->is_depleted = true;
@@ -185,30 +241,64 @@ void LiIon :: __writeSummary(std::string write_path)
     
     //  2. write summary results (markdown)
     ofs << "# ";
-    ofs << std::to_string(int(ceil(this->capacity_kW)));
+    ofs << std::to_string(int(ceil(this->power_capacity_kW)));
     ofs << " kW ";
-    ofs << std::to_string(int(ceil(this->capacity_kWh)));
+    ofs << std::to_string(int(ceil(this->energy_capacity_kWh)));
     ofs << " kWh LIION Summary Results\n";
     ofs << "\n--------\n\n";
     
     //  2.1. Storage attributes
     ofs << "## Storage Attributes\n";
     ofs << "\n";
-    //...
+    ofs << "Power Capacity: " << this->power_capacity_kW << "kW  \n";
+    ofs << "Energy Capacity: " << this->energy_capacity_kWh << "kWh  \n";
+    ofs << "\n";
+    
+    ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
+    ofs << "Capital Cost: " << this->capital_cost << "  \n";
+    ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
+        << " per kWh charged/discharged  \n";
+    ofs << "Nominal Inflation Rate (annual): " << this->nominal_inflation_annual
+        << "  \n";
+    ofs << "Nominal Discount Rate (annual): " << this->nominal_discount_annual
+        << "  \n";
+    ofs << "Real Discount Rate (annual): " << this->real_discount_annual << "  \n";
     
     ofs << "\n--------\n\n";
     
     //  2.2. LiIon attributes
     ofs << "## LiIon Attributes\n";
     ofs << "\n";
-    //...
+    
+    ofs << "Charging Efficiency: " << this->charging_efficiency << "  \n";
+    ofs << "Discharging Efficiency: " << this->discharging_efficiency << "  \n";
+    ofs << "\n";
+    
+    ofs << "Initial State of Charge: " << this->init_SOC << "  \n";
+    ofs << "Minimum State of Charge: " << this->min_SOC << "  \n";
+    ofs << "Hyteresis State of Charge: " << this->hysteresis_SOC << "  \n";
+    ofs << "Maximum State of Charge: " << this->max_SOC << "  \n";
+    ofs << "\n";
+    
+    ofs << "Replacement State of Health: " << this->replace_SOH << "  \n";
     
     ofs << "\n--------\n\n";
     
     //  2.3. LiIon Results
     ofs << "## Results\n";
     ofs << "\n";
-    //...
+    
+    ofs << "Net Present Cost: " << this->net_present_cost << "  \n";
+    ofs << "\n";
+    
+    ofs << "Total Discharge: " << this->total_discharge_kWh
+        << " kWh  \n";
+        
+    ofs << "Levellized Cost of Energy: " << this->levellized_cost_of_energy_kWh
+        << " per kWh dispatched  \n";
+    ofs << "\n";
+    
+    ofs << "Replacements: " << this->n_replacements << "  \n";
     
     ofs << "\n--------\n\n";
     ofs.close();
@@ -233,7 +323,8 @@ void LiIon :: __writeSummary(std::string write_path)
 /// \param write_path A path (either relative or absolute) to the directory location 
 ///     where results are to be written. If already exists, will overwrite.
 ///
-/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the
+///     ElectricalLoad.
 ///
 /// \param max_lines The maximum number of lines of output to write.
 ///
@@ -251,28 +342,22 @@ void LiIon :: __writeTimeSeries(
     
     //  2. write time series results (comma separated value)
     ofs << "Time (since start of data) [hrs],";
-    /*
-    ofs << "LiIon Resource [kW/m2],";
-    ofs << "Production [kW],";
-    ofs << "Dispatch [kW],";
-    ofs << "Storage [kW],";
-    ofs << "Curtailment [kW],";
+    ofs << "Charging Power [kW],";
+    ofs << "Discharging Power [kW],";
+    ofs << "Charge (at end of timestep) [kWh],";
+    ofs << "State of Health (at end of timestep) [ ],";
     ofs << "Capital Cost (actual),";
     ofs << "Operation and Maintenance Cost (actual),";
-    */
     ofs << "\n";
     
     for (int i = 0; i < max_lines; i++) {
         ofs << time_vec_hrs_ptr->at(i) << ",";
-        /*
-        ofs << resource_map_1D_ptr->at(this->resource_key)[i] << ",";
-        ofs << this->production_vec_kW[i] << ",";
-        ofs << this->dispatch_vec_kW[i] << ",";
-        ofs << this->storage_vec_kW[i] << ",";
-        ofs << this->curtailment_vec_kW[i] << ",";
+        ofs << this->charging_power_vec_kW[i] << ",";
+        ofs << this->discharging_power_vec_kW[i] << ",";
+        ofs << this->charge_vec_kWh[i] << ",";
+        ofs << this->SOH_vec[i] << ",";
         ofs << this->capital_cost_vec[i] << ",";
         ofs << this->operation_maintenance_cost_vec[i] << ",";
-        */
         ofs << "\n";
     }
     
@@ -341,12 +426,12 @@ Storage(
     this->type = StorageType :: LIION;
     this->type_str = "LiIon";
     
-    this->dynamic_capacity_kWh = this->capacity_kWh;
+    this->dynamic_energy_capacity_kWh = this->energy_capacity_kWh;
     this->SOH = 1;
     this->replace_SOH = liion_inputs.replace_SOH;
     
     this->init_SOC = liion_inputs.init_SOC;
-    this->charge_kWh = this->init_SOC * this->capacity_kWh;
+    this->charge_kWh = this->init_SOC * this->energy_capacity_kWh;
 
     this->min_SOC = liion_inputs.min_SOC;
     this->hysteresis_SOC = liion_inputs.hysteresis_SOC;
@@ -354,6 +439,20 @@ Storage(
     
     this->charging_efficiency = liion_inputs.charging_efficiency;
     this->discharging_efficiency = liion_inputs.discharging_efficiency;
+    
+    if (liion_inputs.capital_cost < 0) {
+        this->capital_cost = this->__getGenericCapitalCost();
+    }
+    
+    if (liion_inputs.operation_maintenance_cost_kWh < 0) {
+        this->operation_maintenance_cost_kWh = this->__getGenericOpMaintCost();
+    }
+    
+    if (not this->is_sunk) {
+        this->capital_cost_vec[0] = this->capital_cost;
+    }
+    
+    this->SOH_vec.resize(this->n_points, 0);
     
     //  3. construction print
     if (this->print_flag) {
@@ -381,14 +480,14 @@ Storage(
 void LiIon :: handleReplacement(int timestep)
 {
     //  1. reset attributes
-    this->dynamic_capacity_kWh = this->capacity_kWh;
+    this->dynamic_energy_capacity_kWh = this->energy_capacity_kWh;
     this->SOH = 1;
     
     // 2. invoke base class method
     Storage::handleReplacement(timestep);
     
     //  3. correct attributes
-    this->charge_kWh = this->init_SOC * this->capacity_kWh;
+    this->charge_kWh = this->init_SOC * this->energy_capacity_kWh;
     this->is_depleted = false;
     
     return;
@@ -413,7 +512,7 @@ void LiIon :: handleReplacement(int timestep)
 double LiIon :: getAvailablekW(double dt_hrs)
 {
     //  1. get min charge
-    double min_charge_kWh = this->min_SOC * this->capacity_kWh;
+    double min_charge_kWh = this->min_SOC * this->energy_capacity_kWh;
     
     //  2. compute available power
     //     (accounting for the power currently being charged/discharged by the asset)
@@ -428,8 +527,8 @@ double LiIon :: getAvailablekW(double dt_hrs)
     }
     
     //  3. apply power constraint
-    if (available_kW > this->capacity_kW) {
-        available_kW = this->capacity_kW;
+    if (available_kW > this->power_capacity_kW) {
+        available_kW = this->power_capacity_kW;
     }
     
     return available_kW;
@@ -454,10 +553,10 @@ double LiIon :: getAvailablekW(double dt_hrs)
 double LiIon :: getAcceptablekW(double dt_hrs)
 {
     //  1. get max charge
-    double max_charge_kWh = this->max_SOC * this->capacity_kWh;
+    double max_charge_kWh = this->max_SOC * this->energy_capacity_kWh;
     
-    if (max_charge_kWh > this->dynamic_capacity_kWh) {
-        max_charge_kWh = this->dynamic_capacity_kWh;
+    if (max_charge_kWh > this->dynamic_energy_capacity_kWh) {
+        max_charge_kWh = this->dynamic_energy_capacity_kWh;
     }
     
     //  2. compute acceptable power
@@ -473,8 +572,8 @@ double LiIon :: getAcceptablekW(double dt_hrs)
     }
     
     //  3. apply power constraint
-    if (acceptable_kW > this->capacity_kW) {
-        acceptable_kW = this->capacity_kW;
+    if (acceptable_kW > this->power_capacity_kW) {
+        acceptable_kW = this->power_capacity_kW;
     }
     
     return acceptable_kW;
@@ -560,8 +659,9 @@ double LiIon :: commitDischarge(
     double load_kW
 )
 {
-    //  1. record discharging power
+    //  1. record discharging power, update total
     this->discharging_power_vec_kW[timestep] = discharging_kW;
+    this->total_discharge_kWh += discharging_kW * dt_hrs;
     
     //  2. update charge and record
     this->charge_kWh -= (discharging_kW * dt_hrs) / this->discharging_efficiency;

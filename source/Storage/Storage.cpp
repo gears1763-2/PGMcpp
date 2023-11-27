@@ -65,10 +65,10 @@ void Storage :: __checkInputs(
         throw std::invalid_argument(error_str);
     }
     
-    //  3. check capacity_kW
-    if (storage_inputs.capacity_kW <= 0) {
+    //  3. check power_capacity_kW
+    if (storage_inputs.power_capacity_kW <= 0) {
         std::string error_str = "ERROR:  Storage():  ";
-        error_str += "StorageInputs::capacity_kW must be > 0";
+        error_str += "StorageInputs::power_capacity_kW must be > 0";
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;
@@ -77,10 +77,10 @@ void Storage :: __checkInputs(
         throw std::invalid_argument(error_str);
     }
     
-    //  4. check capacity_kWh
-    if (storage_inputs.capacity_kWh <= 0) {
+    //  4. check energy_capacity_kWh
+    if (storage_inputs.energy_capacity_kWh <= 0) {
         std::string error_str = "ERROR:  Storage():  ";
-        error_str += "StorageInputs::capacity_kWh must be > 0";
+        error_str += "StorageInputs::energy_capacity_kWh must be > 0";
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;
@@ -111,9 +111,11 @@ void Storage :: __checkInputs(
 /// Ref: \cite HOMER_real_discount_rate\n
 /// Ref: \cite HOMER_discount_factor\n
 ///
-/// \param nominal_inflation_annual The nominal, annual inflation rate to use in computing model economics.
+/// \param nominal_inflation_annual The nominal, annual inflation rate to use in
+///     computing model economics.
 ///
-/// \param nominal_discount_annual The nominal, annual discount rate to use in computing model economics.
+/// \param nominal_discount_annual The nominal, annual discount rate to use in
+///     computing model economics.
 ///
 /// \return The real, annual discount rate to use in computing model economics.
 ///
@@ -191,8 +193,8 @@ Storage :: Storage(
     
     this->n_years = n_years;
     
-    this->capacity_kW = storage_inputs.capacity_kW;
-    this->capacity_kWh = storage_inputs.capacity_kWh;
+    this->power_capacity_kW = storage_inputs.power_capacity_kW;
+    this->energy_capacity_kWh = storage_inputs.energy_capacity_kWh;
     
     this->charge_kWh = 0;
     this->power_kW = 0;
@@ -272,7 +274,8 @@ void Storage :: handleReplacement(int timestep)
 /// Ref: \cite HOMER_total_annualized_cost\n
 /// Ref: \cite HOMER_capital_recovery_factor\n
 ///
-/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the
+///     ElectricalLoad.
 ///
 
 void Storage :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
@@ -332,7 +335,8 @@ void Storage :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
 /// \param write_path A path (either relative or absolute) to the directory location 
 ///     where results are to be written. If already exists, will overwrite.
 ///
-/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the
+///     ElectricalLoad.
 ///
 /// \param storage_index An integer which corresponds to the index of the Storage
 ///     asset in the Model.
@@ -361,9 +365,9 @@ void Storage :: writeResults(
     
     write_path += this->type_str;
     write_path += "_";
-    write_path += std::to_string(int(ceil(this->capacity_kW)));
+    write_path += std::to_string(int(ceil(this->power_capacity_kW)));
     write_path += "kW_";
-    write_path += std::to_string(int(ceil(this->capacity_kWh)));
+    write_path += std::to_string(int(ceil(this->energy_capacity_kWh)));
     write_path += "kWh_idx";
     write_path += std::to_string(storage_index);
     write_path += "/";

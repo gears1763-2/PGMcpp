@@ -120,6 +120,13 @@ testFloatEquals(
     __LINE__
 );
 
+testFloatEquals(
+    test_liion.SOH_vec.size(),
+    8760,
+    __FILE__,
+    __LINE__
+);
+
 // ======== END ATTRIBUTES ========================================================== //
 
 
