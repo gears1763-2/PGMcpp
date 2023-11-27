@@ -34,24 +34,172 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    try {
-        //...
-    }
+try {
+
+// ======== CONSTRUCTION ============================================================ //
+
+bool error_flag = true;
+
+try {
+    LiIonInputs bad_liion_inputs;
+    bad_liion_inputs.min_SOC = -1;
     
-    catch (...) {
-        //...
-        
-        printGold(" ...................... ");
-        printRed("FAIL");
-        std::cout << std::endl;
-        throw;
-    }
+    LiIon bad_liion(8760, 1, bad_liion_inputs);
     
+    error_flag = false;
+} catch (...) {
+    // Task failed successfully! =P
+}
+if (not error_flag) {
+    expectedErrorNotDetected(__FILE__, __LINE__);
+}
+
+LiIonInputs liion_inputs;
+
+LiIon test_liion(8760, 1, liion_inputs);
+
+// ======== END CONSTRUCTION ======================================================== //
+
+
+
+// ======== ATTRIBUTES ============================================================== //
+
+testFloatEquals(
+    test_liion.init_SOC,
+    0.5,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.min_SOC,
+    0.15,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.hysteresis_SOC,
+    0.5,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.max_SOC,
+    0.9,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.charging_efficiency,
+    0.9,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.discharging_efficiency,
+    0.9,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.replace_SOH,
+    0.8,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.power_kW,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+// ======== END ATTRIBUTES ========================================================== //
+
+
+
+// ======== METHODS ================================================================= //
+
+testFloatEquals(
+    test_liion.getAvailablekW(1),
+    100,    // hits power capacity constraint
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.getAcceptablekW(1),
+    100,    // hits power capacity constraint
+    __FILE__,
+    __LINE__
+);
+
+test_liion.power_kW = 100;
+
+testFloatEquals(
+    test_liion.getAvailablekW(1),
+    100,    // hits power capacity constraint
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.getAcceptablekW(1),
+    100,    // hits power capacity constraint
+    __FILE__,
+    __LINE__
+);
+
+test_liion.power_kW = 1e6;
+
+testFloatEquals(
+    test_liion.getAvailablekW(1),
+    0,    // is already hitting power capacity constraint
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_liion.getAcceptablekW(1),
+    0,    // is already hitting power capacity constraint
+    __FILE__,
+    __LINE__
+);
+
+test_liion.commitCharge(0, 1, 100);
+
+testFloatEquals(
+    test_liion.power_kW,
+    0,
+    __FILE__,
+    __LINE__
+);
+
+// ======== END METHODS ============================================================= //
+
+} /* try */
+
+
+catch (...) {
+    //...
     
     printGold(" ...................... ");
-    printGreen("PASS");
+    printRed("FAIL");
     std::cout << std::endl;
-    return 0;
+    throw;
+}
+
+
+printGold(" ...................... ");
+printGreen("PASS");
+std::cout << std::endl;
+return 0;
 }   /* main() */
 
 

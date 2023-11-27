@@ -183,6 +183,7 @@ Storage :: Storage(
     
     //  2. set attributes
     this->print_flag = storage_inputs.print_flag;
+    this->is_depleted = false;
     this->is_sunk = storage_inputs.is_sunk;
     
     this->n_points = n_points;
@@ -198,10 +199,12 @@ Storage :: Storage(
     
     this->nominal_inflation_annual = storage_inputs.nominal_inflation_annual;
     this->nominal_discount_annual = storage_inputs.nominal_discount_annual;
+    
     this->real_discount_annual = this->__computeRealDiscountAnnual(
         storage_inputs.nominal_inflation_annual,
         storage_inputs.nominal_discount_annual
     );
+    
     this->capital_cost = 0;
     this->operation_maintenance_cost_kWh = 0;
     this->net_present_cost = 0;
@@ -309,6 +312,81 @@ void Storage :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
     
     return;
 }   /* computeEconomics() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Storage :: writeResults(
+///         std::string write_path,
+///         std::vector<double>* time_vec_hrs_ptr,
+///         int storage_index,
+///         int max_lines
+///     )
+///
+/// \brief Method which writes Storage results to an output directory.
+///
+/// \param write_path A path (either relative or absolute) to the directory location 
+///     where results are to be written. If already exists, will overwrite.
+///
+/// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
+///
+/// \param storage_index An integer which corresponds to the index of the Storage
+///     asset in the Model.
+///
+/// \param max_lines The maximum number of lines of output to write. If <0, then all
+///     available lines are written. If =0, then only summary results are written.
+///
+
+void Storage :: writeResults(
+    std::string write_path,
+    std::vector<double>* time_vec_hrs_ptr,
+    int storage_index,
+    int max_lines
+)
+{
+    //  1. handle sentinel
+    if (max_lines < 0) {
+        max_lines = this->n_points;
+    }
+    
+    //  2. create subdirectories
+    write_path += "Storage/";
+    if (not std::filesystem::is_directory(write_path)) {
+        std::filesystem::create_directory(write_path);
+    }
+    
+    write_path += this->type_str;
+    write_path += "_";
+    write_path += std::to_string(int(ceil(this->capacity_kW)));
+    write_path += "kW_";
+    write_path += std::to_string(int(ceil(this->capacity_kWh)));
+    write_path += "kWh_idx";
+    write_path += std::to_string(storage_index);
+    write_path += "/";
+    std::filesystem::create_directory(write_path);
+    
+    //  3. write summary
+    this->__writeSummary(write_path);
+    
+    //  4. write time series
+    if (max_lines > this->n_points) {
+        max_lines = this->n_points;
+    }
+    
+    if (max_lines > 0) {
+        this->__writeTimeSeries(
+            write_path,
+            time_vec_hrs_ptr,
+            max_lines
+        );
+    }
+    
+    return;
+}   /* writeResults() */
 
 // ---------------------------------------------------------------------------------- //
 

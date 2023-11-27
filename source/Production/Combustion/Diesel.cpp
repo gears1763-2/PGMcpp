@@ -380,6 +380,10 @@ void Diesel :: __writeSummary(std::string write_path)
     ofs << "\n";
     
     ofs << "Fuel Cost: " << this->fuel_cost_L << " per L  \n";
+    ofs << "Nominal Fuel Escalation Rate (annual): "
+        << this->nominal_fuel_escalation_annual << "  \n";
+    ofs << "Real Fuel Escalation Rate (annual): "
+        << this->real_fuel_escalation_annual << "  \n";
     ofs << "\n";
     
     ofs << "Linear Fuel Slope: " << this->linear_fuel_slope_LkWh << " L/kWh  \n";

@@ -109,7 +109,7 @@ class Model {
         void addWave(WaveInputs);
         void addWind(WindInputs);
         
-        //void addLiIon(LiIonInputs);
+        void addLiIon(LiIonInputs);
         
         void run(void);
         

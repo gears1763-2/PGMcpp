@@ -96,8 +96,21 @@ class Controller {
             std::vector<Storage*>*
         );
         
-        void __handleStorageCharging(int, double, std::list<Storage*>);
-        void __handleStorageCharging(int, double, std::vector<Storage*>*);
+        void __handleStorageCharging(
+            int,
+            double,
+            std::list<Storage*>,
+            std::vector<Combustion*>*,
+            std::vector<Renewable*>*
+        );
+        
+        void __handleStorageCharging(
+            int,
+            double,
+            std::vector<Storage*>*,
+            std::vector<Combustion*>*,
+            std::vector<Renewable*>*
+        );
         
         double __getRenewableProduction(int, double, Renewable*, Resources*);
         

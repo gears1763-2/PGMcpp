@@ -94,43 +94,6 @@ void Production :: __checkInputs(
 
 // ---------------------------------------------------------------------------------- //
 
-
-
-// ---------------------------------------------------------------------------------- //
-
-///
-/// \fn double Production :: __computeRealDiscountAnnual(
-///         double nominal_inflation_annual,
-///         double nominal_discount_annual
-///     )
-///
-/// \brief Helper method to compute the real, annual discount rate to be used
-///     in computing model economics. This enables application of the discount factor
-///     approach.
-///
-/// Ref: \cite HOMER_real_discount_rate\n
-/// Ref: \cite HOMER_discount_factor\n
-///
-/// \param nominal_inflation_annual The nominal, annual inflation rate to use in computing model economics.
-///
-/// \param nominal_discount_annual The nominal, annual discount rate to use in computing model economics.
-///
-/// \return The real, annual discount rate to use in computing model economics.
-///
-
-double Production :: __computeRealDiscountAnnual(
-    double nominal_inflation_annual,
-    double nominal_discount_annual
-)
-{
-    double real_discount_annual = nominal_discount_annual - nominal_inflation_annual;
-    real_discount_annual /= 1 + nominal_inflation_annual;
-    
-    return real_discount_annual;
-}   /* __computeRealDiscountAnnual() */
-
-// ---------------------------------------------------------------------------------- //
-
 // ======== END PRIVATE ============================================================= //
 
 
@@ -199,10 +162,12 @@ Production :: Production(
     
     this->nominal_inflation_annual = production_inputs.nominal_inflation_annual;
     this->nominal_discount_annual = production_inputs.nominal_discount_annual;
-    this->real_discount_annual = this->__computeRealDiscountAnnual(
+    
+    this->real_discount_annual = this->computeRealDiscountAnnual(
         production_inputs.nominal_inflation_annual,
         production_inputs.nominal_discount_annual
     );
+    
     this->capital_cost = 0;
     this->operation_maintenance_cost_kWh = 0;
     this->net_present_cost = 0;
@@ -255,6 +220,43 @@ void Production :: handleReplacement(int timestep)
     
     return;
 }   /* __handleReplacement() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double Production :: computeRealDiscountAnnual(
+///         double nominal_inflation_annual,
+///         double nominal_discount_annual
+///     )
+///
+/// \brief Method to compute the real, annual discount rate to be used
+///     in computing model economics. This enables application of the discount factor
+///     approach.
+///
+/// Ref: \cite HOMER_real_discount_rate\n
+/// Ref: \cite HOMER_discount_factor\n
+///
+/// \param nominal_inflation_annual The nominal, annual inflation rate to use in computing model economics.
+///
+/// \param nominal_discount_annual The nominal, annual discount rate to use in computing model economics.
+///
+/// \return The real, annual discount rate to use in computing model economics.
+///
+
+double Production :: computeRealDiscountAnnual(
+    double nominal_inflation_annual,
+    double nominal_discount_annual
+)
+{
+    double real_discount_annual = nominal_discount_annual - nominal_inflation_annual;
+    real_discount_annual /= 1 + nominal_inflation_annual;
+    
+    return real_discount_annual;
+}   /* __computeRealDiscountAnnual() */
 
 // ---------------------------------------------------------------------------------- //
 

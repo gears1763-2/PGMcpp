@@ -427,18 +427,49 @@ void Model :: __writeTimeSeries(std::string write_path, int max_lines)
     std::ofstream ofs;
     ofs.open(write_path, std::ofstream::out);
     
-    //  2. write time series results (comma separated value)
+    //  2. write time series results header (comma separated value)
     ofs << "Time (since start of data) [hrs],";
     ofs << "Electrical Load [kW],";
     ofs << "Net Load [kW],";
     ofs << "Missed Load [kW],";
+    
+    for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
+        ofs << this->renewable_ptr_vec[i]->capacity_kW << " kW "
+            << this->renewable_ptr_vec[i]->type_str << " Dispatch [kW],";
+    }
+    
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        //...
+    }
+    
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        ofs << this->combustion_ptr_vec[i]->capacity_kW << " kW "
+            << this->combustion_ptr_vec[i]->type_str << " Dispatch [kW],";
+    }
+    
     ofs << "\n";
     
+    //  3. write time series results values (comma separated value)
     for (int i = 0; i < max_lines; i++) {
+        //  3.1. load values
         ofs << this->electrical_load.time_vec_hrs[i] << ",";
         ofs << this->electrical_load.load_vec_kW[i] << ",";
         ofs << this->controller.net_load_vec_kW[i] << ",";
         ofs << this->controller.missed_load_vec_kW[i] << ",";
+        
+        //  3.2. asset-wise dispatch/discharge
+        for (size_t j = 0; j < this->renewable_ptr_vec.size(); j++) {
+            ofs << this->renewable_ptr_vec[j]->dispatch_vec_kW[i] << ",";
+        }
+        
+        for (size_t j = 0; j < this->storage_ptr_vec.size(); j++) {
+            //...
+        }
+        
+        for (size_t j = 0; j < this->combustion_ptr_vec.size(); j++) {
+            ofs << this->combustion_ptr_vec[j]->dispatch_vec_kW[i] << ",";
+        }
+        
         ofs << "\n";
     }
     
@@ -680,6 +711,33 @@ void Model :: addWind(WindInputs wind_inputs)
 
 // ---------------------------------------------------------------------------------- //
 
+//
+/// \fn void Model :: addLiIon(LiIonInputs liion_inputs)
+///
+/// \brief Method to add a LiIon asset to the Model.
+///
+/// \param liion_inputs A structure of LiIon constructor inputs.
+///
+
+void Model :: addLiIon(LiIonInputs liion_inputs)
+{
+    Storage* liion_ptr = new LiIon(
+        this->electrical_load.n_points,
+        this->electrical_load.n_years,
+        liion_inputs
+    );
+    
+    this->storage_ptr_vec.push_back(liion_ptr);
+    
+    return;
+}   /* addLiIon() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
 ///
 /// \fn void Model :: run(void)
 ///
@@ -875,14 +933,12 @@ void Model :: writeResults(
     
     //  7. call out to Storage :: writeResults()
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
-        /*
         this->storage_ptr_vec[i]->writeResults(
             write_path,
             &(this->electrical_load.time_vec_hrs),
             i,
             max_lines
         );
-        */
     }
     
     return;

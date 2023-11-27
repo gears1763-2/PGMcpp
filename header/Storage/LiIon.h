@@ -63,12 +63,14 @@ class LiIon : public Storage {
         
         //  2. methods
         void __checkInputs(LiIonInputs);
+        void __toggleDepleted(void);
+        
+        void __writeSummary(std::string);
+        void __writeTimeSeries(std::string, std::vector<double>*, int = -1);
         
         
     public:
         //  1. attributes
-        bool is_depleted; ///< A boolean which indicates whether or not the asset is currently considered depleted.
-        
         double dynamic_capacity_kWh; ///< The dynamic (i.e. degrading) energy capacity [kWh] of the asset.
         double SOH; ///< The state of health of the asset.
         double replace_SOH; ///< The state of health at which the asset is considered "dead" and must be replaced.
@@ -87,8 +89,8 @@ class LiIon : public Storage {
         LiIon(int, double, LiIonInputs);
         void handleReplacement(int);
         
-        double getAvailablekW(int);
-        double getAcceptablekW(int);
+        double getAvailablekW(double);
+        double getAcceptablekW(double);
         
         void commitCharge(int, double, double);
         double commitDischarge(int, double, double, double);

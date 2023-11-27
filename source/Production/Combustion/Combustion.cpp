@@ -102,6 +102,13 @@ Production(
     
     //  2. set attributes
     this->fuel_cost_L = 0;
+    this->nominal_fuel_escalation_annual =
+        combustion_inputs.nominal_fuel_escalation_annual;
+    
+    this->real_fuel_escalation_annual = this->computeRealDiscountAnnual(
+        combustion_inputs.nominal_fuel_escalation_annual,
+        combustion_inputs.production_inputs.nominal_discount_annual
+    );
     
     this->linear_fuel_slope_LkWh = 0;
     this->linear_fuel_intercept_LkWh = 0;
@@ -199,6 +206,8 @@ void Combustion :: computeFuelAndEmissions(void)
 ///
 /// \brief Helper method to compute key economic metrics for the Model run.
 ///
+/// Ref: \cite HOMER_discount_factor\n
+///
 /// \param time_vec_hrs_ptr A pointer to the time_vec_hrs attribute of the ElectricalLoad.
 ///
 
@@ -206,17 +215,17 @@ void Combustion :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
 {
     //  1. account for fuel costs in net present cost
     double t_hrs = 0;
-    double real_discount_scalar = 0;
+    double real_fuel_escalation_scalar = 0;
     
     for (int i = 0; i < this->n_points; i++) {
         t_hrs = time_vec_hrs_ptr->at(i);
         
-        real_discount_scalar = 1.0 / pow(
-            1 + this->real_discount_annual,
+        real_fuel_escalation_scalar = 1.0 / pow(
+            1 + this->real_fuel_escalation_annual,
             t_hrs / 8760
         );
         
-        this->net_present_cost += real_discount_scalar * this->fuel_cost_vec[i];
+        this->net_present_cost += real_fuel_escalation_scalar * this->fuel_cost_vec[i];
     }
     
     //  2. invoke base class method

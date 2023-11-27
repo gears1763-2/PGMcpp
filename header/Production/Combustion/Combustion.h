@@ -46,6 +46,8 @@ enum CombustionType {
 
 struct CombustionInputs {
     ProductionInputs production_inputs; ///< An encapsulated ProductionInputs instance.
+    
+    double nominal_fuel_escalation_annual = 0.05; ///< The nominal, annual fuel escalation rate to use in computing model economics.
 };
 
 
@@ -95,6 +97,8 @@ class Combustion : public Production {
         CombustionType type; ///< The type (CombustionType) of the asset.
         
         double fuel_cost_L; ///< The cost of fuel [1/L] (undefined currency).
+        double nominal_fuel_escalation_annual; ///< The nominal, annual fuel escalation rate to use in computing model economics.
+        double real_fuel_escalation_annual; ///< The real, annual fuel escalation rate used in computing model economics. Is computed from the given nominal inflation and discount rates.
         
         double linear_fuel_slope_LkWh; ///< The slope [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.
         double linear_fuel_intercept_LkWh; ///< The intercept [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.

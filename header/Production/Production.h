@@ -61,8 +61,6 @@ class Production {
         //  2. methods
         void __checkInputs(int, double, ProductionInputs);
         
-        double __computeRealDiscountAnnual(double, double);
-        
         
     public:
         //  1. attributes
@@ -108,6 +106,7 @@ class Production {
         Production(void);
         Production(int, double, ProductionInputs);
         virtual void handleReplacement(int);
+        double computeRealDiscountAnnual(double, double);
         
         virtual void computeEconomics(std::vector<double>*);
         virtual double commit(int, double, double, double);

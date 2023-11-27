@@ -258,7 +258,13 @@ void Controller :: __applyLoadFollowingControl_CHARGING(
     
     //  3. attempt to charge all Storage assets using any and all available curtailment
     //     charge priority is Combustion, then Renewable
-    this->__handleStorageCharging(timestep, dt_hrs, storage_ptr_vec_ptr);
+    this->__handleStorageCharging(
+        timestep,
+        dt_hrs,
+        storage_ptr_vec_ptr,
+        combustion_ptr_vec_ptr,
+        renewable_ptr_vec_ptr
+    );
     
     return;
 }   /* __applyLoadFollowingControl_CHARGING() */
@@ -312,7 +318,13 @@ void Controller :: __applyLoadFollowingControl_DISCHARGING(
     for (size_t i = 0; i < storage_ptr_vec_ptr->size(); i++) {
         storage_ptr = storage_ptr_vec_ptr->at(i);
         
-        //...
+        if (storage_ptr->is_depleted) {
+            depleted_storage_ptr_list.push_back(storage_ptr);
+        }
+        
+        else {
+            nondepleted_storage_ptr_list.push_back(storage_ptr);
+        }
     }
     
     //  3. discharge non-depleted storage assets
@@ -335,7 +347,13 @@ void Controller :: __applyLoadFollowingControl_DISCHARGING(
     //  5. attempt to charge depleted Storage assets using any and all available
     ///    curtailment
     //     charge priority is Combustion, then Renewable
-    this->__handleStorageCharging(timestep, dt_hrs, depleted_storage_ptr_list);
+    this->__handleStorageCharging(
+        timestep,
+        dt_hrs,
+        depleted_storage_ptr_list,
+        combustion_ptr_vec_ptr,
+        renewable_ptr_vec_ptr
+    );
     
     //  6. record any missed load
     if (net_load_kW > 1e-6) {
@@ -444,7 +462,13 @@ void Controller :: __applyCycleChargingControl_DISCHARGING(
     for (size_t i = 0; i < storage_ptr_vec_ptr->size(); i++) {
         storage_ptr = storage_ptr_vec_ptr->at(i);
         
-        //...
+        if (storage_ptr->is_depleted) {
+            depleted_storage_ptr_list.push_back(storage_ptr);
+        }
+        
+        else {
+            nondepleted_storage_ptr_list.push_back(storage_ptr);
+        }
     }
     
     //  3. discharge non-depleted storage assets
@@ -480,7 +504,13 @@ void Controller :: __applyCycleChargingControl_DISCHARGING(
     //  5. attempt to charge depleted Storage assets using any and all available
     ///    curtailment
     //     charge priority is Combustion, then Renewable
-    this->__handleStorageCharging(timestep, dt_hrs, depleted_storage_ptr_list);
+    this->__handleStorageCharging(
+        timestep,
+        dt_hrs,
+        depleted_storage_ptr_list,
+        combustion_ptr_vec_ptr,
+        renewable_ptr_vec_ptr
+    );
     
     //  6. record any missed load
     if (net_load_kW > 1e-6) {
@@ -500,7 +530,9 @@ void Controller :: __applyCycleChargingControl_DISCHARGING(
 /// \fn void Controller :: __handleStorageCharging(
 ///         int timestep,
 ///         double dt_hrs,
-///         std::list<Storage*> storage_ptr_list
+///         std::list<Storage*> storage_ptr_list,
+///         std::vector<Combustion*>* combustion_ptr_vec_ptr,
+///         std::vector<Renewable*>* renewable_ptr_vec_ptr
 ///     )
 ///
 /// \brief Helper method to handle the charging of the given Storage assets.
@@ -512,14 +544,27 @@ void Controller :: __applyCycleChargingControl_DISCHARGING(
 /// \param storage_ptr_list A list of pointers to the Storage assets that are to be
 ///     charged.
 ///
+/// \param combustion_ptr_vec_ptr A pointer to the Combustion pointer vector of the Model.
+///
+/// \param renewable_ptr_vec_ptr A pointer to the Renewable pointer vector of the Model.
+///
 
 void Controller :: __handleStorageCharging(
     int timestep,
     double dt_hrs,
-    std::list<Storage*> storage_ptr_list
+    std::list<Storage*> storage_ptr_list,
+    std::vector<Combustion*>* combustion_ptr_vec_ptr,
+    std::vector<Renewable*>* renewable_ptr_vec_ptr
 )
 {
-    //...
+    std::list<Storage*>::iterator iter;
+    for (
+        iter = storage_ptr_list.begin();
+        iter != storage_ptr_list.end();
+        iter++
+    ){
+        //...
+    }
     
     return;
 }   /* __handleStorageCharging() */
@@ -534,7 +579,9 @@ void Controller :: __handleStorageCharging(
 /// \fn void Controller :: __handleStorageCharging(
 ///         int timestep,
 ///         double dt_hrs,
-///         std::vector<Storage*>* storage_ptr_vec_ptr
+///         std::vector<Storage*>* storage_ptr_vec_ptr,
+///         std::vector<Combustion*>* combustion_ptr_vec_ptr,
+///         std::vector<Renewable*>* renewable_ptr_vec_ptr
 ///     )
 ///
 /// \brief Helper method to handle the charging of the given Storage assets.
@@ -546,14 +593,22 @@ void Controller :: __handleStorageCharging(
 /// \param storage_ptr_vec_ptr A pointer to a vector of pointers to the Storage assets
 ///     that are to be charged.
 ///
+/// \param combustion_ptr_vec_ptr A pointer to the Combustion pointer vector of the Model.
+///
+/// \param renewable_ptr_vec_ptr A pointer to the Renewable pointer vector of the Model.
+///
 
 void Controller :: __handleStorageCharging(
     int timestep,
     double dt_hrs,
-    std::vector<Storage*>* storage_ptr_vec_ptr
+    std::vector<Storage*>* storage_ptr_vec_ptr,
+    std::vector<Combustion*>* combustion_ptr_vec_ptr,
+    std::vector<Renewable*>* renewable_ptr_vec_ptr
 )
 {
-    //...
+    for (size_t i = 0; i < storage_ptr_vec_ptr->size(); i++) {
+        //...
+    }
     
     return;
 }   /* __handleStorageCharging() */
@@ -787,7 +842,14 @@ double Controller :: __handleStorageDischarging(
     std::list<Storage*> storage_ptr_list
 )
 {
-    //...
+    std::list<Storage*>::iterator iter;
+    for (
+        iter = storage_ptr_list.begin();
+        iter != storage_ptr_list.end();
+        iter++
+    ){
+        //...
+    }
     
     return net_load_kW;
 }   /* __handleStorageDischarging() */

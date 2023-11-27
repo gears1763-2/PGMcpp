@@ -448,6 +448,26 @@ testFloatEquals(
 );
 
 
+//  add LiIon asset
+LiIonInputs liion_inputs;
+
+test_model.addLiIon(liion_inputs);
+
+testFloatEquals(
+    test_model.storage_ptr_vec.size(),
+    1,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.storage_ptr_vec[0]->type,
+    StorageType :: LIION,
+    __FILE__,
+    __LINE__
+);
+
+
 //  run
 test_model.run();
 

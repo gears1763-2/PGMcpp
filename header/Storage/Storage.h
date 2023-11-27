@@ -49,7 +49,7 @@ struct StorageInputs {
     bool is_sunk = false; ///< A boolean which indicates whether or not the asset should be considered a sunk cost (i.e., capital cost incurred at the start of the model, or no).
     
     double capacity_kW = 100; ///< The rated power capacity [kW] of the asset.
-    double capacity_kWh = 100; ///< The rated energy capacity [kWh] of the asset.
+    double capacity_kWh = 1000; ///< The rated energy capacity [kWh] of the asset.
     
     double nominal_inflation_annual = 0.02; ///< The nominal, annual inflation rate to use in computing model economics.
     double nominal_discount_annual = 0.04; ///< The nominal, annual discount rate to use in computing model economics.
@@ -74,12 +74,16 @@ class Storage {
         
         double __computeRealDiscountAnnual(double, double);
         
+        virtual void __writeSummary(std::string) {return;}
+        virtual void __writeTimeSeries(std::string, std::vector<double>*, int = -1) {return;}
+        
         
     public:
         //  1. attributes
         StorageType type; ///< The type (StorageType) of the asset.
         
         bool print_flag; ///< A flag which indicates whether or not object construct/destruction should be verbose.
+        bool is_depleted; ///< A boolean which indicates whether or not the asset is currently considered depleted.
         bool is_sunk; ///< A boolean which indicates whether or not the asset should be considered a sunk cost (i.e., capital cost incurred at the start of the model, or no).
         
         int n_points; ///< The number of points in the modelling time series.
@@ -120,11 +124,13 @@ class Storage {
         
         void computeEconomics(std::vector<double>*);
         
-        virtual double getAvailablekW(int) {return 0;}
-        virtual double getAcceptablekW(int) {return 0;}
+        virtual double getAvailablekW(double) {return 0;}
+        virtual double getAcceptablekW(double) {return 0;}
         
         virtual void commitCharge(int, double, double) {return;}
         virtual double commitDischarge(int, double, double, double) {return 0;}
+        
+        void writeResults(std::string, std::vector<double>*, int, int = -1);
         
         virtual ~Storage(void);
         
