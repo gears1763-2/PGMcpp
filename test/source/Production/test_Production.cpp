@@ -29,7 +29,7 @@ int main(int argc, char** argv)
         activateVirtualTerminal();
     #endif  /* _WIN32 */
     
-    printGold("\n\tTesting Production");
+    printGold("\tTesting Production");
     
     srand(time(NULL));
     

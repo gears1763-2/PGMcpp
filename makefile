@@ -47,6 +47,16 @@ testing_utils: $(SRC_TESTING_UTILS)
 	$(CXX) $(CXXFLAGS) -c $(SRC_TESTING_UTILS) -o $(OBJ_TESTING_UTILS)
 
 
+#### ==== Interpolator ==== ####
+
+SRC_INTERPOLATOR = source/Interpolator.cpp
+OBJ_INTERPOLATOR = object/Interpolator.o
+
+.PHONY: interpolator
+interpolator: $(SRC_INTERPOLATOR)
+	$(CXX) $(CXXFLAGS) -c $(SRC_INTERPOLATOR) -o $(OBJ_INTERPOLATOR)
+
+
 #### ==== Production Hierarchy <-- Combustion ==== ####
 
 SRC_PRODUCTION = source/Production/Production.cpp
@@ -210,10 +220,22 @@ OBJ_MODEL_COMPONENTS = $(OBJ_CONTROLLER) \
 #### ==== Tests ==== ####
 
 OBJ_ALL = $(OBJ_TESTING_UTILS) \
+          $(OBJ_INTERPOLATOR)\
           $(OBJ_COMBUSTION_HIERARCHY) \
           $(OBJ_RENEWABLE_HIERARCHY) \
           $(OBJ_STORAGE_HIERARCHY) \
           $(OBJ_MODEL_COMPONENTS)
+
+
+## == Test: Interpolator == ##
+
+SRC_TEST_INTERPOLATOR = test/source/test_Interpolator.cpp
+OUT_TEST_INTERPOLATOR = test/bin/test_Interpolator.out
+
+.PHONY: test_Interpolator
+test_Interpolator: $(SRC_TEST_INTERPOLATOR)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_INTERPOLATOR) $(OBJ_ALL) \
+-o $(OUT_TEST_INTERPOLATOR) $(LIBS)
 
 
 ## == Test: Production Hierarchy <-- Combustion == ##
@@ -350,7 +372,8 @@ test_Model: $(SRC_TEST_MODEL)
 -o $(OUT_TEST_MODEL) $(LIBS)
 
 
-TESTS = test_Production \
+TESTS = test_Interpolator\
+        test_Production \
         test_Combustion \
         test_Diesel \
         test_Renewable \
@@ -366,7 +389,8 @@ TESTS = test_Production \
         test_Model
 
 
-OUT_TESTS = $(OUT_TEST_PRODUCTION) &&\
+OUT_TESTS = $(OUT_TEST_INTERPOLATOR) &&\
+            $(OUT_TEST_PRODUCTION) &&\
             $(OUT_TEST_COMBUSTION) &&\
             $(OUT_TEST_DIESEL) &&\
             $(OUT_TEST_RENEWABLE) &&\
@@ -440,6 +464,7 @@ PGMcpp:
 	make clean
 	make dirs
 	make testing_utils
+	make interpolator
 	make $(COMBUSTION_HIERARCHY)
 	make $(RENEWABLE_HIERARCHY)
 	make $(STORAGE_HIERARCHY)
