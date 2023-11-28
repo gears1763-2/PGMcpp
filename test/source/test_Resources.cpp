@@ -40,7 +40,7 @@ try {
 // ======== CONSTRUCTION ============================================================ //
 
 std::string path_2_electrical_load_time_series = 
-    "data/test/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
+    "data/test/electrical_load/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
 
 ElectricalLoad test_electrical_load(path_2_electrical_load_time_series);
 
@@ -87,7 +87,7 @@ testFloatEquals(
 
 int solar_resource_key = 0;
 std::string path_2_solar_resource_data =
-    "data/test/solar_GHI_peak-1kWm2_1yr_dt-1hr.csv";
+    "data/test/resources/solar_GHI_peak-1kWm2_1yr_dt-1hr.csv";
 
 test_resources.addResource(
     RenewableType::SOLAR,
@@ -116,7 +116,7 @@ if (not error_flag) {
 
 try {
     std::string path_2_solar_resource_data_BAD_TIMES =
-        "data/test/solar_GHI_peak-1kWm2_1yr_dt-1hr_BAD_TIMES.csv";
+        "data/test/resources/solar_GHI_peak-1kWm2_1yr_dt-1hr_BAD_TIMES.csv";
     
     test_resources.addResource(
         RenewableType::SOLAR,
@@ -136,7 +136,7 @@ if (not error_flag) {
 
 try {
     std::string path_2_solar_resource_data_BAD_LENGTH =
-        "data/test/solar_GHI_peak-1kWm2_1yr_dt-1hr_BAD_LENGTH.csv";
+        "data/test/resources/solar_GHI_peak-1kWm2_1yr_dt-1hr_BAD_LENGTH.csv";
     
     test_resources.addResource(
         RenewableType::SOLAR,
@@ -216,7 +216,7 @@ for (size_t i = 0; i < expected_solar_resource_vec_kWm2.size(); i++) {
 
 int tidal_resource_key = 1;
 std::string path_2_tidal_resource_data =
-    "data/test/tidal_speed_peak-3ms_1yr_dt-1hr.csv";
+    "data/test/resources/tidal_speed_peak-3ms_1yr_dt-1hr.csv";
 
 test_resources.addResource(
     RenewableType::TIDAL,
@@ -288,7 +288,7 @@ for (size_t i = 0; i < expected_tidal_resource_vec_ms.size(); i++) {
 
 int wave_resource_key = 2;
 std::string path_2_wave_resource_data =
-    "data/test/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr.csv";
+    "data/test/resources/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr.csv";
 
 test_resources.addResource(
     RenewableType::WAVE,
@@ -418,7 +418,7 @@ for (size_t i = 0; i < expected_significant_wave_height_vec_m.size(); i++) {
 
 int wind_resource_key = 3;
 std::string path_2_wind_resource_data =
-    "data/test/wind_speed_peak-25ms_1yr_dt-1hr.csv";
+    "data/test/resources/wind_speed_peak-25ms_1yr_dt-1hr.csv";
 
 test_resources.addResource(
     RenewableType::WIND,

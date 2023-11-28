@@ -13,7 +13,7 @@
 ///
 /// \file ElectricalLoad.h
 ///
-/// \brief Header file the ElectricalLoad class.
+/// \brief Header file for the ElectricalLoad class.
 ///
 
 

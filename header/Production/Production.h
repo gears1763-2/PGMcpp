@@ -13,7 +13,7 @@
 ///
 /// \file Production.h
 ///
-/// \brief Header file the Production class.
+/// \brief Header file for the Production class.
 ///
 
 
@@ -23,6 +23,8 @@
 
 #include "../std_includes.h"
 #include "../../third_party/fast-cpp-csv-parser/csv.h"
+
+#include "../Interpolator.h"
 
 
 ///
@@ -64,6 +66,8 @@ class Production {
         
     public:
         //  1. attributes
+        Interpolator interpolator; ///< Interpolator component of Production.
+        
         bool print_flag; ///< A flag which indicates whether or not object construct/destruction should be verbose.
         bool is_running; ///< A boolean which indicates whether or not the asset is running.
         bool is_sunk; ///< A boolean which indicates whether or not the asset should be considered a sunk cost (i.e., capital cost incurred at the start of the model, or no).

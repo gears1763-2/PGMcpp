@@ -29,16 +29,26 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void Model :: __checkInputs(ModelInputs)
+/// \fn void Model :: __checkInputs(ModelInputs model_inputs)
 ///
 /// \brief Helper method (private) to check inputs to the Model constructor.
 ///
 /// \param model_inputs A structure of Model constructor inputs.
 ///
 
-void Model :: __checkInputs(ModelInputs)
+void Model :: __checkInputs(ModelInputs model_inputs)
 {
-    //...
+    //  1. check path_2_electrical_load_time_series
+    if (model_inputs.path_2_electrical_load_time_series.empty()) {
+        std::string error_str = "ERROR:  Model()  path_2_electrical_load_time_series ";
+        error_str += "cannot be empty";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
     
     return;
 }   /* __checkInputs() */

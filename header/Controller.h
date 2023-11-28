@@ -13,7 +13,7 @@
 ///
 /// \file Controller.h
 ///
-/// \brief Header file the Controller class.
+/// \brief Header file for the Controller class.
 ///
 
 

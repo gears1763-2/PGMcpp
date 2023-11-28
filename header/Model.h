@@ -13,7 +13,7 @@
 ///
 /// \file Model.h
 ///
-/// \brief Header file the Model class.
+/// \brief Header file for the Model class.
 ///
 
 

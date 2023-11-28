@@ -13,7 +13,7 @@
 ///
 /// \file Combustion.h
 ///
-/// \brief Header file the Combustion class.
+/// \brief Header file for the Combustion class.
 ///
 
 

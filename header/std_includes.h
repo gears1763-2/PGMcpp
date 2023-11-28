@@ -13,7 +13,7 @@
 ///
 /// \file std_includes.h
 ///
-/// \brief Header file which simply batches together the usual, standard includes.
+/// \brief Header file which simply batches together some standard includes.
 
 
 #ifndef STD_INCLUDES_H

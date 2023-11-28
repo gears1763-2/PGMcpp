@@ -13,7 +13,7 @@
 ///
 /// \file Wind.h
 ///
-/// \brief Header file the Wind class.
+/// \brief Header file for the Wind class.
 ///
 
 

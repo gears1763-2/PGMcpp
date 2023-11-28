@@ -38,7 +38,7 @@ try {
 
 // ======== CONSTRUCTION ============================================================ //
 
-//...
+Interpolator test_interpolator;
 
 // ======== END CONSTRUCTION =========================================================//
 
@@ -54,7 +54,10 @@ try {
 
 // ======== METHODS ================================================================= //
 
-//...
+int data_key = 0;
+std::string path_2_data = "data/test/interpolation/diesel_fuel_curve.csv";
+
+test_interpolator.addData1D(data_key, path_2_data);
 
 // ======== END METHODS ============================================================= //
 

@@ -13,7 +13,7 @@
 ///
 /// \file Storage.h
 ///
-/// \brief Header file the Storage class.
+/// \brief Header file for the Storage class.
 ///
 
 
@@ -23,6 +23,8 @@
 
 #include "../std_includes.h"
 #include "../../third_party/fast-cpp-csv-parser/csv.h"
+
+#include "../Interpolator.h"
 
 
 ///
@@ -81,6 +83,8 @@ class Storage {
     public:
         //  1. attributes
         StorageType type; ///< The type (StorageType) of the asset.
+        
+        Interpolator interpolator; ///< Interpolator component of Storage.
         
         bool print_flag; ///< A flag which indicates whether or not object construct/destruction should be verbose.
         bool is_depleted; ///< A boolean which indicates whether or not the asset is currently considered depleted.

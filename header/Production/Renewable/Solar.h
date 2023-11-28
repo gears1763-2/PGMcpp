@@ -13,7 +13,7 @@
 ///
 /// \file Solar.h
 ///
-/// \brief Header file the Solar class.
+/// \brief Header file for the Solar class.
 ///
 
 

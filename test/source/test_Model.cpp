@@ -41,9 +41,7 @@ try {
 bool error_flag = true;
 
 try {
-    ModelInputs bad_model_inputs;
-    bad_model_inputs.path_2_electrical_load_time_series =
-        "data/test/bad_path_240984069830.csv";
+    ModelInputs bad_model_inputs;   // path_2_electrical_load_time_series left empty
     
     Model bad_model(bad_model_inputs);
     
@@ -55,8 +53,25 @@ if (not error_flag) {
     expectedErrorNotDetected(__FILE__, __LINE__);
 }
 
+
+try {
+    ModelInputs bad_model_inputs;
+    bad_model_inputs.path_2_electrical_load_time_series =
+        "data/test/electrical_load/bad_path_240984069830.csv";
+    
+    Model bad_model(bad_model_inputs);
+    
+    error_flag = false;
+} catch (...) {
+    // Task failed successfully! =P
+}
+if (not error_flag) {
+    expectedErrorNotDetected(__FILE__, __LINE__);
+}
+
+
 std::string path_2_electrical_load_time_series =
-    "data/test/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
+    "data/test/electrical_load/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
 
 ModelInputs test_model_inputs;
 test_model_inputs.path_2_electrical_load_time_series =
@@ -205,7 +220,7 @@ for (int i = 0; i < 48; i++) {
 //  add Solar resource
 int solar_resource_key = 0;
 std::string path_2_solar_resource_data =
-    "data/test/solar_GHI_peak-1kWm2_1yr_dt-1hr.csv";
+    "data/test/resources/solar_GHI_peak-1kWm2_1yr_dt-1hr.csv";
 
 test_model.addResource(
     RenewableType :: SOLAR,
@@ -277,7 +292,7 @@ for (size_t i = 0; i < expected_solar_resource_vec_kWm2.size(); i++) {
 //  add Tidal resource
 int tidal_resource_key = 1;
 std::string path_2_tidal_resource_data =
-    "data/test/tidal_speed_peak-3ms_1yr_dt-1hr.csv";
+    "data/test/resources/tidal_speed_peak-3ms_1yr_dt-1hr.csv";
 
 test_model.addResource(
     RenewableType :: TIDAL,
@@ -289,7 +304,7 @@ test_model.addResource(
 //  add Wave resource
 int wave_resource_key = 2;
 std::string path_2_wave_resource_data =
-    "data/test/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr.csv";
+    "data/test/resources/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr.csv";
 
 test_model.addResource(
     RenewableType :: WAVE,
@@ -301,7 +316,7 @@ test_model.addResource(
 //  add Wind resource
 int wind_resource_key = 3;
 std::string path_2_wind_resource_data =
-    "data/test/wind_speed_peak-25ms_1yr_dt-1hr.csv";
+    "data/test/resources/wind_speed_peak-25ms_1yr_dt-1hr.csv";
 
 test_model.addResource(
     RenewableType :: WIND,

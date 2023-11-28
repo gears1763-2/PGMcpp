@@ -13,7 +13,7 @@
 ///
 /// \file Renewable.h
 ///
-/// \brief Header file the Renewable class.
+/// \brief Header file for the Renewable class.
 ///
 
 

@@ -13,7 +13,7 @@
 ///
 /// \file Wave.h
 ///
-/// \brief Header file the Wave class.
+/// \brief Header file for the Wave class.
 ///
 
 

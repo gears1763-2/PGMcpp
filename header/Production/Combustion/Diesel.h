@@ -13,7 +13,7 @@
 ///
 /// \file Diesel.h
 ///
-/// \brief Header file the Diesel class.
+/// \brief Header file for the Diesel class.
 ///
 
 

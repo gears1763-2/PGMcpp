@@ -13,7 +13,7 @@
 ///
 /// \file Tidal.h
 ///
-/// \brief Header file the Tidal class.
+/// \brief Header file for the Tidal class.
 ///
 
 

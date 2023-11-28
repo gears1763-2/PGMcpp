@@ -28,7 +28,8 @@
 ///
 /// \class Interpolator
 ///
-/// \brief A class which contains interpolation data and functionality.
+/// \brief A class which contains interpolation data and functionality. Intended to
+///     serve as a component of the Production and Storage hierarchies.
 ///
 
 class Interpolator {
@@ -38,18 +39,30 @@ class Interpolator {
         
         
         //  2. methods
-        //...
+        void __checkDataKey1D(int);
+        void __checkDataKey2D(int);
+        
+        void __readData1D(int, std::string);
+        void __readData2D(int, std::string);
         
         
     public:
         //  1. attributes
-        //...
+        std::map<int, std::vector<double>> interp_map_1D; ///< A map <int, vector<double>> of given 1D interpolation data.
+        std::map<int, std::string> path_map_1D; ///< A map <int, string> of the paths (either relative or absolute) to the given 1D interpolation data.
+        
+        std::map<int, std::vector<std::vector<double>>> interp_map_2D; ///< A map <int, vector<vector<double>>> of given 2D interpolation data.
+        std::map<int, std::string> path_map_2D; ///< A map <int, string> of the paths (either relative or absolute) to the given 2D interpolation data.
         
         
         //  2. methods
         Interpolator(void);
         
-        //...
+        void addData1D(int, std::string);
+        void addData2D(int, std::string);
+        
+        double interp1D(int, double);
+        double interp2D(int, double, double);
         
         ~Interpolator(void);
         

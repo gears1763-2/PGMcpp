@@ -39,7 +39,7 @@ try {
 // ======== CONSTRUCTION ============================================================ //
 
 std::string path_2_electrical_load_time_series = 
-    "data/test/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
+    "data/test/electrical_load/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
 
 ElectricalLoad test_electrical_load(path_2_electrical_load_time_series);
 

@@ -13,7 +13,7 @@
 ///
 /// \file Resources.h
 ///
-/// \brief Header file the Resources class.
+/// \brief Header file for the Resources class.
 ///
 
 
@@ -59,11 +59,11 @@ class Resources {
         
     public:
         //  1. attributes
-        std::map<int, std::vector<double>> resource_map_1D; ///< A map <int, vector> of given 1D renewable resource time series.
+        std::map<int, std::vector<double>> resource_map_1D; ///< A map <int, vector<double>> of given 1D renewable resource time series.
         std::map<int, std::string> string_map_1D; ///< A map <int, string> of descriptors for the type of the given 1D renewable resource time series.
         std::map<int, std::string> path_map_1D; ///< A map <int, string> of the paths (either relative or absolute) to given 1D renewable resource time series.
         
-        std::map<int, std::vector<std::vector<double>>> resource_map_2D; ///< A map <int, vector> of given 2D renewable resource time series.
+        std::map<int, std::vector<std::vector<double>>> resource_map_2D; ///< A map <int, vector<vector<double>>> of given 2D renewable resource time series.
         std::map<int, std::string> string_map_2D; ///< A map <int, string> of descriptors for the type of the given 2D renewable resource time series.
         std::map<int, std::string> path_map_2D; ///< A map <int, string> of the paths (either relative or absolute) to given 2D renewable resource time series.
         

@@ -13,7 +13,7 @@
 ///
 /// \file LiIon.h
 ///
-/// \brief Header file the LiIon class.
+/// \brief Header file for the LiIon class.
 ///
 
 
