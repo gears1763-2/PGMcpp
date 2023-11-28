@@ -64,6 +64,12 @@ LiIon test_liion(8760, 1, liion_inputs);
 
 // ======== ATTRIBUTES ============================================================== //
 
+testTruth(
+    test_liion.type_str == "LIION",
+    __FILE__,
+    __LINE__
+);
+
 testFloatEquals(
     test_liion.init_SOC,
     0.5,

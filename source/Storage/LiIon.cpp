@@ -124,6 +124,105 @@ void LiIon :: __checkInputs(LiIonInputs liion_inputs)
         throw std::invalid_argument(error_str);
     }
     
+    //  8. check degradation_alpha
+    if (liion_inputs.degradation_alpha <= 0) {
+        std::string error_str = "ERROR:  LiIon():  degradation_alpha must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  9. check degradation_beta
+    if (liion_inputs.degradation_beta <= 0) {
+        std::string error_str = "ERROR:  LiIon():  degradation_beta must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  10. check degradation_B_hat_cal_0
+    if (liion_inputs.degradation_B_hat_cal_0 <= 0) {
+        std::string error_str = "ERROR:  LiIon():  degradation_B_hat_cal_0 must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  11. check degradation_r_cal
+    if (liion_inputs.degradation_r_cal < 0) {
+        std::string error_str = "ERROR:  LiIon():  degradation_r_cal must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  12. check degradation_Ea_cal_0
+    if (liion_inputs.degradation_Ea_cal_0 <= 0) {
+        std::string error_str = "ERROR:  LiIon():  degradation_Ea_cal_0 must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  13. check degradation_a_cal
+    if (liion_inputs.degradation_a_cal < 0) {
+        std::string error_str = "ERROR:  LiIon():  degradation_a_cal must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  14. check degradation_s_cal 
+    if (liion_inputs.degradation_s_cal < 0) {
+        std::string error_str = "ERROR:  LiIon():  degradation_s_cal must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  15. check gas_constant_JmolK
+    if (liion_inputs.gas_constant_JmolK <= 0) {
+        std::string error_str = "ERROR:  LiIon():  gas_constant_JmolK must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  16. check temperature_K
+    if (liion_inputs.temperature_K < 0) {
+        std::string error_str = "ERROR:  LiIon():  temperature_K must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
     return;
 }   /* __checkInputs() */
 
@@ -224,6 +323,132 @@ void LiIon :: __toggleDepleted(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void LiIon :: __handleDegradation(
+///         int timestep,
+///         double dt_hrs,
+///         double charging_discharging_kW
+///     )
+///
+/// \brief Helper method to apply degradation modelling and update attributes.
+///
+/// \param timestep The timestep (i.e., time series index) for the request.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the timestep.
+///
+/// \param charging_discharging_kW The charging/discharging power [kw] being sent to
+///     the asset.
+///
+
+
+void LiIon :: __handleDegradation(
+    int timestep,
+    double dt_hrs,
+    double charging_discharging_kW
+)
+{
+    //  1. model degradation
+    if (charging_discharging_kW > 0) {
+        this->__modelDegradation(dt_hrs, charging_discharging_kW);
+    }
+    
+    //  2. update and record
+    this->SOH_vec[timestep] = this->SOH;
+    this->dynamic_energy_capacity_kWh = this->SOH * this->energy_capacity_kWh;
+    
+    return;
+}   /* __handleDegradation() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void LiIon :: __modelDegradation(double dt_hrs, double charging_discharging_kW)
+///
+/// \brief Helper method to model energy capacity degradation as a function of operating
+///     state.
+///
+/// Ref: \cite BatteryDegradation_2023\n
+///
+/// \param dt_hrs The interval of time [hrs] associated with the timestep.
+///
+/// \param charging_discharging_kW The charging/discharging power [kw] being sent to
+///     the asset.
+///
+
+void LiIon :: __modelDegradation(double dt_hrs, double charging_discharging_kW)
+{
+    double SOC = this->charge_kWh / this->energy_capacity_kWh;
+    
+    // use (Eqn 2.5) here
+    
+    return;
+}   /* __modelDegradation() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double LiIon :: __getBcal(double SOC)
+///
+/// \brief Helper method to compute and return the base pre-exponential factor for a 
+///     given state of charge.
+///
+/// Ref: \cite BatteryDegradation_2023\n
+///
+/// \param SOC The current state of charge of the asset.
+///
+/// \return The base pre-exponential factor for the given state of charge.
+///
+
+double LiIon :: __getBcal(double SOC)
+{
+    double B_cal = this->degradation_B_hat_cal_0 *
+        exp(this->degradation_r_cal * SOC);
+    
+    return B_cal;
+}   /* __getBcal() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double LiIon :: __getEacal(double SOC)
+///
+/// \brief Helper method to compute and return the activation energy value for a given
+///     state of charge.
+///
+/// Ref: \cite BatteryDegradation_2023\n
+///
+/// \param SOC The current state of charge of the asset.
+///
+/// \return The activation energy value for the given state of charge.
+///
+
+double LiIon :: __getEacal(double SOC)
+{
+    double Ea_cal = this->degradation_Ea_cal_0;
+    Ea_cal -= this->degradation_a_cal *
+        (exp(this->degradation_s_cal * SOC) - 1);
+    
+    return Ea_cal;
+}   /* __getEacal( */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn void LiIon :: __writeSummary(std::string write_path)
 ///
 /// \brief Helper method to write summary results for LiIon.
@@ -281,6 +506,24 @@ void LiIon :: __writeSummary(std::string write_path)
     ofs << "\n";
     
     ofs << "Replacement State of Health: " << this->replace_SOH << "  \n";
+    ofs << "\n";
+    
+    ofs << "Degradation Acceleration Coeff.: " << this->degradation_alpha << "  \n";
+    ofs << "Degradation Acceleration Exp.: " << this->degradation_beta << "  \n";
+    ofs << "Degradation Base Pre-Exponential Factor: "
+        << this->degradation_B_hat_cal_0 << " 1/sqrt(hrs)  \n";
+    ofs << "Degradation Dimensionless Constant (r_cal): "
+        << this->degradation_r_cal << "  \n";
+    ofs << "Degradation Base Activation Energy: "
+        << this->degradation_Ea_cal_0 << " J/mol  \n";
+    ofs << "Degradation Pre-Exponential Factor: "
+        << this->degradation_a_cal << " J/mol  \n";
+    ofs << "Degradation Dimensionless Constant (s_cal): "
+        << this->degradation_s_cal << "  \n";
+    ofs << "Universal Gas Constant: " << this->gas_constant_JmolK
+        << " J/mol.K  \n";
+    ofs << "Absolute Environmental Temperature: " << this->temperature_K << " K  \n";
+    ofs << "\n";
     
     ofs << "\n--------\n\n";
     
@@ -424,11 +667,21 @@ Storage(
     
     //  2. set attributes
     this->type = StorageType :: LIION;
-    this->type_str = "LiIon";
+    this->type_str = "LIION";
     
     this->dynamic_energy_capacity_kWh = this->energy_capacity_kWh;
     this->SOH = 1;
     this->replace_SOH = liion_inputs.replace_SOH;
+    
+    this->degradation_alpha = liion_inputs.degradation_alpha;
+    this->degradation_beta = liion_inputs.degradation_beta;
+    this->degradation_B_hat_cal_0 = liion_inputs.degradation_B_hat_cal_0;
+    this->degradation_r_cal = liion_inputs.degradation_r_cal;
+    this->degradation_Ea_cal_0 = liion_inputs.degradation_Ea_cal_0;
+    this->degradation_a_cal = liion_inputs.degradation_a_cal;
+    this->degradation_s_cal = liion_inputs.degradation_s_cal;
+    this->gas_constant_JmolK = liion_inputs.gas_constant_JmolK;
+    this->temperature_K = liion_inputs.temperature_K;
     
     this->init_SOC = liion_inputs.init_SOC;
     this->charge_kWh = this->init_SOC * this->energy_capacity_kWh;
@@ -619,11 +872,17 @@ void LiIon :: commitCharge(
     this->__toggleDepleted();
     
     //  4. model degradation
-    //...
+    this->__handleDegradation(timestep, dt_hrs, charging_kW);
     
     //  5. trigger replacement (if applicable)
     if (this->SOH <= this->replace_SOH) {
         this->handleReplacement(timestep);
+    }
+    
+    //  6. capture operation and maintenance costs (if applicable)
+    if (charging_kW > 0) {
+        this->operation_maintenance_cost_vec[timestep] = charging_kW * dt_hrs *
+            this->operation_maintenance_cost_kWh;
     }
     
     this->power_kW= 0;
@@ -637,9 +896,15 @@ void LiIon :: commitCharge(
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn
+/// \fn double LiIon :: commitDischarge(
+///         int timestep,
+///         double dt_hrs,
+///         double discharging_kW,
+///         double load_kW
+///     )
 ///
-/// \brief 
+/// \brief Method which takes in the discharging power for the current timestep and
+///     records. Returns the load remaining after discharge.
 ///
 /// \param timestep The timestep (i.e., time series index) for the request.
 ///
@@ -674,11 +939,17 @@ double LiIon :: commitDischarge(
     this->__toggleDepleted();
     
     //  5. model degradation
-    //...
+    this->__handleDegradation(timestep, dt_hrs, discharging_kW);
     
     //  6. trigger replacement (if applicable)
     if (this->SOH <= this->replace_SOH) {
         this->handleReplacement(timestep);
+    }
+    
+    //  7. capture operation and maintenance costs (if applicable)
+    if (discharging_kW > 0) {
+        this->operation_maintenance_cost_vec[timestep] = discharging_kW * dt_hrs *
+            this->operation_maintenance_cost_kWh;
     }
     
     this->power_kW = 0;

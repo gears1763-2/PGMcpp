@@ -31,6 +31,8 @@
 ///     Provides default values for every necessary input. Note that this structure
 ///     encapsulates StorageInputs.
 ///
+/// Ref: \cite BatteryDegradation_2023\n
+///
 
 struct LiIonInputs {
     StorageInputs storage_inputs; ///< An encapsulated StorageInputs instance.
@@ -48,6 +50,16 @@ struct LiIonInputs {
     double discharging_efficiency = 0.9; ///< The discharging efficiency of the asset.
     
     double replace_SOH = 0.8; ///< The state of health at which the asset is considered "dead" and must be replaced.
+    
+    double degradation_alpha = 8.935; ///< A dimensionless acceleration coefficient used in modelling energy capacity degradation.
+    double degradation_beta = 1; ///< A dimensionless acceleration exponent used in modelling energy capacity degradation.
+    double degradation_B_hat_cal_0 = 5.22226e6; ///< A reference (or base) pre-exponential factor [1/sqrt(hrs)] used in modelling energy capacity degradation.
+    double degradation_r_cal = 0.4361; ///< A dimensionless constant used in modelling energy capacity degradation.
+    double degradation_Ea_cal_0 = 5.279e4; ///< A reference (or base) activation energy [J/mol] used in modelling energy capacity degradation.
+    double degradation_a_cal = 100; ///< A pre-exponential factor [J/mol] used in modelling energy capacity degradation.
+    double degradation_s_cal = 2; ///< A dimensionless constant used in modelling energy capacity degradation.
+    double gas_constant_JmolK = 8.31446; ///< The universal gas constant [J/mol.K].
+    double temperature_K = 273 + 20; ///< The absolute environmental temperature [K] of the lithium ion battery energy storage system.
 };
 
 
@@ -72,6 +84,12 @@ class LiIon : public Storage {
         
         void __toggleDepleted(void);
         
+        void __handleDegradation(int, double, double);
+        void __modelDegradation(double, double);
+        
+        double __getBcal(double);
+        double __getEacal(double);
+        
         void __writeSummary(std::string);
         void __writeTimeSeries(std::string, std::vector<double>*, int = -1);
         
@@ -81,6 +99,16 @@ class LiIon : public Storage {
         double dynamic_energy_capacity_kWh; ///< The dynamic (i.e. degrading) energy capacity [kWh] of the asset.
         double SOH; ///< The state of health of the asset.
         double replace_SOH; ///< The state of health at which the asset is considered "dead" and must be replaced.
+        
+        double degradation_alpha; ///< A dimensionless acceleration coefficient used in modelling energy capacity degradation.
+        double degradation_beta; ///< A dimensionless acceleration exponent used in modelling energy capacity degradation.
+        double degradation_B_hat_cal_0; ///< A reference (or base) pre-exponential factor [1/sqrt(hrs)] used in modelling energy capacity degradation.
+        double degradation_r_cal; ///< A dimensionless constant used in modelling energy capacity degradation.
+        double degradation_Ea_cal_0; ///< A reference (or base) activation energy [J/mol] used in modelling energy capacity degradation.
+        double degradation_a_cal; ///< A pre-exponential factor [J/mol] used in modelling energy capacity degradation.
+        double degradation_s_cal; ///< A dimensionless constant used in modelling energy capacity degradation.
+        double gas_constant_JmolK; ///< The universal gas constant [J/mol.K].
+        double temperature_K; ///< The absolute environmental temperature [K] of the lithium ion battery energy storage system.
         
         double init_SOC; ///< The initial state of charge of the asset.
     
