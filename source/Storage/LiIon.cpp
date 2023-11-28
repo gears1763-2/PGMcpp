@@ -347,9 +347,7 @@ void LiIon :: __handleDegradation(
 )
 {
     //  1. model degradation
-    if (charging_discharging_kW > 0) {
-        this->__modelDegradation(dt_hrs, charging_discharging_kW);
-    }
+    this->__modelDegradation(dt_hrs, charging_discharging_kW);
     
     //  2. update and record
     this->SOH_vec[timestep] = this->SOH;
@@ -380,9 +378,28 @@ void LiIon :: __handleDegradation(
 
 void LiIon :: __modelDegradation(double dt_hrs, double charging_discharging_kW)
 {
+    //  1. compute SOC
     double SOC = this->charge_kWh / this->energy_capacity_kWh;
     
-    // use (Eqn 2.5) here
+    //  2. compute C-rate and corresponding acceleration factor
+    double C_rate = charging_discharging_kW / this->power_capacity_kW;
+    
+    double C_acceleration_factor =
+        1 + this->degradation_alpha * pow(C_rate, this->degradation_beta);
+    
+    //  3. compute dSOH / dt
+    double B_cal = __getBcal(SOC);
+    double Ea_cal = __getEacal(SOC);
+    
+    double dSOH_dt = B_cal *
+        exp((-1 * Ea_cal) / (this->gas_constant_JmolK * this->temperature_K));
+    
+    dSOH_dt *= dSOH_dt;
+    dSOH_dt *= 1 / (2 * this->SOH);
+    dSOH_dt *= C_acceleration_factor;
+    
+    //  4. update state of health
+    this->SOH -= dSOH_dt * dt_hrs;
     
     return;
 }   /* __modelDegradation() */
@@ -436,6 +453,7 @@ double LiIon :: __getBcal(double SOC)
 double LiIon :: __getEacal(double SOC)
 {
     double Ea_cal = this->degradation_Ea_cal_0;
+    
     Ea_cal -= this->degradation_a_cal *
         (exp(this->degradation_s_cal * SOC) - 1);
     
