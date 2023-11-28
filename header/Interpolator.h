@@ -26,6 +26,38 @@
 
 
 ///
+/// \struct InterpolatorStruct1D
+///
+/// \brief A struct which holds two parallel vectors for use in 1D interpolation.
+///
+
+struct InterpolatorStruct1D {
+    int n_points = 0; ///< The number of data points in each parallel vector
+    
+    std::vector<double> x_vec = {}; ///< A vector of independent data.
+    std::vector<double> y_vec = {}; ///< A vector of dependent data.
+};
+
+
+///
+/// \struct InterpolatorStruct2D
+///
+/// \brief A struct which holds two parallel vectors and a matrix for use in 2D 
+///     interpolation.
+///
+
+struct InterpolatorStruct2D {
+    int n_rows = 0; ///< The number of rows in the matrix (also the length of y_vec)
+    int n_cols = 0; ///< The number of cols in the matrix (also the length of x_vec)
+    
+    std::vector<double> x_vec = {}; ///< A vector of independent data (columns).
+    std::vector<double> y_vec = {}; ///< A vector of independent data (rows).
+    
+    std::vector<std::vector<double>> z_matrix = {}; ///< A matrix of dependent data.
+};
+
+
+///
 /// \class Interpolator
 ///
 /// \brief A class which contains interpolation data and functionality. Intended to
@@ -42,16 +74,27 @@ class Interpolator {
         void __checkDataKey1D(int);
         void __checkDataKey2D(int);
         
+        void __throwReadError(std::string, int);
+        
+        bool __isNonNumeric(std::string);
+        
+        std::vector<std::string> __splitCommaSeparatedString(
+            std::string,
+            std::string = "||"
+        );
+        
+        std::vector<std::vector<std::string>> __getDataStringMatrix(std::string);
+        
         void __readData1D(int, std::string);
         void __readData2D(int, std::string);
         
         
     public:
         //  1. attributes
-        std::map<int, std::vector<double>> interp_map_1D; ///< A map <int, vector<double>> of given 1D interpolation data.
+        std::map<int, InterpolatorStruct1D> interp_map_1D; ///< A map <int, InterpolatorStruct1D> of given 1D interpolation data.
         std::map<int, std::string> path_map_1D; ///< A map <int, string> of the paths (either relative or absolute) to the given 1D interpolation data.
         
-        std::map<int, std::vector<std::vector<double>>> interp_map_2D; ///< A map <int, vector<vector<double>>> of given 2D interpolation data.
+        std::map<int, InterpolatorStruct2D> interp_map_2D; ///< A map <int, vector<vector<double>>> of given 2D interpolation data.
         std::map<int, std::string> path_map_2D; ///< A map <int, string> of the paths (either relative or absolute) to the given 2D interpolation data.
         
         

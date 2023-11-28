@@ -178,8 +178,8 @@ void Controller :: __constructCombustionMap(
         );
     }
     
-    //  4. test print
     /*
+    // ==== TEST PRINT ==== //
     std::cout << std::endl;
     
     std::cout << "\t\t";
@@ -201,7 +201,8 @@ void Controller :: __constructCombustionMap(
         }
         std::cout << "}" << std::endl;
     }
-    */
+    // ==== END TEST PRINT ==== //
+    //*/
     
     return;
 }   /* __constructCombustionTable() */
