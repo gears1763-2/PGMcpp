@@ -94,7 +94,7 @@ class Interpolator {
         std::map<int, InterpolatorStruct1D> interp_map_1D; ///< A map <int, InterpolatorStruct1D> of given 1D interpolation data.
         std::map<int, std::string> path_map_1D; ///< A map <int, string> of the paths (either relative or absolute) to the given 1D interpolation data.
         
-        std::map<int, InterpolatorStruct2D> interp_map_2D; ///< A map <int, vector<vector<double>>> of given 2D interpolation data.
+        std::map<int, InterpolatorStruct2D> interp_map_2D; ///< A map <int, InterpolatorStruct2D> of given 2D interpolation data.
         std::map<int, std::string> path_map_2D; ///< A map <int, string> of the paths (either relative or absolute) to the given 2D interpolation data.
         
         

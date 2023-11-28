@@ -98,7 +98,7 @@ void Interpolator :: __checkDataKey2D(int data_key)
 
 void Interpolator :: __throwReadError(std::string path_2_data, int dimensions)
 {
-    std::string error_str = "ERROR:  Interpolator::__readData";
+    std::string error_str = "ERROR:  Interpolator::addData";
     error_str += std::to_string(dimensions);
     error_str += "D()  ";
     error_str += " failed to read ";

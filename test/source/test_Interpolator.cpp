@@ -61,6 +61,12 @@ std::string path_2_data = "data/test/interpolation/diesel_fuel_curve.csv";
 
 test_interpolator.addData1D(data_key, path_2_data);
 
+testTruth(
+    test_interpolator.path_map_1D[data_key] == path_2_data,
+    __FILE__,
+    __LINE__
+);
+
 testFloatEquals(
     test_interpolator.interp_map_1D[data_key].n_points,
     16,
@@ -139,6 +145,12 @@ path_2_data =
     "data/test/interpolation/wave_energy_converter_normalized_performance_matrix.csv";
 
 test_interpolator.addData2D(data_key, path_2_data);
+
+testTruth(
+    test_interpolator.path_map_2D[data_key] == path_2_data,
+    __FILE__,
+    __LINE__
+);
 
 testFloatEquals(
     test_interpolator.interp_map_2D[data_key].n_rows,
