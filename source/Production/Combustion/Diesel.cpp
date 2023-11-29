@@ -1,5 +1,5 @@
 /*
- *  PGMcpp : PRIMED Grid Dieselling (in C++)
+ *  PGMcpp : PRIMED Grid Modelling (in C++)
  *
  *  Anthony Truelove MASc, P.Eng.
  *  email:  gears1763@tutanota.com
@@ -358,7 +358,7 @@ void Diesel :: __writeSummary(std::string write_path)
     ofs << "## Production Attributes\n";
     ofs << "\n";
     
-    ofs << "Capacity: " << this->capacity_kW << "kW  \n";
+    ofs << "Capacity: " << this->capacity_kW << " kW  \n";
     ofs << "\n";
     
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";

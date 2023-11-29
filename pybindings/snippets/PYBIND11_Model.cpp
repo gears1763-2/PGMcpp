@@ -60,4 +60,10 @@ pybind11::class_<Model>(m, "Model")
     .def("addLiIon", &Model::addLiIon)
     .def("run", &Model::run)
     .def("reset", &Model::reset)
-    .def("clear", &Model::clear);
+    .def("clear", &Model::clear)
+    .def(
+        "writeResults",
+        &Model::writeResults,
+        pybind11::arg("write_path"),
+        pybind11::arg("max_lines") = -1
+    );

@@ -1,5 +1,5 @@
 /*
- *  PGMcpp : PRIMED Grid Combustionling (in C++)
+ *  PGMcpp : PRIMED Grid Modelling (in C++)
  *
  *  Anthony Truelove MASc, P.Eng.
  *  email:  gears1763@tutanota.com

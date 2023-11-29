@@ -20,14 +20,14 @@ The Institute for Integrated Energy Systems (IESVic): <https://www.uvic.ca/resea
 
 ## Contents
 
-In the directory for this project, you should find this README, a license file, a
-makefile, and the following sub-directories:
+In the directory for this project, you should find this README, a LICENSE file, a
+makefile, a TODO list, and the following sub-directories:
 
-    data/           to hold sample input data for testing
+    data/           to hold sample input data for testing and examples
     docs/           to hold various documentation
     header/         to hold header files
-    projects/       to hold PGMcpp projects, including an example project
-    pybindings/     to hold source and extension files for making Python 3 bindings
+    projects/       to hold PGMcpp projects (ships with some example projects)
+    pybindings/     to hold source and setup files for building Python 3 bindings (ships with some pre-compiled bindings)
     source/         to hold source files
     test/           to hold the source files for a suite of tests
     third_party/    to hold third party content used in the development of PGMcpp
@@ -37,20 +37,34 @@ makefile, and the following sub-directories:
 
 ## Key Features
 
-  * stuff ...
-  * ... and things
+  * A time-domain microgrid modelling code that will work with any time series data (can be non-uniform series of arbitrary length).
+  * Support for modelling diesel generators. This includes modelling fuel consumption and emissions. Any number of generators can be modelled.
+  * Support for modelling solar, wind, tidal, and wave renewable production assets. Any number of assets can be modelled.
+  * Any number of renewable resource time series can be modelled, with resources being associated with chosen production assets.
+  * Support for modelling lithium ion battery energy storage. This includes modelling use-based battery degradation dynamics.
+  * Support for modelling both load following and cycle charging dispatch control.
+  * Can be either accessed natively in C++, or accessed in Python by way of the provided bindings.
 
 --------
 
 
 ## Setup
 
-pybind11 (<https://pybind11.readthedocs.io/en/stable/>), setup.py, etc. ... the idea is
-to make and use Python 3 bindings for PGMcpp
+### C++
 
-[...]
+To build PGMcpp, you can simply
+
+    make PGMcpp
+
+### Python
+
+The `pybindings/` sub-directory contains the infrastructure needed to build Python bindings
+for PGMcpp (for more details, see `pybindings/README.md`). In summary, you can build
+the bindings by way of
 
     python(3) setup.py build_ext --inplace
+
+depending on your setup.
 
 --------
 
@@ -58,25 +72,34 @@ to make and use Python 3 bindings for PGMcpp
 ## Documentation
 
 Documentation for this project is auto-generated using Doxygen
-(<https://www.doxygen.nl/>). HTML documentation can be found in docs/html, and a 
-pre-compiled LaTeX pdf can be bound at docs/PGMcpp_manual.pdf. Additionally, docs/refs
-contains a few shareable references that form some of the theoretical/empirical bases
-for the implementation of PGMcpp.
+(<https://www.doxygen.nl/>). HTML documentation can be found in
+`docs/PGMcpp_manual_html.7z`, and LaTeX documentation can be found in
+`docs/PGMcpp_manual_LaTeX.pdf`. Additionally, shareable references are included in
+`docs/refs/`, and all references are listed in `docs/refs.bib`.
+
+If you do make changes to the code, you can easily generate updated documentation by way
+of
+
+    make docs
 
 --------
 
 
 ## Testing
 
-Tests are automatically run at compile time; one need only "make all"
+Invoking
 
-[...]
+    make PGMcpp
 
-The makefile and all source code was successfully tested on the following OS and
-architectures:
+will build PGMcpp and then run the suite of tests defined in `test/` (for more details,
+see `test/README.md`). Additionally, `pybindings/test.py` is provided to test the Python
+bindings for PGMcpp.
+
+The provided makefile and all source code was successfully tested on the following OS
+and architectures:
 
     Operating System: Linux Mint 21.2
-              Kernel: Linux 6.5.4-76060504-generic
+              Kernel: Linux 6.5.6-76060506-generic
         Architecture: x86-64
 
     Operating System: Windows 11 Home

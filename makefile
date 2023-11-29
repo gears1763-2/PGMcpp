@@ -423,10 +423,13 @@ PGMcpp_project: $(SRC_PROJECT)
 clean:
 	rm -frv bin
 	rm -frv object
+	rm -frv projects/example_cpp
+	rm -frv projects/example_py
+	rm -frv pybindings/PGMcpp.*
 	rm -frv test/bin
 	rm -frv test/object
 	rm -frv test/test_results
-	rm -frv pybindings/PGMcpp.*
+
 
 
 .PHONY: dirs
