@@ -43,7 +43,7 @@ makefile, a TODO list, and the following sub-directories:
   * Any number of renewable resource time series can be modelled, with resources being associated with chosen production assets.
   * Support for modelling lithium ion battery energy storage. This includes modelling use-based battery degradation dynamics.
   * Support for modelling both load following and cycle charging dispatch control.
-  * Can be either accessed natively in C++, or accessed in Python by way of the provided bindings.
+  * Can be either accessed natively in C++, or accessed in Python 3 by way of the provided bindings.
 
 --------
 
@@ -56,11 +56,14 @@ To build PGMcpp, you can simply
 
     make PGMcpp
 
-### Python
+On Windows, this was achieved using the environment provided by the MSYS2 project (see 
+<https://www.msys2.org/>).
 
-The `pybindings/` sub-directory contains the infrastructure needed to build Python bindings
-for PGMcpp (for more details, see `pybindings/README.md`). In summary, you can build
-the bindings by way of
+### Python 3
+
+The `pybindings/` sub-directory contains the infrastructure needed to build Python 3 
+bindings for PGMcpp (for more details, see `pybindings/README.md`). In summary, you can 
+build the bindings by way of
 
     python(3) setup.py build_ext --inplace
 
@@ -93,7 +96,7 @@ Invoking
 
 will build PGMcpp and then run the suite of tests defined in `test/` (for more details,
 see `test/README.md`). Additionally, `pybindings/test.py` is provided to test the Python
-bindings for PGMcpp.
+3 bindings for PGMcpp (for more details, see `pybindings/README.md`).
 
 The provided makefile and all source code was successfully tested on the following OS
 and architectures:
