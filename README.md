@@ -106,7 +106,7 @@ and architectures:
         Architecture: x86-64
 
     Operating System: Windows 11 Home
-             Version: 10.0.22621 Build 22621
+             Version: 22H2
         Architecture: 64-bit OS, x64-based processor
 
 
