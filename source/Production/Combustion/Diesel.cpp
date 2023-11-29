@@ -386,10 +386,31 @@ void Diesel :: __writeSummary(std::string write_path)
         << this->real_fuel_escalation_annual << "  \n";
     ofs << "\n";
     
-    ofs << "Linear Fuel Slope: " << this->linear_fuel_slope_LkWh << " L/kWh  \n";
-    ofs << "Linear Fuel Intercept Coefficient: " << this->linear_fuel_intercept_LkWh
-        << " L/kWh  \n";
-    ofs << "\n";
+    ofs << "Fuel Mode: " << this->fuel_mode_str << "  \n";
+    switch (this->fuel_mode) {
+        case (FuelMode :: FUEL_MODE_LINEAR): {
+            ofs << "Linear Fuel Slope: " << this->linear_fuel_slope_LkWh
+                << " L/kWh  \n";
+            ofs << "Linear Fuel Intercept Coefficient: "
+                << this->linear_fuel_intercept_LkWh << " L/kWh  \n";
+            ofs << "\n";
+            
+            break;
+        }
+        
+        case (FuelMode :: FUEL_MODE_LOOKUP): {
+            ofs << "Interpolation Data: " << this->interpolator.path_map_1D[0]
+                << "  \n";
+            
+            break;
+        }
+        
+        default: {
+            // write nothing!
+            
+            break;
+        }
+    }
     
     ofs << "Carbon Dioxide (CO2) Emissions Intensity: "
         << this->CO2_emissions_intensity_kgL << " kg/L  \n";

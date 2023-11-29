@@ -60,6 +60,12 @@ DieselInputs diesel_inputs;
 
 test_diesel_ptr =  new Diesel(8760, 1, diesel_inputs);
 
+diesel_inputs.combustion_inputs.fuel_mode = FuelMode :: FUEL_MODE_LOOKUP;
+diesel_inputs.combustion_inputs.path_2_fuel_interp_data =
+    "data/test/interpolation/diesel_fuel_curve.csv";
+
+Diesel test_diesel_lookup(8760, 1, diesel_inputs);
+
 
 // ======== END CONSTRUCTION ======================================================== //
 
@@ -390,6 +396,57 @@ for (int i = 0; i < 48; i++) {
             __LINE__
         );
     }
+}
+
+std::vector<double> load_ratio_vec = {
+    0,
+    0.170812859791767,
+    0.322739274162545,
+    0.369750203682042,
+    0.443532869135929,
+    0.471567864244626,
+    0.536513734479662,
+    0.586125806988674,
+    0.601101175455075,
+    0.658356862575221,
+    0.70576929893201,
+    0.784069734739331,
+    0.805765927542453,
+    0.884747873186048,
+    0.930870496062112,
+    0.979415217694769,
+    1
+};
+
+std::vector<double> expected_fuel_consumption_vec_L = {
+    4.68079520372916,
+    8.35159603357656,
+    11.7422361561399,
+    12.9931187917615,
+    14.8786636301325,
+    15.5746957307243,
+    17.1419229487141,
+    18.3041866133728,
+    18.6530540913696,
+    19.9569217633299,
+    21.012354614584,
+    22.7142305879957,
+    23.1916726441968,
+    24.8602332554707,
+    25.8172124624032,
+    26.8256741279932,
+    27.254952
+};
+
+for (size_t i = 0; i < load_ratio_vec.size(); i++) {
+    testFloatEquals(
+        test_diesel_lookup.getFuelConsumptionL(
+            1, load_ratio_vec[i] * test_diesel_lookup.capacity_kW
+        ),
+        expected_fuel_consumption_vec_L[i],
+        __FILE__,
+        __LINE__
+    );
 }
 
 // ======== END METHODS ============================================================= //

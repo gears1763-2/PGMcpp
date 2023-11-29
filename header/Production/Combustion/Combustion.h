@@ -37,6 +37,20 @@ enum CombustionType {
 
 
 ///
+/// \enum FuelMode
+///
+/// \brief An enumeration of the fuel modes for the Combustion asset which are
+///     supported by PGMcpp
+///
+
+enum FuelMode {
+    FUEL_MODE_LINEAR, ///< A linearized fuel curve model (i.e., HOMER-like model)
+    FUEL_MODE_LOOKUP, ///< Interpolating over a given fuel lookup table
+    N_FUEL_MODES ///< A simple hack to get the number of elements in FuelMode
+};
+
+
+///
 /// \struct CombustionInputs
 ///
 /// \brief A structure which bundles the necessary inputs for the Combustion constructor.
@@ -47,7 +61,11 @@ enum CombustionType {
 struct CombustionInputs {
     ProductionInputs production_inputs; ///< An encapsulated ProductionInputs instance.
     
+    FuelMode fuel_mode = FuelMode :: FUEL_MODE_LINEAR; ///< The fuel mode to use in modelling fuel consumption.
+    
     double nominal_fuel_escalation_annual = 0.05; ///< The nominal, annual fuel escalation rate to use in computing model economics.
+    
+    std::string path_2_fuel_interp_data = ""; ///< A path (either relative or absolute) to a set of fuel consumption data.
 };
 
 
@@ -95,6 +113,8 @@ class Combustion : public Production {
     public:
         //  1. attributes
         CombustionType type; ///< The type (CombustionType) of the asset.
+        FuelMode fuel_mode; ///< The fuel mode to use in modelling fuel consumption.
+        Emissions total_emissions; ///< An Emissions structure for holding total emissions [kg].
         
         double fuel_cost_L; ///< The cost of fuel [1/L] (undefined currency).
         double nominal_fuel_escalation_annual; ///< The nominal, annual fuel escalation rate to use in computing model economics.
@@ -111,7 +131,8 @@ class Combustion : public Production {
         double PM_emissions_intensity_kgL; ///< Particulate Matter (PM) emissions intensity [kg/L].
         
         double total_fuel_consumed_L; ///< The total fuel consumed [L] over a model run.
-        Emissions total_emissions; ///< An Emissions structure for holding total emissions [kg].
+        
+        std::string fuel_mode_str; ///< A string describing the fuel mode of the asset.
     
         std::vector<double> fuel_consumption_vec_L; ///< A vector of fuel consumed [L] over each modelling time step.
         std::vector<double> fuel_cost_vec; ///< A vector of fuel costs (undefined currency) incurred over each modelling time step. These costs are not discounted (i.e., these are actual costs).

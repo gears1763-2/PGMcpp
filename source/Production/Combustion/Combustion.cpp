@@ -38,7 +38,21 @@
 
 void Combustion :: __checkInputs(CombustionInputs combustion_inputs)
 {
-    // ...
+    // 1. if FUEL_MODE_LOOKUP, check that path is given
+    if (
+        combustion_inputs.fuel_mode == FuelMode :: FUEL_MODE_LOOKUP and
+        combustion_inputs.path_2_fuel_interp_data.empty()
+    ) {
+        std::string error_str = "ERROR:  Combustion()  fuel mode was set to ";
+        error_str += "FuelMode::FUEL_MODE_LOOKUP, but no path to fuel interpolation ";
+        error_str += "data was given";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
     
     return;
 }   /* __checkInputs() */
@@ -101,6 +115,39 @@ Production(
     this->__checkInputs(combustion_inputs);
     
     //  2. set attributes
+    this->fuel_mode = combustion_inputs.fuel_mode;
+    
+    switch (this->fuel_mode) {
+        case (FuelMode :: FUEL_MODE_LINEAR): {
+            this->fuel_mode_str = "FUEL_MODE_LINEAR";
+            
+            break;
+        }
+        
+        case (FuelMode :: FUEL_MODE_LOOKUP): {
+            this->fuel_mode_str = "FUEL_MODE_LOOKUP";
+            
+            this->interpolator.addData1D(0, combustion_inputs.path_2_fuel_interp_data);
+            
+            break;
+        }
+        
+        default: {
+            std::string error_str = "ERROR:  Combustion():  ";
+            error_str += "fuel mode ";
+            error_str += std::to_string(this->fuel_mode);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
+            
+            break;
+        }
+    }
+    
     this->fuel_cost_L = 0;
     this->nominal_fuel_escalation_annual =
         combustion_inputs.nominal_fuel_escalation_annual;
@@ -320,10 +367,41 @@ double Combustion :: commit(
 
 double Combustion :: getFuelConsumptionL(double dt_hrs, double production_kW)
 {
-    double fuel_consumed_L = (
-        this->linear_fuel_slope_LkWh * production_kW +
-        this->linear_fuel_intercept_LkWh * this->capacity_kW
-    ) * dt_hrs;
+    double fuel_consumed_L = 0;
+    
+    switch (this->fuel_mode) {
+        case (FuelMode :: FUEL_MODE_LINEAR): {
+            fuel_consumed_L = (
+                this->linear_fuel_slope_LkWh * production_kW +
+                this->linear_fuel_intercept_LkWh * this->capacity_kW
+            ) * dt_hrs;
+            
+            break;
+        }
+        
+        case (FuelMode :: FUEL_MODE_LOOKUP): {
+            double load_ratio = production_kW / this->capacity_kW;
+            
+            fuel_consumed_L = this->interpolator.interp1D(0, load_ratio) * dt_hrs;
+            
+            break;
+        }
+        
+        default: {
+            std::string error_str = "ERROR:  Combustion::getFuelConsumptionL():  ";
+            error_str += "fuel mode ";
+            error_str += std::to_string(this->fuel_mode);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
+            
+            break;
+        }
+    }
     
     return fuel_consumed_L;
 } /* getFuelConsumptionL() */
