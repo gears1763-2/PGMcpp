@@ -114,6 +114,7 @@ The following compilers were used in testing:
 
     g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
     g++ (Rev10, Built by MSYS2 project) 13.2.0
+    Microsoft C/C++ Optimizing Compiler Version 19.37.32825
 
 
 PGMcpp has the following dependencies (by compiler link):
