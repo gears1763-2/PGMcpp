@@ -1,0 +1,3 @@
+*   add production lookup functionality to Tidal and Wind
+*   add a Hydro class (for both conventional and run-of-river)
+*   implement model predictive control in Controller

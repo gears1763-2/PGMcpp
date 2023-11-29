@@ -13,12 +13,12 @@
 ///
 /// \file PYBIND11_PGM.cpp
 ///
-/// \brief Python 3 bindings file for PGMcpp.
+/// \brief Bindings file for PGMcpp.
 ///
-/// This is a file which defines the Python 3 bindings to be generated for PGMcpp. To
-/// generate bindings, use the provided setup.py. \n
-/// \n
-/// ref: https://pybind11.readthedocs.io/en/stable/
+/// Ref: \cite pybind11\n
+///
+/// A file which instructs pybind11 how to build Python bindings for PGMcpp.
+///
 
 
 #include <pybind11/pybind11.h>
@@ -29,55 +29,7 @@
 
 PYBIND11_MODULE(PGMcpp, m) {
 
-// ================ Controller ================ //
-/*
-pybind11::class_<Controller>(m, "Controller")
-    .def(pybind11::init());
-*/
-// ================ END Controller ================ //
-
-
-
-// ================ ElectricalLoad ================ //
-/*
-pybind11::class_<ElectricalLoad>(m, "ElectricalLoad")
-    .def_readwrite("n_points", &ElectricalLoad::n_points)
-    .def_readwrite("max_load_kW", &ElectricalLoad::max_load_kW)
-    .def_readwrite("mean_load_kW", &ElectricalLoad::mean_load_kW)
-    .def_readwrite("min_load_kW", &ElectricalLoad::min_load_kW)
-    .def_readwrite("dt_vec_hrs", &ElectricalLoad::dt_vec_hrs)
-    .def_readwrite("load_vec_kW", &ElectricalLoad::load_vec_kW)
-    .def_readwrite("time_vec_hrs", &ElectricalLoad::time_vec_hrs)
-    
-    .def(pybind11::init<std::string>());
-*/
-// ================ END ElectricalLoad ================ //
-
-
-
-// ================ Model ================ //
-/*
-pybind11::class_<Model>(m, "Model")
-    .def(
-        pybind11::init<
-            ElectricalLoad*,
-            RenewableResources*
-        >()
-    );
-*/
-// ================ END Model ================ //
-
-
-
-// ================ RenewableResources ================ //
-/*
-pybind11::class_<RenewableResources>(m, "RenewableResources")
-    .def(pybind11::init());
-    /*
-    .def(pybind11::init<>());
-    */
-*/
-// ================ END RenewableResources ================ //
+    //...
 
 }   /* PYBIND11_MODULE() */
 

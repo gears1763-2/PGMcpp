@@ -29,9 +29,6 @@ from pybind11.setup_helpers import Pybind11Extension
 
 # remove any existing extensions
 for root, dirs, files in os.walk(os.getcwd()):
-    for name in dirs:
-        if "build" in name:
-            shutil.rmtree(name)
     for name in files:
         if "PGMcpp" in name:
             os.remove(name)
@@ -42,8 +39,10 @@ source_list = ["PYBIND11_PGM.cpp"]
 for root, dirs, files in os.walk(".." + os.sep + "source"):
     for name in files:
         path_str = os.path.join(root, name)
-        if "control" not in path_str:
-            source_list.append(path_str)
+        source_list.append(path_str)
+
+for source in source_list:
+    print(source)
 
 
 # generate list of pybind11 extensions
