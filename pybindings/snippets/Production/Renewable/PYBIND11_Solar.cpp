@@ -19,7 +19,28 @@
 /// Ref: \cite pybind11\n
 ///
 /// A file which instructs pybind11 how to build Python bindings for the Solar
-/// class.
+/// class. Only public attributes/methods are bound!
 ///
 
-//...
+
+pybind11::class_<SolarInputs>(m, "SolarInputs")
+    .def_readwrite("renewable_inputs", &SolarInputs::renewable_inputs)
+    .def_readwrite("resource_key", &SolarInputs::resource_key)
+    .def_readwrite("capital_cost", &SolarInputs::capital_cost)
+    .def_readwrite(
+        "operation_maintenance_cost_kWh",
+        &SolarInputs::operation_maintenance_cost_kWh
+    )
+    .def_readwrite("derating", &SolarInputs::derating)
+    
+    .def(pybind11::init());
+
+
+pybind11::class_<Solar>(m, "Solar")
+    .def_readwrite("derating", &Solar::derating)
+      
+    .def(pybind11::init<>())
+    .def(pybind11::init<int, double, SolarInputs>())
+    .def("handleReplacement", &Solar::handleReplacement)
+    .def("computeProductionkW", &Solar::computeProductionkW)
+    .def("commit", &Solar::commit);

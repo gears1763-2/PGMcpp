@@ -19,7 +19,7 @@
 /// Ref: \cite pybind11\n
 ///
 /// A file which instructs pybind11 how to build Python bindings for the Interpolator
-/// class.
+/// class. Only public attributes/methods are bound!
 ///
 
 //...

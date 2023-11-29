@@ -426,6 +426,7 @@ clean:
 	rm -frv test/bin
 	rm -frv test/object
 	rm -frv test/test_results
+	rm -frv pybindings/PGMcpp.*
 
 
 .PHONY: dirs

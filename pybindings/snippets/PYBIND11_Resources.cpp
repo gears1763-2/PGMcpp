@@ -19,7 +19,18 @@
 /// Ref: \cite pybind11\n
 ///
 /// A file which instructs pybind11 how to build Python bindings for the Resources
-/// class.
+/// class. Only public attributes/methods are bound!
 ///
 
-//...
+
+pybind11::class_<Resources>(m, "Resources")
+    .def_readwrite("resource_map_1D", &Resources::resource_map_1D)
+    .def_readwrite("string_map_1D", &Resources::string_map_1D)
+    .def_readwrite("path_map_1D", &Resources::path_map_1D)
+    .def_readwrite("resource_map_2D", &Resources::resource_map_2D)
+    .def_readwrite("string_map_2D", &Resources::string_map_2D)
+    .def_readwrite("path_map_2D", &Resources::path_map_2D)
+
+    .def(pybind11::init<>())
+    .def("addResource", &Resources::addResource)
+    .def("clear", &Resources::clear);

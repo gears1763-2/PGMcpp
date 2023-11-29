@@ -17,7 +17,8 @@
 ///
 /// Ref: \cite pybind11\n
 ///
-/// A file which instructs pybind11 how to build Python bindings for PGMcpp.
+/// A file which instructs pybind11 how to build Python bindings for PGMcpp. Only public
+/// attributes/methods are bound!
 ///
 
 

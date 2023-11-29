@@ -188,13 +188,11 @@ void Model :: __computeLevellizedCostOfEnergy(void)
     
     //  3. account for Storage economics in levellized cost of energy
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
-        /*
         this->levellized_cost_of_energy_kWh += 
             (
                 this->storage_ptr_vec[i]->levellized_cost_of_energy_kWh *
                 this->storage_ptr_vec[i]->total_discharge_kWh
             ) / this->total_dispatch_discharge_kWh;
-        */
     }
     
     return;
