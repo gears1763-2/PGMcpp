@@ -35,6 +35,10 @@ struct InterpolatorStruct1D {
     int n_points = 0; ///< The number of data points in each parallel vector
     
     std::vector<double> x_vec = {}; ///< A vector of independent data.
+    
+    double min_x = 0; ///< The minimum (i.e., first) element of x_vec.
+    double max_x = 0; ///< The maximum (i.e., last) element of x_vec.
+    
     std::vector<double> y_vec = {}; ///< A vector of dependent data.
 };
 
@@ -51,7 +55,14 @@ struct InterpolatorStruct2D {
     int n_cols = 0; ///< The number of cols in the matrix (also the length of x_vec)
     
     std::vector<double> x_vec = {}; ///< A vector of independent data (columns).
+    
+    double min_x = 0; ///< The minimum (i.e., first) element of x_vec.
+    double max_x = 0; ///< The maximum (i.e., last) element of x_vec.
+    
     std::vector<double> y_vec = {}; ///< A vector of independent data (rows).
+    
+    double min_y = 0; ///< The minimum (i.e., first) element of y_vec.
+    double max_y = 0; ///< The maximum (i.e., last) element of y_vec.
     
     std::vector<std::vector<double>> z_matrix = {}; ///< A matrix of dependent data.
 };
@@ -74,9 +85,14 @@ class Interpolator {
         void __checkDataKey1D(int);
         void __checkDataKey2D(int);
         
+        void __checkBounds1D(int, double);
+        void __checkBounds2D(int, double, double);
+        
         void __throwReadError(std::string, int);
         
         bool __isNonNumeric(std::string);
+        
+        int __getInterpolationIndex(double, std::vector<double>*);
         
         std::vector<std::string> __splitCommaSeparatedString(
             std::string,
