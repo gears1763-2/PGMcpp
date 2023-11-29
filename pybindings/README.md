@@ -58,6 +58,8 @@ C++ compiler already. However, if this is not the case, then you can simply
 
     sudo apt-get install build-essential
 
+The provided `setup.py` was successfully invoked on Linux Mint 21.2 using `g++ 11.4.0`.
+
 ### Windows Notes
 
 On Windows, there are a few things to set up first before building the Python 3 bindings;
@@ -66,6 +68,8 @@ namely
   * You need to be using Python for Windows, as available from <https://www.python.org/downloads/>. Version 3.10+ should do fine.
   * You need to `pip install` the dependencies listed above (and in `pip_requirements`).
   * You need to be using the MSVC compiler (`cl.exe`). This can be obtained by way of installing Visual Studio (as available from <https://visualstudio.microsoft.com/downloads/>; the free community edition is fine) and then selecting the "Desktop development with C++" workload.
+
+The provided `setup.py` was successfully invoked on Windows 11 Home (22H2) using the Microsoft C/C++ Optimizing Compiler Version 19.37.32825.
 
 --------
 

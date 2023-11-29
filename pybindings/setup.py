@@ -11,7 +11,7 @@
     
     $   python(3) setup.py build_ext --inplace
     
-    depending on your interpreter.
+    depending on your set up.
     
     ref: https://pybind11.readthedocs.io/en/stable/compiling.html \n
     ref: https://github.com/pybind/python_example/ \n
@@ -27,22 +27,12 @@ from setuptools import setup
 from pybind11.setup_helpers import Pybind11Extension
 
 
-# remove any existing extensions
-for root, dirs, files in os.walk(os.getcwd()):
-    for name in files:
-        if "PGMcpp" in name:
-            os.remove(name)
-
-
 # generate list of source files
 source_list = ["PYBIND11_PGM.cpp"]
 for root, dirs, files in os.walk(".." + os.sep + "source"):
     for name in files:
         path_str = os.path.join(root, name)
         source_list.append(path_str)
-
-for source in source_list:
-    print(source)
 
 
 # generate list of pybind11 extensions
