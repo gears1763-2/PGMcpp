@@ -399,7 +399,7 @@ void Diesel :: __writeSummary(std::string write_path)
         }
         
         case (FuelMode :: FUEL_MODE_LOOKUP): {
-            ofs << "Interpolation Data: " << this->interpolator.path_map_1D[0]
+            ofs << "Fuel Consumption Data: " << this->interpolator.path_map_1D[0]
                 << "  \n";
             
             break;

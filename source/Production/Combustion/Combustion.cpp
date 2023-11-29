@@ -127,7 +127,10 @@ Production(
         case (FuelMode :: FUEL_MODE_LOOKUP): {
             this->fuel_mode_str = "FUEL_MODE_LOOKUP";
             
-            this->interpolator.addData1D(0, combustion_inputs.path_2_fuel_interp_data);
+            this->interpolator.addData1D(
+                0,
+                combustion_inputs.path_2_fuel_interp_data
+            );
             
             break;
         }

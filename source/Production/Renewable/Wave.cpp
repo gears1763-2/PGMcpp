@@ -61,6 +61,22 @@ void Wave :: __checkInputs(WaveInputs wave_inputs)
         throw std::invalid_argument(error_str);
     }
     
+    //  3. if WAVE_POWER_LOOKUP, check that path is given
+    if (
+        wave_inputs.power_model == WavePowerProductionModel :: WAVE_POWER_LOOKUP and
+        wave_inputs.path_2_normalized_performance_matrix.empty()
+    ) {
+        std::string error_str = "ERROR:  Wave()  power model was set to ";
+        error_str += "WavePowerProductionModel::WAVE_POWER_LOOKUP, but no path to a ";
+        error_str += "normalized performance matrix was given";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
     return;
 }   /* __checkInputs() */
 
@@ -275,9 +291,13 @@ double Wave:: __computeLookupProductionkW(
     double energy_period_s
 )
 {
-    // *** WORK IN PROGRESS *** //
+    double prod = this->interpolator.interp2D(
+        0,
+        significant_wave_height_m,
+        energy_period_s
+    );
     
-    return 0;
+    return prod * this->capacity_kW;
 }   /* __computeLookupProductionkW() */
 
 // ---------------------------------------------------------------------------------- //
@@ -353,7 +373,8 @@ void Wave :: __writeSummary(std::string write_path)
         }
         
         case (WavePowerProductionModel :: WAVE_POWER_LOOKUP): {
-            //...
+            ofs << "Normalized Performance Matrix: "
+                << this->interpolator.path_map_2D[0] << "  \n";
             
             break;
         }
@@ -544,6 +565,11 @@ Renewable(
         
         case (WavePowerProductionModel :: WAVE_POWER_LOOKUP): {
             this->power_model_string = "LOOKUP";
+            
+            this->interpolator.addData2D(
+                0,
+                wave_inputs.path_2_normalized_performance_matrix
+            );
             
             break;
         }

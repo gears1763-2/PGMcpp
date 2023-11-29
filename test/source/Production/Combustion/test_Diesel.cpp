@@ -60,6 +60,7 @@ DieselInputs diesel_inputs;
 
 test_diesel_ptr =  new Diesel(8760, 1, diesel_inputs);
 
+
 diesel_inputs.combustion_inputs.fuel_mode = FuelMode :: FUEL_MODE_LOOKUP;
 diesel_inputs.combustion_inputs.path_2_fuel_interp_data =
     "data/test/interpolation/diesel_fuel_curve.csv";

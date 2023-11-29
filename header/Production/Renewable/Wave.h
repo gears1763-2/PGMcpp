@@ -59,6 +59,8 @@ struct WaveInputs {
     double design_energy_period_s = 10; ///< The energy period [s] at which the wave energy converter achieves its rated capacity.
     
     WavePowerProductionModel power_model = WavePowerProductionModel :: WAVE_POWER_PARABOLOID; ///< The wave power production model to be applied.
+    
+    std::string path_2_normalized_performance_matrix = ""; ///< A path (either relative or absolute) to a normalized performance matrix for the wave energy converter.
 };
 
 
