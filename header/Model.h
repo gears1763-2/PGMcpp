@@ -104,6 +104,7 @@ class Model {
         
         void addDiesel(DieselInputs);
         
+        void addResource(NoncombustionType, std::string, int);
         void addResource(RenewableType, std::string, int);
         
         void addHydro(HydroInputs);

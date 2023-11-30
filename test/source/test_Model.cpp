@@ -325,10 +325,25 @@ test_model.addResource(
 );
 
 
+//  add Hydro resource
+int hydro_resource_key = 4;
+std::string path_2_hydro_resource_data =
+    "data/test/resources/hydro_inflow_peak-20000m3hr_1yr_dt-1hr.csv";
+
+test_model.addResource(
+    NoncombustionType :: HYDRO,
+    path_2_hydro_resource_data,
+    hydro_resource_key
+);
+
+
 //  add Hydro asset
 HydroInputs hydro_inputs;
 hydro_inputs.noncombustion_inputs.production_inputs.capacity_kW = 300;
+hydro_inputs.reservoir_capacity_m3 = 10000;
+hydro_inputs.init_reservoir_state = 0.5;
 hydro_inputs.noncombustion_inputs.production_inputs.is_sunk = true;
+hydro_inputs.resource_key = hydro_resource_key;
 
 test_model.addHydro(hydro_inputs);
 
@@ -342,6 +357,13 @@ testFloatEquals(
 testFloatEquals(
     test_model.noncombustion_ptr_vec[0]->type,
     NoncombustionType :: HYDRO,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.noncombustion_ptr_vec[0]->resource_key,
+    hydro_resource_key,
     __FILE__,
     __LINE__
 );
@@ -517,6 +539,7 @@ test_model.writeResults("test/test_results/");
 double net_load_kW;
 
 Combustion* combustion_ptr;
+Noncombustion* noncombustion_ptr;
 Renewable* renewable_ptr;
 Storage* storage_ptr;
 
@@ -544,6 +567,22 @@ for (int i = 0; i < test_model.electrical_load.n_points; i++) {
         );
         
         net_load_kW -= combustion_ptr->production_vec_kW[i];
+    }
+    
+    for (size_t j = 0; j < test_model.noncombustion_ptr_vec.size(); j++) {
+        noncombustion_ptr = test_model.noncombustion_ptr_vec[j];
+        
+        testFloatEquals(
+            noncombustion_ptr->production_vec_kW[i] -
+            noncombustion_ptr->dispatch_vec_kW[i] -
+            noncombustion_ptr->curtailment_vec_kW[i] -
+            noncombustion_ptr->storage_vec_kW[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        net_load_kW -= noncombustion_ptr->production_vec_kW[i];
     }
     
     for (size_t j = 0; j < test_model.renewable_ptr_vec.size(); j++) {

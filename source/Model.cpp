@@ -357,6 +357,13 @@ void Model :: __writeSummary(std::string write_path)
         ofs << "Asset Index: " << i << "  \n";
         ofs << "Type: " << this->noncombustion_ptr_vec[i]->type_str << "  \n";
         ofs << "Capacity: " << this->noncombustion_ptr_vec[i]->capacity_kW << " kW  \n";
+        
+        if (this->noncombustion_ptr_vec[i]->type == NoncombustionType :: HYDRO) {
+            ofs << "Reservoir Capacity: " <<
+                ((Hydro*)(this->noncombustion_ptr_vec[i]))->reservoir_capacity_m3 <<
+                " m3  \n";
+        }
+        
         ofs << "\n";
     }
     
@@ -618,6 +625,44 @@ void Model :: addDiesel(DieselInputs diesel_inputs)
     
     return;
 }   /* addDiesel() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: addResource(
+///         NoncombustionType noncombustion_type,
+///         std::string path_2_resource_data,
+///         int resource_key
+///     )
+///
+/// \brief A method to add a renewable resource time series to the Model.
+///
+/// \param noncombustion_type The type of renewable resource being added to the Model.
+///
+/// \param path_2_resource_data A string defining the path (either relative or absolute) to the given resource time series.
+///
+/// \param resource_key A key used to index into the Resources object, used to associate Renewable assets with the corresponding resource.
+///
+
+void Model :: addResource(
+    NoncombustionType noncombustion_type,
+    std::string path_2_resource_data,
+    int resource_key
+)
+{
+    resources.addResource(
+        noncombustion_type,
+        path_2_resource_data,
+        resource_key,
+        &(this->electrical_load)
+    );
+    
+    return;
+}   /* addResource() */
 
 // ---------------------------------------------------------------------------------- //
 

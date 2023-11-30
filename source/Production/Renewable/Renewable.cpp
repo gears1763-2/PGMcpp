@@ -47,12 +47,20 @@ void Renewable :: __checkInputs(RenewableInputs renewable_inputs)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void Renewable :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+/// \fn Renewable :: __handleStartStop(
+///         int timestep,
+///         double dt_hrs,
+///         double production_kW
+///     )
 ///
 /// \brief Helper method to handle the starting/stopping of the renewable asset.
 ///
 
-void Renewable :: __handleStartStop(int timestep, double dt_hrs, double production_kW)
+void Renewable :: __handleStartStop(
+    int timestep,
+    double dt_hrs,
+    double production_kW
+)
 {
     if (this->is_running) {
         // handle stopping

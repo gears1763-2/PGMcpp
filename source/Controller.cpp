@@ -1091,7 +1091,15 @@ double Controller :: __handleNoncombustionDispatch(
                     timestep,
                     dt_hrs,
                     net_load_kW,
-                    0   // <-- *** RESOURCE HERE ***
+                    resources_ptr->resource_map_1D[noncombustion_ptr->resource_key][timestep]
+                );
+                
+                net_load_kW = noncombustion_ptr->commit(
+                    timestep,
+                    dt_hrs,
+                    production_kW,
+                    net_load_kW,
+                    resources_ptr->resource_map_1D[noncombustion_ptr->resource_key][timestep]
                 );
                 
                 break;
@@ -1104,16 +1112,16 @@ double Controller :: __handleNoncombustionDispatch(
                     net_load_kW
                 );
                 
+                net_load_kW = noncombustion_ptr->commit(
+                    timestep,
+                    dt_hrs,
+                    production_kW,
+                    net_load_kW
+                );
+                
                 break;
             }
         }
-        
-        net_load_kW = noncombustion_ptr->commit(
-            timestep,
-            dt_hrs,
-            production_kW,
-            net_load_kW
-        );
     }
     
     return net_load_kW;

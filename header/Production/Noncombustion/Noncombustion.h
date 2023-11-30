@@ -65,6 +65,7 @@ class Noncombustion : public Production {
         
         //  2. methods
         void __checkInputs(NoncombustionInputs);
+        void __handleStartStop(int, double, double);
         
         virtual void __writeSummary(std::string) {return;}
         virtual void __writeTimeSeries(
@@ -78,6 +79,8 @@ class Noncombustion : public Production {
         //  1. attributes
         NoncombustionType type; ///< The type (NoncombustionType) of the asset.
         
+        int resource_key; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
+        
         
         //  2. methods
         Noncombustion(void);
@@ -88,7 +91,9 @@ class Noncombustion : public Production {
         
         virtual double requestProductionkW(int, double, double) {return 0;}
         virtual double requestProductionkW(int, double, double, double) {return 0;}
+        
         virtual double commit(int, double, double, double);
+        virtual double commit(int, double, double, double, double) {return 0;}
         
         void writeResults(
             std::string,

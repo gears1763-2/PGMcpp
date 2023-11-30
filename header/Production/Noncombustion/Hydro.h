@@ -25,6 +25,19 @@
 
 
 ///
+/// \enum HydroTurbineType
+///
+/// \brief An enumeration of the types of hydroelectric turbine supported by PGMcpp
+///
+
+enum HydroTurbineType {
+    HYDRO_TURBINE_PELTON, ///< A Pelton turbine
+    HYDRO_TURBINE_FRANCIS, ///< A Francis turbine
+    N_HYDRO_TURBINES ///< A simple hack to get the number of elements in HydroTurbineType
+};
+
+
+///
 /// \struct HydroInputs
 ///
 /// \brief A structure which bundles the necessary inputs for the Hydro constructor.
@@ -36,6 +49,17 @@ struct HydroInputs {
     NoncombustionInputs noncombustion_inputs; ///< An encapsulated NoncombustionInputs instance.
     
     int resource_key = 0; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
+    
+    double capital_cost = -1; ///< The capital cost of the asset (undefined currency). -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD].
+    double operation_maintenance_cost_kWh = -1; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced. -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD/kWh].
+    
+    double fluid_density_kgm3 = 1000; ///< The density [kg/m3] of the hydroelectric working fluid.
+    double net_head_m = 10; ///< The net head [m] of the asset.
+    
+    double reservoir_capacity_m3 = 0; ///< The capacity [m3] of the hydro reservoir.
+    double init_reservoir_state = 0; ///< The initial state of the reservoir (where state is volume of stored fluid divided by capacity).
+    
+    HydroTurbineType turbine_type = HydroTurbineType :: HYDRO_TURBINE_PELTON; ///< The type of hydroelectric turbine model to use.
 };
 
 
@@ -55,7 +79,18 @@ class Hydro : public Noncombustion {
         //  2. methods
         void __checkInputs(HydroInputs);
         
-        //...
+        double __getGenericCapitalCost(void);
+        double __getGenericOpMaintCost(void);
+        
+        double __getMinimumFlowm3hr(void);
+        double __getMaximumFlowm3hr(void);
+        
+        double __flowToPower(double);
+        double __powerToFlow(double);
+        
+        double __getAvailableFlow(double, double);
+        
+        void __updateState(int, double, double, double);
         
         void __writeSummary(std::string);
         void __writeTimeSeries(
@@ -67,7 +102,20 @@ class Hydro : public Noncombustion {
     
     public:
         //  1. attributes
-        int resource_key; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
+        HydroTurbineType turbine_type; ///< The type of hydroelectric turbine model to use.
+        
+        double fluid_density_kgm3; ///< The density [kg/m3] of the hydroelectric working fluid.
+        double net_head_m; ///< The net head [m] of the asset.
+        
+        double reservoir_capacity_m3; ///< The capacity [m3] of the hydro reservoir.
+        double init_reservoir_state; ///< The initial state of the reservoir (where state is volume of stored fluid divided by capacity).
+        double stored_volume_m3; ///< The volume [m3] of stored fluid.
+        
+        double minimum_flow_m3hr; ///< The minimum required flow [m3/hr] for the asset to produce.
+        double maximum_flow_m3hr; ///< The maximum productive flow [m3/hr] that the asset can support.
+        
+        std::vector<double> turbine_flow_vec_m3hr; ///< A vector of the turbine flow [m3/hr] at each point in the modelling time series.
+        std::vector<double> stored_volume_vec_m3; ///< A vector of the stored volume [m3] in the reservoir at each point in the modelling time series.
         
         
         //  2. methods
@@ -76,7 +124,7 @@ class Hydro : public Noncombustion {
         void handleReplacement(int);
         
         double requestProductionkW(int, double, double, double);
-        double commit(int, double, double, double);
+        double commit(int, double, double, double, double);
         
         ~Hydro(void);
         
