@@ -87,6 +87,7 @@ class Noncombustion : public Production {
         void computeEconomics(std::vector<double>*);
         
         virtual double requestProductionkW(int, double, double) {return 0;}
+        virtual double requestProductionkW(int, double, double, double) {return 0;}
         virtual double commit(int, double, double, double);
         
         void writeResults(

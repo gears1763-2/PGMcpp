@@ -325,6 +325,28 @@ test_model.addResource(
 );
 
 
+//  add Hydro asset
+HydroInputs hydro_inputs;
+hydro_inputs.noncombustion_inputs.production_inputs.capacity_kW = 300;
+hydro_inputs.noncombustion_inputs.production_inputs.is_sunk = true;
+
+test_model.addHydro(hydro_inputs);
+
+testFloatEquals(
+    test_model.noncombustion_ptr_vec.size(),
+    1,
+    __FILE__,
+    __LINE__
+);
+
+testFloatEquals(
+    test_model.noncombustion_ptr_vec[0]->type,
+    NoncombustionType :: HYDRO,
+    __FILE__,
+    __LINE__
+);
+
+
 //  add Diesel assets
 DieselInputs diesel_inputs;
 diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 100;

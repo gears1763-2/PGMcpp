@@ -30,6 +30,7 @@
 
 // production and storage
 #include "Production/Combustion/Combustion.h"
+#include "Production/Noncombustion/Noncombustion.h"
 #include "Production/Renewable/Renewable.h"
 #include "Storage/Storage.h"
 
@@ -67,7 +68,9 @@ class Controller {
         void __applyLoadFollowingControl_CHARGING(
             int,
             ElectricalLoad*,
+            Resources*,
             std::vector<Combustion*>*,
+            std::vector<Noncombustion*>*,
             std::vector<Renewable*>*,
             std::vector<Storage*>*
         );
@@ -75,7 +78,9 @@ class Controller {
         void __applyLoadFollowingControl_DISCHARGING(
             int,
             ElectricalLoad*,
+            Resources*,
             std::vector<Combustion*>*,
+            std::vector<Noncombustion*>*,
             std::vector<Renewable*>*,
             std::vector<Storage*>*
         );
@@ -83,7 +88,9 @@ class Controller {
         void __applyCycleChargingControl_CHARGING(
             int,
             ElectricalLoad*,
+            Resources*,
             std::vector<Combustion*>*,
+            std::vector<Noncombustion*>*,
             std::vector<Renewable*>*,
             std::vector<Storage*>*
         );
@@ -91,7 +98,9 @@ class Controller {
         void __applyCycleChargingControl_DISCHARGING(
             int,
             ElectricalLoad*,
+            Resources*,
             std::vector<Combustion*>*,
+            std::vector<Noncombustion*>*,
             std::vector<Renewable*>*,
             std::vector<Storage*>*
         );
@@ -101,6 +110,7 @@ class Controller {
             double,
             std::list<Storage*>,
             std::vector<Combustion*>*,
+            std::vector<Noncombustion*>*,
             std::vector<Renewable*>*
         );
         
@@ -109,6 +119,7 @@ class Controller {
             double,
             std::vector<Storage*>*,
             std::vector<Combustion*>*,
+            std::vector<Noncombustion*>*,
             std::vector<Renewable*>*
         );
         
@@ -120,6 +131,14 @@ class Controller {
             double,
             std::vector<Combustion*>*,
             bool
+        );
+        
+        double __handleNoncombustionDispatch(
+            int,
+            double,
+            double,
+            std::vector<Noncombustion*>*,
+            Resources*
         );
         
         double __handleStorageDischarging(int, double, double, std::list<Storage*>);
@@ -150,7 +169,9 @@ class Controller {
         
         void applyDispatchControl(
             ElectricalLoad*,
+            Resources*,
             std::vector<Combustion*>*,
+            std::vector<Noncombustion*>*,
             std::vector<Renewable*>*,
             std::vector<Storage*>*
         );

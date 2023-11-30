@@ -29,6 +29,7 @@
 #include "ElectricalLoad.h"
 
 // production
+#include "Production/Noncombustion/Noncombustion.h"
 #include "Production/Renewable/Renewable.h"
 
 
@@ -48,8 +49,13 @@ class Resources {
         //  2. methods
         void __checkResourceKey1D(int, RenewableType);
         void __checkResourceKey2D(int, RenewableType);
+        
+        void __checkResourceKey1D(int, NoncombustionType);
+        
         void __checkTimePoint(double, double, std::string, ElectricalLoad*);
         void __throwLengthError(std::string, ElectricalLoad*);
+        
+        void __readHydroResource(std::string, int, ElectricalLoad*);
         
         void __readSolarResource(std::string, int, ElectricalLoad*);
         void __readTidalResource(std::string, int, ElectricalLoad*);
@@ -71,6 +77,7 @@ class Resources {
         //  2. methods
         Resources(void);
         
+        void addResource(NoncombustionType, std::string, int, ElectricalLoad*);
         void addResource(RenewableType, std::string, int, ElectricalLoad*);
         
         void clear(void);

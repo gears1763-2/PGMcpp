@@ -28,6 +28,7 @@
 
 //  production
 #include "Production/Combustion/Diesel.h"
+#include "Production/Noncombustion/Hydro.h"
 #include "Production/Renewable/Solar.h"
 #include "Production/Renewable/Tidal.h"
 #include "Production/Renewable/Wave.h"
@@ -92,6 +93,7 @@ class Model {
         Resources resources; ///< Resources component of Model
         
         std::vector<Combustion*> combustion_ptr_vec; ///< A vector of pointers to the various Combustion assets in the Model
+        std::vector<Noncombustion*> noncombustion_ptr_vec; ///< A vector of pointers to the various Noncombustion assets in the Model
         std::vector<Renewable*> renewable_ptr_vec;  ///< A vector of pointers to the various Renewable assets in the Model
         std::vector<Storage*> storage_ptr_vec;  ///< A vector of pointers to the various Storage assets in the Model
         
@@ -103,6 +105,8 @@ class Model {
         void addDiesel(DieselInputs);
         
         void addResource(RenewableType, std::string, int);
+        
+        void addHydro(HydroInputs);
         
         void addSolar(SolarInputs);
         void addTidal(TidalInputs);

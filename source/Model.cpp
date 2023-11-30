@@ -124,7 +124,20 @@ void Model :: __computeNetPresentCost(void)
             this->combustion_ptr_vec[i]->total_dispatch_kWh;
     }
     
-    //  2. account for Renewable economics in net present cost,
+    //  2. account for Noncombustion economics in net present cost
+    //     increment total dispatch
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        this->noncombustion_ptr_vec[i]->computeEconomics(
+            &(this->electrical_load.time_vec_hrs)
+        );
+        
+        this->net_present_cost += this->noncombustion_ptr_vec[i]->net_present_cost;
+        
+        this->total_dispatch_discharge_kWh +=
+            this->noncombustion_ptr_vec[i]->total_dispatch_kWh;
+    }
+    
+    //  3. account for Renewable economics in net present cost,
     //     increment total dispatch
     for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
         this->renewable_ptr_vec[i]->computeEconomics(
@@ -137,7 +150,7 @@ void Model :: __computeNetPresentCost(void)
             this->renewable_ptr_vec[i]->total_dispatch_kWh;
     }
     
-    //  3. account for Storage economics in net present cost
+    //  4. account for Storage economics in net present cost
     //     increment total dispatch
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         this->storage_ptr_vec[i]->computeEconomics(
@@ -177,7 +190,16 @@ void Model :: __computeLevellizedCostOfEnergy(void)
             ) / this->total_dispatch_discharge_kWh;
     }
     
-    //  2. account for Renewable economics in levellized cost of energy
+    //  2. account for Noncombustion economics in levellized cost of energy
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        this->levellized_cost_of_energy_kWh += 
+            (
+                this->noncombustion_ptr_vec[i]->levellized_cost_of_energy_kWh *
+                this->noncombustion_ptr_vec[i]->total_dispatch_kWh
+            ) / this->total_dispatch_discharge_kWh;
+    }
+    
+    //  3. account for Renewable economics in levellized cost of energy
     for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
         this->levellized_cost_of_energy_kWh += 
             (
@@ -186,7 +208,7 @@ void Model :: __computeLevellizedCostOfEnergy(void)
             ) / this->total_dispatch_discharge_kWh;
     }
     
-    //  3. account for Storage economics in levellized cost of energy
+    //  4. account for Storage economics in levellized cost of energy
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         this->levellized_cost_of_energy_kWh += 
             (
@@ -327,7 +349,20 @@ void Model :: __writeSummary(std::string write_path)
     
     ofs << "\n--------\n\n";
     
-    //  3.6. Renewable
+    //  3.6. Noncombustion
+    ofs << "## Noncombustion Assets\n";
+    ofs << "\n";
+    
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        ofs << "Asset Index: " << i << "  \n";
+        ofs << "Type: " << this->noncombustion_ptr_vec[i]->type_str << "  \n";
+        ofs << "Capacity: " << this->noncombustion_ptr_vec[i]->capacity_kW << " kW  \n";
+        ofs << "\n";
+    }
+    
+    ofs << "\n--------\n\n";
+    
+    //  3.7. Renewable
     ofs << "## Renewable Assets\n";
     ofs << "\n";
     
@@ -340,17 +375,23 @@ void Model :: __writeSummary(std::string write_path)
     
     ofs << "\n--------\n\n";
     
-    //  3.7. Storage
+    //  3.8. Storage
     ofs << "## Storage Assets\n";
     ofs << "\n";
     
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
-        //...
+        ofs << "Asset Index: " << i << "  \n";
+        ofs << "Type: " << this->storage_ptr_vec[i]->type_str << "  \n";
+        ofs << "Power Capacity: " << this->storage_ptr_vec[i]->power_capacity_kW
+            << " kW  \n";
+        ofs << "Energy Capacity: " << this->storage_ptr_vec[i]->energy_capacity_kWh
+            << " kWh  \n";
+        ofs << "\n";
     }
     
     ofs << "\n--------\n\n";
     
-    //  3.8. Model Results
+    //  3.9. Model Results
     ofs << "## Results\n";
     ofs << "\n";
     
@@ -447,7 +488,14 @@ void Model :: __writeTimeSeries(std::string write_path, int max_lines)
     }
     
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
-        //...
+        ofs << this->storage_ptr_vec[i]->power_capacity_kW << " kW "
+            << this->storage_ptr_vec[i]->energy_capacity_kWh << " kWh "
+            << this->storage_ptr_vec[i]->type_str << " Discharge [kW],";
+    }
+    
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        ofs << this->noncombustion_ptr_vec[i]->capacity_kW << " kW "
+            << this->noncombustion_ptr_vec[i]->type_str << " Dispatch [kW],";
     }
     
     for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
@@ -471,7 +519,11 @@ void Model :: __writeTimeSeries(std::string write_path, int max_lines)
         }
         
         for (size_t j = 0; j < this->storage_ptr_vec.size(); j++) {
-            //...
+            ofs << this->storage_ptr_vec[j]->discharging_power_vec_kW[i] << ",";
+        }
+        
+        for (size_t j = 0; j < this->noncombustion_ptr_vec.size(); j++) {
+            ofs << this->noncombustion_ptr_vec[j]->dispatch_vec_kW[i] << ",";
         }
         
         for (size_t j = 0; j < this->combustion_ptr_vec.size(); j++) {
@@ -604,6 +656,33 @@ void Model :: addResource(
     
     return;
 }   /* addResource() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Model :: addHydro(HydroInputs hydro_inputs)
+///
+/// \brief Method to add a Hydro asset to the Model.
+///
+/// \param hydro_inputs A structure of Hydro constructor inputs.
+///
+
+void Model :: addHydro(HydroInputs hydro_inputs)
+{
+    Noncombustion* hydro_ptr = new Hydro(
+        this->electrical_load.n_points,
+        this->electrical_load.n_years,
+        hydro_inputs
+    );
+    
+    this->noncombustion_ptr_vec.push_back(hydro_ptr);
+    
+    return;
+}   /* addHydro() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -765,7 +844,9 @@ void Model :: run(void)
     //  2. apply dispatch control
     this->controller.applyDispatchControl(
         &(this->electrical_load),
+        &(this->resources),
         &(this->combustion_ptr_vec),
+        &(this->noncombustion_ptr_vec),
         &(this->renewable_ptr_vec),
         &(this->storage_ptr_vec)
     );
@@ -802,19 +883,25 @@ void Model :: reset(void)
     }
     this->combustion_ptr_vec.clear();
     
-    //  2. clear renewable_ptr_vec
+    //  2. clear noncombustion_ptr_vec
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        delete this->noncombustion_ptr_vec[i];
+    }
+    this->noncombustion_ptr_vec.clear();
+    
+    //  3. clear renewable_ptr_vec
     for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
         delete this->renewable_ptr_vec[i];
     }
     this->renewable_ptr_vec.clear();
     
-    //  3. clear storage_ptr_vec
+    //  4. clear storage_ptr_vec
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         delete this->storage_ptr_vec[i];
     }
     this->storage_ptr_vec.clear();
     
-    //  4. reset attributes
+    //  5. reset attributes
     this->total_fuel_consumed_L = 0;
     
     this->total_emissions.CO2_kg = 0;
@@ -927,7 +1014,17 @@ void Model :: writeResults(
         );
     }
     
-    //  6. call out to Renewable :: writeResults()
+    //  6. call out to Noncombustion :: writeResults()
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        this->noncombustion_ptr_vec[i]->writeResults(
+            write_path,
+            &(this->electrical_load.time_vec_hrs),
+            i,
+            max_lines
+        );
+    }
+    
+    //  7. call out to Renewable :: writeResults()
     for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
         this->renewable_ptr_vec[i]->writeResults(
             write_path,
@@ -939,7 +1036,7 @@ void Model :: writeResults(
         );
     }
     
-    //  7. call out to Storage :: writeResults()
+    //  8. call out to Storage :: writeResults()
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         this->storage_ptr_vec[i]->writeResults(
             write_path,

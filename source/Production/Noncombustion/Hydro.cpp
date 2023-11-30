@@ -257,6 +257,8 @@ Noncombustion(
     this->type = NoncombustionType :: HYDRO;
     this->type_str = "HYDRO";
     
+    this->resource_key = hydro_inputs.resource_key;
+    
     //...
     
     return;
@@ -298,7 +300,8 @@ void Hydro :: handleReplacement(int timestep)
 /// \fn double Hydro :: requestProductionkW(
 ///         int timestep,
 ///         double dt_hrs,
-///         double request_kW
+///         double request_kW,
+///         double hydro_resource_m3hr
 ///     )
 ///
 /// \brief Method which takes in production request, and then returns what the asset can
@@ -310,13 +313,16 @@ void Hydro :: handleReplacement(int timestep)
 ///
 /// \param request_kW The requested production [kW].
 ///
+/// \param hydro_resource_m3hr The currently available hydro flow resource [m3/hr].
+///
 /// \return The production [kW] delivered by the hydro generator.
 ///
 
 double Hydro :: requestProductionkW(
     int timestep,
     double dt_hrs,
-    double request_kW
+    double request_kW,
+    double hydro_resource_m3hr
 )
 {
     //  1. return on request of zero

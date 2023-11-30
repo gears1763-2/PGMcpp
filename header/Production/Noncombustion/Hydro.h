@@ -34,6 +34,8 @@
 
 struct HydroInputs {
     NoncombustionInputs noncombustion_inputs; ///< An encapsulated NoncombustionInputs instance.
+    
+    int resource_key = 0; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
 };
 
 
@@ -65,7 +67,7 @@ class Hydro : public Noncombustion {
     
     public:
         //  1. attributes
-        //...
+        int resource_key; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
         
         
         //  2. methods
@@ -73,7 +75,7 @@ class Hydro : public Noncombustion {
         Hydro (int, double, HydroInputs);
         void handleReplacement(int);
         
-        double requestProductionkW(int, double, double);
+        double requestProductionkW(int, double, double, double);
         double commit(int, double, double, double);
         
         ~Hydro(void);

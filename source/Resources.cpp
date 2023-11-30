@@ -37,6 +37,8 @@
 ///
 /// \param resource_key The key associated with the given renewable resource.
 ///
+/// \param renewable_type The type of renewable resource being added to Resources.
+///
 
 void Resources :: __checkResourceKey1D(
     int resource_key,
@@ -87,6 +89,62 @@ void Resources :: __checkResourceKey1D(
 }   /*  __checkResourceKey1D() */
 
 // ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Resources :: __checkResourceKey1D(
+///         int resource_key,
+///         NoncombustionType noncombustion_type
+///     )
+///
+/// \brief Helper method to check if given resource key (1D) is already in use.
+///
+/// \param resource_key The key associated with the given renewable resource.
+///
+/// \param noncombustion_type The type of renewable resource being added to Resources.
+///
+
+void Resources :: __checkResourceKey1D(
+    int resource_key,
+    NoncombustionType noncombustion_type
+)
+{
+    if (this->resource_map_1D.count(resource_key) > 0) {
+        std::string error_str = "ERROR:  Resources::addResource(";
+        
+        switch (noncombustion_type) {
+            case (NoncombustionType :: HYDRO): {
+                error_str += "HYDRO):  ";
+                
+                break;
+            }
+            
+            default: {
+                error_str += "UNDEFINED_TYPE):  ";
+                
+                break;
+            }
+        }
+        
+        error_str += "resource key (1D) ";
+        error_str += std::to_string(resource_key);
+        error_str += " is already in use";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    return;
+}   /*  __checkResourceKey1D() */
+
+// ---------------------------------------------------------------------------------- //
+
 
 
 // ---------------------------------------------------------------------------------- //
@@ -141,6 +199,7 @@ void Resources :: __checkResourceKey2D(
 // ---------------------------------------------------------------------------------- //
 
 
+
 // ---------------------------------------------------------------------------------- //
 
 ///
@@ -192,6 +251,7 @@ void Resources :: __checkTimePoint(
 // ---------------------------------------------------------------------------------- //
 
 
+
 // ---------------------------------------------------------------------------------- //
 
 ///
@@ -228,6 +288,92 @@ void Resources :: __throwLengthError(
     
     return;
 }   /* __throwLengthError() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Resources :: __readHydroResource(
+///         std::string path_2_resource_data,
+///         int resource_key,
+///         ElectricalLoad* electrical_load_ptr
+///     )
+///
+/// \brief Helper method to handle reading a hydro resource time series into Resources.
+///
+/// \param path_2_resource_data The path (either relative or absolute) to the given 
+///     resource time series.
+///
+/// \param resource_key The key associated with the given renewable resource.
+///
+/// \param electrical_load_ptr A pointer to the Model's ElectricalLoad object.
+///
+
+void Resources :: __readHydroResource(
+    std::string path_2_resource_data,
+    int resource_key,
+    ElectricalLoad* electrical_load_ptr
+)
+{
+    //  1. init CSV reader, record path and type
+    io::CSVReader<2> CSV(path_2_resource_data);
+    
+    CSV.read_header(
+        io::ignore_extra_column,
+        "Time (since start of data) [hrs]",
+        "Hydro Inflow [m3/hr]"
+    );
+    
+    this->path_map_1D.insert(
+        std::pair<int, std::string>(resource_key, path_2_resource_data)
+    );
+    
+    this->string_map_1D.insert(std::pair<int, std::string>(resource_key, "HYDRO"));
+    
+    //  2. init map element
+    this->resource_map_1D.insert(
+        std::pair<int, std::vector<double>>(resource_key, {})
+    );
+    this->resource_map_1D[resource_key].resize(electrical_load_ptr->n_points, 0);
+    
+    
+    //  3. read in resource data, check against time series (point-wise and length)
+    int n_points = 0;
+    double time_hrs = 0;
+    double time_expected_hrs = 0;
+    double hydro_resource_m3hr = 0;
+    
+    while (CSV.read_row(time_hrs, hydro_resource_m3hr)) {
+        if (n_points > electrical_load_ptr->n_points) {
+            this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+        }
+        
+        time_expected_hrs = electrical_load_ptr->time_vec_hrs[n_points];
+        this->__checkTimePoint(
+            time_hrs,
+            time_expected_hrs,
+            path_2_resource_data,
+            electrical_load_ptr
+        );
+        
+        this->resource_map_1D[resource_key][n_points] = hydro_resource_m3hr;
+        
+        n_points++;
+    }
+    
+    //  4. check data length
+    if (n_points != electrical_load_ptr->n_points) {
+        this->__throwLengthError(path_2_resource_data, electrical_load_ptr);
+    }
+    
+    return;
+}   /* __readHydroResource() */
+
+// ---------------------------------------------------------------------------------- //
+
 
 
 // ---------------------------------------------------------------------------------- //
@@ -312,6 +458,7 @@ void Resources :: __readSolarResource(
 // ---------------------------------------------------------------------------------- //
 
 
+
 // ---------------------------------------------------------------------------------- //
 
 ///
@@ -392,6 +539,7 @@ void Resources :: __readTidalResource(
 }   /* __readTidalResource() */
 
 // ---------------------------------------------------------------------------------- //
+
 
 
 // ---------------------------------------------------------------------------------- //
@@ -479,6 +627,7 @@ void Resources :: __readWaveResource(
 // ---------------------------------------------------------------------------------- //
 
 
+
 // ---------------------------------------------------------------------------------- //
 
 ///
@@ -563,6 +712,7 @@ void Resources :: __readWindResource(
 // ======== END PRIVATE ============================================================= //
 
 
+
 // ======== PUBLIC ================================================================== //
 
 // ---------------------------------------------------------------------------------- //
@@ -577,6 +727,74 @@ Resources :: Resources(void)
 {
     return;
 }   /* Resources() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Resources :: addResource(
+///         NoncombustionType noncombustion_type,
+///         std::string path_2_resource_data,
+///         int resource_key,
+///         ElectricalLoad* electrical_load_ptr
+///     )
+///
+/// \brief A method to add a renewable resource time series to Resources. Checks if
+///     given resource key is already in use. The associated helper methods also
+///     check against ElectricalLoad to ensure that all added time series align with the
+///     electrical load time series (both in terms of length and which points in time
+///     are included).
+///
+/// \param noncombustion_type The type of renewable resource being added to Resources.
+///
+/// \param path_2_resource_data A string defining the path (either relative or absolute) to the given resource time series.
+///
+/// \param resource_key A key used to index into the Resources object, used to associate Renewable assets with the corresponding resource.
+///
+/// \param electrical_load_ptr A pointer to the Model's ElectricalLoad object.
+///
+
+void Resources :: addResource(
+    NoncombustionType noncombustion_type,
+    std::string path_2_resource_data,
+    int resource_key,
+    ElectricalLoad* electrical_load_ptr
+)
+{
+    switch (noncombustion_type) {
+        case (NoncombustionType :: HYDRO): {
+            this->__checkResourceKey1D(resource_key, noncombustion_type);
+            
+            this->__readHydroResource(
+                path_2_resource_data,
+                resource_key,
+                electrical_load_ptr
+            );
+            
+            break;
+        }
+        
+        default: {
+            std::string error_str = "ERROR:  Resources :: addResource(:  ";
+            error_str += "noncombustion type ";
+            error_str += std::to_string(noncombustion_type);
+            error_str += " has no associated resource";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
+            
+            break;
+        }
+    }
+    
+    return;
+}   /* addResource() */
 
 // ---------------------------------------------------------------------------------- //
 
