@@ -176,6 +176,26 @@ for (int i = 0; i < 8760; i++) {
         __FILE__,
         __LINE__
     );
+    
+    if (i > 0) {
+        testLessThanOrEqualTo(  //<-- since reservoir has finite capacity
+            ((Hydro*)test_hydro_ptr)->stored_volume_vec_m3[i] -
+            ((Hydro*)test_hydro_ptr)->stored_volume_vec_m3[i - 1],
+            test_resources.resource_map_1D[test_hydro_ptr->resource_key][i] - 
+            ((Hydro*)test_hydro_ptr)->turbine_flow_vec_m3hr[i],
+            __FILE__,
+            __LINE__
+        );
+        
+        if (((Hydro*)test_hydro_ptr)->stored_volume_vec_m3[i - 1] <= 0) {   //<-- if nothing stored, then only resource available for turbine flow
+            testLessThanOrEqualTo(
+                ((Hydro*)test_hydro_ptr)->turbine_flow_vec_m3hr[i],
+                test_resources.resource_map_1D[test_hydro_ptr->resource_key][i],
+                __FILE__,
+                __LINE__
+            );
+        }
+    }
 }
 
 // ======== END METHODS ============================================================= //

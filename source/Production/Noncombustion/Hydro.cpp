@@ -162,19 +162,28 @@ double Hydro :: __getMinimumFlowm3hr(void)
     
     switch (this->turbine_type) {
         case (HydroTurbineType :: HYDRO_TURBINE_PELTON): {
-            coefficient = 0.023529;
+            coefficient = PELTON_COEFFICIENT_MIN;
             
             break;
         }
         
         case (HydroTurbineType :: HYDRO_TURBINE_FRANCIS): {
-            coefficient = 0.2164706;
+            coefficient = FRANCIS_COEFFICIENT_MIN;
             
             break;
         }
         
         default: {
-            //..
+            std::string error_str = "ERROR:  Hydro::__getMinimumFlowm3hr()  ";
+            error_str += "turbine type ";
+            error_str += std::to_string(this->turbine_type);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }
@@ -212,19 +221,28 @@ double Hydro :: __getMaximumFlowm3hr(void)
     
     switch (this->turbine_type) {
         case (HydroTurbineType :: HYDRO_TURBINE_PELTON): {
-            coefficient = 1.166301;
+            coefficient = PELTON_COEFFICIENT_MAX;
             
             break;
         }
         
         case (HydroTurbineType :: HYDRO_TURBINE_FRANCIS): {
-            coefficient = 1.1952933;
+            coefficient = FRANCIS_COEFFICIENT_MAX;
             
             break;
         }
         
         default: {
-            //..
+            std::string error_str = "ERROR:  Hydro::__getMaximumFlowm3hr()  ";
+            error_str += "turbine type ";
+            error_str += std::to_string(this->turbine_type);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }
@@ -257,25 +275,26 @@ double Hydro :: __getMaximumFlowm3hr(void)
 
 double Hydro :: __flowToPower(double flow_m3hr)
 {
-    if (flow_m3hr <= 0) {
+    //  1. return on less than minimum flow
+    if (flow_m3hr < this->minimum_flow_m3hr) {
         return 0;
     }
     
-    //  1. compute power ratio
+    //  2. compute power ratio
     double power_ratio =
         this->fluid_density_kgm3 * 9.81 * this->net_head_m * (flow_m3hr / 3600);
     
     power_ratio /= 1000 * this->capacity_kW;
     
-    //  2. get normalized power
+    //  3. get normalized power
     double normalized_power = 0;
     
     switch (this->turbine_type) {
         case (HydroTurbineType :: HYDRO_TURBINE_PELTON): {
-            if (power_ratio <= 0.023529) {
+            if (power_ratio <= PELTON_COEFFICIENT_MIN) {
                 normalized_power = 0;
             }
-            else if (power_ratio >= 1.166301) {
+            else if (power_ratio >= PELTON_COEFFICIENT_MAX) {
                 normalized_power = 1;
             }
             else {
@@ -286,10 +305,10 @@ double Hydro :: __flowToPower(double flow_m3hr)
         }
         
         case (HydroTurbineType :: HYDRO_TURBINE_FRANCIS): {
-            if (power_ratio <= 0.2164706) {
+            if (power_ratio <= FRANCIS_COEFFICIENT_MIN) {
                 normalized_power = 0;
             }
-            else if (power_ratio >= 1.1952933) {
+            else if (power_ratio >= FRANCIS_COEFFICIENT_MAX) {
                 normalized_power = 1;
             }
             else {
@@ -302,7 +321,16 @@ double Hydro :: __flowToPower(double flow_m3hr)
         }
         
         default: {
-            //..
+            std::string error_str = "ERROR:  Hydro::__flowToPower()  ";
+            error_str += "turbine type ";
+            error_str += std::to_string(this->turbine_type);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }
@@ -339,10 +367,12 @@ double Hydro :: __flowToPower(double flow_m3hr)
 
 double Hydro :: __powerToFlow(double power_kW)
 {
+    //  1. return on zero power 
     if (power_kW <= 0) {
         return 0;
     }
     
+    //  2. compute flow
     double flow_m3hr = 0;
     
     switch (this->turbine_type) {
@@ -367,7 +397,16 @@ double Hydro :: __powerToFlow(double power_kW)
         }
         
         default: {
-            //..
+            std::string error_str = "ERROR:  Hydro::__powerToFlow()  ";
+            error_str += "turbine type ";
+            error_str += std::to_string(this->turbine_type);
+            error_str += " not recognized";
+            
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
             
             break;
         }
@@ -449,12 +488,12 @@ void Hydro :: __updateState(
     double flow_m3hr = this->__powerToFlow(production_kW);
     this->turbine_flow_vec_m3hr[timestep] = flow_m3hr;
     
-    //  2. update reservoir state, log
+    //  2. update reservoir state, log (if applicable)
     if (this->reservoir_capacity_m3 > 0) {
         this->stored_volume_m3 += hydro_resource_m3hr * dt_hrs;
         this->stored_volume_m3 -= flow_m3hr * dt_hrs;
         
-        if (this->stored_volume_m3 < 0) {
+        if (this->stored_volume_m3 < 1e-6) {
             this->stored_volume_m3 = 0;
         }
         

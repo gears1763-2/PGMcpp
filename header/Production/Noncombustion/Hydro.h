@@ -37,6 +37,18 @@ enum HydroTurbineType {
 };
 
 
+#ifndef TURBINE_COEFFICIENTS
+#define TURBINE_COEFFICIENTS
+
+    #define PELTON_COEFFICIENT_MIN  0.023529 ///< A coefficient used in modelling the minimum required flow for Pelton turbine to be productive
+    #define PELTON_COEFFICIENT_MAX  1.166301 ///< A coefficient used in modelling the maximum flow that a Pelton turbine can support
+    
+    #define FRANCIS_COEFFICIENT_MIN 0.2164706 ///< A coefficient used in modelling the minimum required flow for Francis turbine to be productive
+    #define FRANCIS_COEFFICIENT_MAX 1.1952933 ///< A coefficient used in modelling the maximum flow that a Francis turbine can support
+
+#endif  /* TURBINE_COEFFICIENTS */
+
+
 ///
 /// \struct HydroInputs
 ///
