@@ -92,6 +92,31 @@ OBJ_COMBUSTION_HIERARCHY = $(OBJ_PRODUCTION) \
                            $(OBJ_DIESEL)
 
 
+#### ==== Production Hierarchy <-- Noncombustion ==== ####
+
+SRC_NONCOMBUSTION = source/Production/Noncombustion/Noncombustion.cpp
+OBJ_NONCOMBUSTION = object/Production/Noncombustion/Noncombustion.o
+
+.PHONY: Noncombustion
+Noncombustion: $(SRC_NONCOMBUSTION)
+	$(CXX) $(CXXFLAGS) -c $(SRC_NONCOMBUSTION) -o $(OBJ_NONCOMBUSTION)
+
+
+SRC_HYDRO = source/Production/Noncombustion/Hydro.cpp
+OBJ_HYDRO = object/Production/Noncombustion/Hydro.o
+
+.PHONY: Hydro
+Hydro: $(SRC_HYDRO)
+	$(CXX) $(CXXFLAGS) -c $(SRC_HYDRO) -o $(OBJ_HYDRO)
+
+
+NONCOMBUSTION_HIERARCHY = Noncombustion \
+                          Hydro
+
+OBJ_NONCOMBUSTION_HIERARCHY = $(OBJ_NONCOMBUSTION) \
+                              $(OBJ_HYDRO)
+
+
 #### ==== Production Hierarchy <-- Renewable ==== ####
 
 SRC_RENEWABLE = source/Production/Renewable/Renewable.cpp
@@ -222,6 +247,7 @@ OBJ_MODEL_COMPONENTS = $(OBJ_CONTROLLER) \
 OBJ_ALL = $(OBJ_TESTING_UTILS) \
           $(OBJ_INTERPOLATOR)\
           $(OBJ_COMBUSTION_HIERARCHY) \
+          $(OBJ_NONCOMBUSTION_HIERARCHY) \
           $(OBJ_RENEWABLE_HIERARCHY) \
           $(OBJ_STORAGE_HIERARCHY) \
           $(OBJ_MODEL_COMPONENTS)
@@ -265,6 +291,26 @@ OUT_TEST_DIESEL = test/bin/Production/Combustion/test_Diesel.out
 test_Diesel: $(SRC_TEST_DIESEL)
 	$(CXX) $(CXXFLAGS) $(SRC_TEST_DIESEL) $(OBJ_ALL) \
 -o $(OUT_TEST_DIESEL) $(LIBS)
+
+
+## == Test: Production Hierarchy <-- Noncombustion == ##
+
+SRC_TEST_NONCOMBUSTION = test/source/Production/Noncombustion/test_Noncombustion.cpp
+OUT_TEST_NONCOMBUSTION = test/bin/Production/Noncombustion/test_Noncombustion.out
+
+.PHONY: test_Noncombustion
+test_Noncombustion: $(SRC_TEST_NONCOMBUSTION)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_NONCOMBUSTION) $(OBJ_ALL) \
+-o $(OUT_TEST_NONCOMBUSTION) $(LIBS)
+
+
+SRC_TEST_HYDRO = test/source/Production/Noncombustion/test_Hydro.cpp
+OUT_TEST_HYDRO = test/bin/Production/Noncombustion/test_Hydro.out
+
+.PHONY: test_Hydro
+test_Hydro: $(SRC_TEST_HYDRO)
+	$(CXX) $(CXXFLAGS) $(SRC_TEST_HYDRO) $(OBJ_ALL) \
+-o $(OUT_TEST_HYDRO) $(LIBS)
 
 
 ## == Test: Production Hierarchy <-- Renewable == ##
@@ -376,6 +422,8 @@ TESTS = test_Interpolator\
         test_Production \
         test_Combustion \
         test_Diesel \
+        test_Noncombustion \
+        test_Hydro \
         test_Renewable \
         test_Solar \
         test_Tidal \
@@ -393,6 +441,8 @@ OUT_TESTS = $(OUT_TEST_INTERPOLATOR) &&\
             $(OUT_TEST_PRODUCTION) &&\
             $(OUT_TEST_COMBUSTION) &&\
             $(OUT_TEST_DIESEL) &&\
+            $(OUT_TEST_NONCOMBUSTION) &&\
+            $(OUT_TEST_HYDRO) &&\
             $(OUT_TEST_RENEWABLE) &&\
             $(OUT_TEST_SOLAR) &&\
             $(OUT_TEST_TIDAL) &&\
@@ -435,12 +485,15 @@ clean:
 .PHONY: dirs
 dirs:
 	mkdir -pv bin/Production/Combustion
+	mkdir -pv bin/Production/Noncombustion
 	mkdir -pv bin/Production/Renewable
 	mkdir -pv bin/Storage
 	mkdir -pv object/Production/Combustion
+	mkdir -pv object/Production/Noncombustion
 	mkdir -pv object/Production/Renewable
 	mkdir -pv object/Storage
 	mkdir -pv test/bin/Production/Combustion
+	mkdir -pv test/bin/Production/Noncombustion
 	mkdir -pv test/bin/Production/Renewable
 	mkdir -pv test/bin/Storage
 	mkdir -pv test/object
@@ -470,6 +523,7 @@ PGMcpp:
 	make testing_utils
 	make interpolator
 	make $(COMBUSTION_HIERARCHY)
+	make $(NONCOMBUSTION_HIERARCHY)
 	make $(RENEWABLE_HIERARCHY)
 	make $(STORAGE_HIERARCHY)
 	make $(MODEL)
