@@ -184,14 +184,14 @@ for (int i = 0; i < 48; i++) {
 catch (...) {
     //...
     
-    printGold(" ......................... ");
+    printGold(" ........................... ");
     printRed("FAIL");
     std::cout << std::endl;
     throw;
 } 
 
 
-printGold(" ......................... ");
+printGold(" ........................... ");
 printGreen("PASS");
 std::cout << std::endl;
 return 0;

@@ -118,14 +118,14 @@ testFloatEquals(
 catch (...) {
     //...
     
-    printGold(" .............. ");
+    printGold(" ................ ");
     printRed("FAIL");
     std::cout << std::endl;
     throw;
 }
 
 
-printGold(" .............. ");
+printGold(" ................ ");
 printGreen("PASS");
 std::cout << std::endl;
 return 0;

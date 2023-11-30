@@ -458,7 +458,7 @@ for (size_t i = 0; i < load_ratio_vec.size(); i++) {
 catch (...) {
     delete test_diesel_ptr;
     
-    printGold(" ... ");
+    printGold(" ..... ");
     printRed("FAIL");
     std::cout << std::endl;
     throw;
@@ -467,7 +467,7 @@ catch (...) {
 
 delete test_diesel_ptr;
 
-printGold(" ... ");
+printGold(" ..... ");
 printGreen("PASS");
 std::cout << std::endl;
 return 0;

@@ -333,7 +333,7 @@ for (size_t i = 0; i < energy_period_vec_s.size(); i++) {
 catch (...) {
     delete test_wave_ptr;
     
-    printGold(" ...... ");
+    printGold(" ........ ");
     printRed("FAIL");
     std::cout << std::endl;
     throw;
@@ -342,7 +342,7 @@ catch (...) {
 
 delete test_wave_ptr;
 
-printGold(" ...... ");
+printGold(" ........ ");
 printGreen("PASS");
 std::cout << std::endl;
 return 0;

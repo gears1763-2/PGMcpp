@@ -493,14 +493,14 @@ for (size_t i = 0; i < expected_wind_resource_vec_ms.size(); i++) {
 
 
 catch (...) {
-    printGold(" .............................. ");
+    printGold(" ................................ ");
     printRed("FAIL");
     std::cout << std::endl;
     throw;
 }
 
 
-printGold(" .............................. ");
+printGold(" ................................ ");
 printGreen("PASS");
 std::cout << std::endl;
 return 0;

@@ -255,7 +255,7 @@ for (int i = 0; i < 48; i++) {
 catch (...) {
     delete test_wind_ptr;
     
-    printGold(" ...... ");
+    printGold(" ........ ");
     printRed("FAIL");
     std::cout << std::endl;
     throw;
@@ -264,7 +264,7 @@ catch (...) {
 
 delete test_wind_ptr;
 
-printGold(" ...... ");
+printGold(" ........ ");
 printGreen("PASS");
 std::cout << std::endl;
 return 0;
