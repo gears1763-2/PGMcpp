@@ -98,10 +98,36 @@ model.addResource(
     wind_resource_key
 )
 
+#   3.5. add hydro resource time series
+hydro_resource_key = 4
+path_2_hydro_resource_data = (
+    "../data/test/resources/hydro_inflow_peak-20000m3hr_1yr_dt-1hr.csv"
+)
 
-#   4. add Renewable objects to Model
+model.addResource(
+    PGMcpp.NoncombustionType.HYDRO,
+    path_2_hydro_resource_data,
+    hydro_resource_key
+)
 
-#   4.1. add 1 x 250 kW solar PV array
+
+#   4. add Hydro object to Model
+#      assume hydroelectric is a sunk asset (no initial capital cost)
+
+#   4.1. add 1 x 300 kW hydroelectric plant with a 10,000 m3 reservoir
+hydro_inputs = PGMcpp.HydroInputs()
+hydro_inputs.noncombustion_inputs.production_inputs.capacity_kW = 300
+hydro_inputs.reservoir_capacity_m3 = 10000
+hydro_inputs.init_reservoir_state = 0.5    #<-- reservoir initially at 50%
+hydro_inputs.noncombustion_inputs.production_inputs.is_sunk = True
+hydro_inputs.resource_key = hydro_resource_key
+
+model.addHydro(hydro_inputs);
+
+
+#   5. add Renewable objects to Model
+
+#   5.1. add 1 x 250 kW solar PV array
 solar_inputs = PGMcpp.SolarInputs()
 
 solar_inputs.renewable_inputs.production_inputs.capacity_kW = 250
@@ -109,7 +135,7 @@ solar_inputs.resource_key = solar_resource_key
 
 model.addSolar(solar_inputs)
 
-#   4.2. add 1 x 120 kW tidal turbine
+#   5.2. add 1 x 120 kW tidal turbine
 tidal_inputs = PGMcpp.TidalInputs()
 
 tidal_inputs.renewable_inputs.production_inputs.capacity_kW = 120
@@ -118,7 +144,7 @@ tidal_inputs.resource_key = tidal_resource_key
 
 model.addTidal(tidal_inputs)
 
-#   4.3. add 1 x 150 kW wind turbine
+#   5.3. add 1 x 150 kW wind turbine
 wind_inputs = PGMcpp.WindInputs()
 
 wind_inputs.renewable_inputs.production_inputs.capacity_kW = 150
@@ -126,7 +152,7 @@ wind_inputs.resource_key = wind_resource_key
 
 model.addWind(wind_inputs)
 
-#   4.4. add 1 x 100 kW wave energy converter
+#   5.4. add 1 x 100 kW wave energy converter
 wave_inputs = PGMcpp.WaveInputs()
 
 wave_inputs.renewable_inputs.production_inputs.capacity_kW = 100
@@ -135,9 +161,9 @@ wave_inputs.resource_key = wave_resource_key
 model.addWave(wave_inputs)
 
 
-#   5. add LiIon object to Model
+#   6. add LiIon object to Model
 
-#   5.1. add 1 x (500 kW, ) lithium ion battery energy storage system
+#   6.1. add 1 x (500 kW, ) lithium ion battery energy storage system
 liion_inputs = PGMcpp.LiIonInputs()
 
 liion_inputs.storage_inputs.power_capacity_kW = 500
@@ -146,7 +172,7 @@ liion_inputs.storage_inputs.energy_capacity_kWh = 1050  #<-- about 4 hours of me
 model.addLiIon(liion_inputs)
 
 
-#   6. run and write results
+#   7. run and write results
 model.run()
 
 model.writeResults("example_py")

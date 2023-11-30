@@ -102,10 +102,35 @@ int main(int argc, char** argv)
         wind_resource_key
     );
     
+    //  3.5. add hydro resource time series
+    int hydro_resource_key = 4;
+    std::string path_2_hydro_resource_data =
+        "data/test/resources/hydro_inflow_peak-20000m3hr_1yr_dt-1hr.csv";
+
+    model.addResource(
+        NoncombustionType :: HYDRO,
+        path_2_hydro_resource_data,
+        hydro_resource_key
+    );
     
-    //  4. add Renewable objects to Model
     
-    //  4.1. add 1 x 250 kW solar PV array
+    //  4. add Hydro object to Model
+    //     assume hydroelectric is a sunk asset (no initial capital cost)
+    
+    //  4.1. add 1 x 300 kW hydroelectric plant with a 10,000 m3 reservoir
+    HydroInputs hydro_inputs;
+    hydro_inputs.noncombustion_inputs.production_inputs.capacity_kW = 300;
+    hydro_inputs.reservoir_capacity_m3 = 10000;
+    hydro_inputs.init_reservoir_state = 0.5;    //<-- reservoir initially at 50%
+    hydro_inputs.noncombustion_inputs.production_inputs.is_sunk = true;
+    hydro_inputs.resource_key = hydro_resource_key;
+
+    model.addHydro(hydro_inputs);
+    
+    
+    //  5. add Renewable objects to Model
+    
+    //  5.1. add 1 x 250 kW solar PV array
     SolarInputs solar_inputs;
     
     solar_inputs.renewable_inputs.production_inputs.capacity_kW = 250;
@@ -113,7 +138,7 @@ int main(int argc, char** argv)
 
     model.addSolar(solar_inputs);
     
-    //  4.2. add 1 x 120 kW tidal turbine
+    //  5.2. add 1 x 120 kW tidal turbine
     TidalInputs tidal_inputs;
     
     tidal_inputs.renewable_inputs.production_inputs.capacity_kW = 120;
@@ -122,7 +147,7 @@ int main(int argc, char** argv)
 
     model.addTidal(tidal_inputs);
     
-    //  4.3. add 1 x 150 kW wind turbine
+    //  5.3. add 1 x 150 kW wind turbine
     WindInputs wind_inputs;
     
     wind_inputs.renewable_inputs.production_inputs.capacity_kW = 150;
@@ -130,7 +155,7 @@ int main(int argc, char** argv)
 
     model.addWind(wind_inputs);
     
-    //  4.4. add 1 x 100 kW wave energy converter
+    //  5.4. add 1 x 100 kW wave energy converter
     WaveInputs wave_inputs;
     
     wave_inputs.renewable_inputs.production_inputs.capacity_kW = 100;
@@ -139,9 +164,9 @@ int main(int argc, char** argv)
     model.addWave(wave_inputs);
     
     
-    //  5. add LiIon object to Model
+    //  6. add LiIon object to Model
     
-    //  5.1. add 1 x (500 kW, ) lithium ion battery energy storage system
+    //  6.1. add 1 x (500 kW, ) lithium ion battery energy storage system
     LiIonInputs liion_inputs;
     
     liion_inputs.storage_inputs.power_capacity_kW = 500;
@@ -150,7 +175,7 @@ int main(int argc, char** argv)
     model.addLiIon(liion_inputs);
     
     
-    //  6. run and write results
+    //  7. run and write results
     model.run();
     
     model.writeResults("projects/example_cpp");
