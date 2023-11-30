@@ -37,7 +37,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Interpolator " +
-            27 * "." +
+            29 * "." +
             " " +
             "\033[0m"
         )
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Production " +
-            29 * "." +
+            31 * "." +
             " " +
             "\033[0m"
         )
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Production <-- Combustion " +
-            14 * "." +
+            16 * "." +
             " " +
             "\033[0m"
         )
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Production <-- Combustion <-- Diesel " +
-            3 * "." +
+            5 * "." +
             " " +
             "\033[0m"
         )
@@ -110,11 +110,45 @@ if __name__ == "__main__":
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
         
+        ## ================ test Noncombustion ================ ##
+        sys.stdout.write(
+            "\x1B[33m" +
+            "  Testing Production <-- Noncombustion " +
+            13 * "." +
+            " " +
+            "\033[0m"
+        )
+        
+        test_noncombustion_inputs = PGMcpp.NoncombustionInputs()
+        
+        test_noncombustion = PGMcpp.Noncombustion(8760, 1, test_noncombustion_inputs)
+        
+        sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
+        
+        
+        ## ================ test Hydro ================ ##
+        
+        sys.stdout.write(
+            "\x1B[33m" +
+            "  Testing Production <-- Noncombustion <-- Hydro " +
+            3 * "." +
+            " " +
+            "\033[0m"
+        )
+        
+        test_hydro_inputs = PGMcpp.NoncombustionInputs()
+        
+        test_hydro = PGMcpp.Noncombustion(8760, 1, test_hydro_inputs)
+        
+        sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
+        
+        
+        
         ## ================ test Renewable ================ ##
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Production <-- Renewable " +
-            15 * "." +
+            17 * "." +
             " " +
             "\033[0m"
         )
@@ -130,7 +164,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Production <-- Renewable <-- Solar " +
-            5 * "." +
+            7 * "." +
             " " +
             "\033[0m"
         )
@@ -146,7 +180,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Production <-- Renewable <-- Tidal " +
-            5 * "." +
+            7 * "." +
             " " +
             "\033[0m"
         )
@@ -162,7 +196,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Production <-- Renewable <-- Wave " +
-            6 * "." +
+            8 * "." +
             " " +
             "\033[0m"
         )
@@ -178,7 +212,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Production <-- Renewable <-- Wind " +
-            6 * "." +
+            8 * "." +
             " " +
             "\033[0m"
         )
@@ -194,7 +228,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Storage " +
-            32 * "." +
+            34 * "." +
             " " +
             "\033[0m"
         )
@@ -210,7 +244,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Storage <-- LiIon " +
-            22 * "." +
+            24 * "." +
             " " +
             "\033[0m"
         )
@@ -226,7 +260,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Controller " +
-            29 * "." +
+            31 * "." +
             " " +
             "\033[0m"
         )
@@ -245,7 +279,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing ElectricalLoad " +
-            25 * "." +
+            27 * "." +
             " " +
             "\033[0m"
         )
@@ -281,7 +315,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Resources " +
-            30 * "." +
+            32 * "." +
             " " +
             "\033[0m"
         )
@@ -295,7 +329,7 @@ if __name__ == "__main__":
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Model " +
-            34 * "." +
+            36 * "." +
             " " +
             "\033[0m"
         )
@@ -318,6 +352,11 @@ if __name__ == "__main__":
         )
         
         assert (test_model.controller.control_string == "LOAD_FOLLOWING")
+        
+        for i in range(0, 3):
+            test_model.addDiesel(test_diesel_inputs)
+        
+        test_model.run()
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
 

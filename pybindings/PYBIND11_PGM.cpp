@@ -38,6 +38,9 @@ PYBIND11_MODULE(PGMcpp, m) {
     
     #include "snippets/Production/PYBIND11_Production.cpp"
     
+    #include "snippets/Production/Noncombustion/PYBIND11_Noncombustion.cpp"
+    #include "snippets/Production/Noncombustion/PYBIND11_Hydro.cpp"
+    
     #include "snippets/Production/Combustion/PYBIND11_Combustion.cpp"
     #include "snippets/Production/Combustion/PYBIND11_Diesel.cpp"
     

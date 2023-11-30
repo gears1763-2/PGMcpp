@@ -52,7 +52,14 @@ pybind11::class_<Model>(m, "Model")
     .def(pybind11::init<>())
     .def(pybind11::init<ModelInputs>())
     .def("addDiesel", &Model::addDiesel)
-    .def("addResource", &Model::addResource)
+    .def(
+        "addResource",
+        pybind11::overload_cast<NoncombustionType, std::string, int>(&Model::addResource)
+    )
+    .def(
+        "addResource",
+        pybind11::overload_cast<RenewableType, std::string, int>(&Model::addResource)
+    )
     .def("addSolar", &Model::addSolar)
     .def("addTidal", &Model::addTidal)
     .def("addWave", &Model::addWave)

@@ -32,5 +32,12 @@ pybind11::class_<Resources>(m, "Resources")
     .def_readwrite("path_map_2D", &Resources::path_map_2D)
 
     .def(pybind11::init<>())
-    .def("addResource", &Resources::addResource)
+    .def(
+        "addResource",
+        pybind11::overload_cast<NoncombustionType, std::string, int, ElectricalLoad*>(&Resources::addResource)
+    )
+    .def(
+        "addResource",
+        pybind11::overload_cast<RenewableType, std::string, int, ElectricalLoad*>(&Resources::addResource)
+    )
     .def("clear", &Resources::clear);
