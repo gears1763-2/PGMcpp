@@ -946,7 +946,9 @@ void Model :: reset(void)
     }
     this->storage_ptr_vec.clear();
     
-    //  5. reset attributes
+    //  5. reset components and attributes
+    this->controller.clear();
+    
     this->total_fuel_consumed_L = 0;
     
     this->total_emissions.CO2_kg = 0;
