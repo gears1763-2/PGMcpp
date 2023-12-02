@@ -26,6 +26,7 @@
 pybind11::enum_<HydroTurbineType>(m, "HydroTurbineType")
     .value("HYDRO_TURBINE_PELTON", HydroTurbineType::HYDRO_TURBINE_PELTON)
     .value("HYDRO_TURBINE_FRANCIS", HydroTurbineType::HYDRO_TURBINE_FRANCIS)
+    .value("HYDRO_TURBINE_KAPLAN", HydroTurbineType::HYDRO_TURBINE_KAPLAN)
     .value("N_HYDRO_TURBINES", HydroTurbineType::N_HYDRO_TURBINES);
 
 
@@ -53,9 +54,11 @@ pybind11::class_<Hydro>(m, "Hydro")
     .def_readwrite("reservoir_capacity_m3", &Hydro::reservoir_capacity_m3)
     .def_readwrite("init_reservoir_state", &Hydro::init_reservoir_state)
     .def_readwrite("stored_volume_m3", &Hydro::stored_volume_m3)
+    .def_readwrite("minimum_power_kW", &Hydro::minimum_power_kW)
     .def_readwrite("minimum_flow_m3hr", &Hydro::minimum_flow_m3hr)
     .def_readwrite("maximum_flow_m3hr", &Hydro::maximum_flow_m3hr)
     .def_readwrite("turbine_flow_vec_m3hr", &Hydro::turbine_flow_vec_m3hr)
+    .def_readwrite("spill_rate_vec_m3hr", &Hydro::spill_rate_vec_m3hr)
     .def_readwrite("stored_volume_vec_m3", &Hydro::stored_volume_vec_m3)
       
     .def(pybind11::init<>())
