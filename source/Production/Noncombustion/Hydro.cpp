@@ -272,9 +272,9 @@ void Hydro :: __initInterpolator(void)
 
 double Hydro :: __getGenericCapitalCost(void)
 {
-    double capital_cost_per_kW = 15000000 + 1000 * this->capacity_kW; //<-- WIP: need something better here
+    double capital_cost_per_kW = 1000; //<-- WIP: need something better here!
     
-    return capital_cost_per_kW * this->capacity_kW;
+    return capital_cost_per_kW * this->capacity_kW + 15000000; //<-- WIP: need something better here!
 }   /* __getGenericCapitalCost() */
 
 // ---------------------------------------------------------------------------------- //
@@ -297,7 +297,7 @@ double Hydro :: __getGenericCapitalCost(void)
 
 double Hydro :: __getGenericOpMaintCost(void)
 {
-    double operation_maintenance_cost_kWh = 0.05;  //<-- WIP: need something better here
+    double operation_maintenance_cost_kWh = 0.05;  //<-- WIP: need something better here!
     
     return operation_maintenance_cost_kWh;
 }   /* __getGenericOpMaintCost() */
@@ -687,8 +687,11 @@ void Hydro :: __writeSummary(std::string write_path)
         }
     }
     ofs << "  \n";
+    ofs << "\n";
     ofs << "Minimum Flow: " << this->minimum_flow_m3hr << " m3/hr  \n";
     ofs << "Maximum Flow: " << this->maximum_flow_m3hr << " m3/hr  \n";
+    ofs << "\n";
+    ofs << "Minimum Production: " << this->minimum_power_kW << " kW  \n";
     ofs << "\n";
     
     ofs << "\n--------\n\n";
