@@ -1,3 +1,2 @@
-*   need to tweak hydro some more; still getting some odd results
 *   add production lookup functionality to Tidal and Wind
 *   implement model predictive control in Controller
