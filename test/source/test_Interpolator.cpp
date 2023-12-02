@@ -149,6 +149,52 @@ testFloatEquals(
     __LINE__
 );
 
+
+bool error_flag = true;
+try {
+    test_interpolator.interp1D(data_key, -1);
+    error_flag = false;
+} catch (...) {
+    // Task failed successfully! =P
+}
+if (not error_flag) {
+    expectedErrorNotDetected(__FILE__, __LINE__);
+}
+
+
+try {
+    test_interpolator.interp1D(data_key, 2);
+    error_flag = false;
+} catch (...) {
+    // Task failed successfully! =P
+}
+if (not error_flag) {
+    expectedErrorNotDetected(__FILE__, __LINE__);
+}
+
+
+try {
+    test_interpolator.interp1D(data_key, 0 - FLOAT_TOLERANCE);
+    error_flag = false;
+} catch (...) {
+    // Task failed successfully! =P
+}
+if (not error_flag) {
+    expectedErrorNotDetected(__FILE__, __LINE__);
+}
+
+
+try {
+    test_interpolator.interp1D(data_key, 1 + FLOAT_TOLERANCE);
+    error_flag = false;
+} catch (...) {
+    // Task failed successfully! =P
+}
+if (not error_flag) {
+    expectedErrorNotDetected(__FILE__, __LINE__);
+}
+
+
 std::vector<double> interp_x_vec = {
     0,
     0.170812859791767,

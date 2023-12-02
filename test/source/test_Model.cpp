@@ -340,7 +340,7 @@ test_model.addResource(
 //  add Hydro asset
 HydroInputs hydro_inputs;
 hydro_inputs.noncombustion_inputs.production_inputs.capacity_kW = 300;
-hydro_inputs.reservoir_capacity_m3 = 10000;
+hydro_inputs.reservoir_capacity_m3 = 100000;
 hydro_inputs.init_reservoir_state = 0.5;
 hydro_inputs.noncombustion_inputs.production_inputs.is_sunk = true;
 hydro_inputs.resource_key = hydro_resource_key;

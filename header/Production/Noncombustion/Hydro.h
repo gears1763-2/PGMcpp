@@ -31,22 +31,25 @@
 ///
 
 enum HydroTurbineType {
-    HYDRO_TURBINE_PELTON, ///< A Pelton turbine
-    HYDRO_TURBINE_FRANCIS, ///< A Francis turbine
+    HYDRO_TURBINE_PELTON, ///< A Pelton turbine (impluse)
+    HYDRO_TURBINE_FRANCIS, ///< A Francis turbine (reaction)
+    HYDRO_TURBINE_KAPLAN, ///< A Kaplan turbine (reaction)
     N_HYDRO_TURBINES ///< A simple hack to get the number of elements in HydroTurbineType
 };
 
 
-#ifndef TURBINE_COEFFICIENTS
-#define TURBINE_COEFFICIENTS
+///
+/// \enum HydroInterpKeys
+///
+/// \brief An enumeration of the Interpolator keys used by the Hydro asset
+///
 
-    #define PELTON_COEFFICIENT_MIN  0.023529 ///< A coefficient used in modelling the minimum required flow for Pelton turbine to be productive
-    #define PELTON_COEFFICIENT_MAX  1.166301 ///< A coefficient used in modelling the maximum flow that a Pelton turbine can support
-    
-    #define FRANCIS_COEFFICIENT_MIN 0.2164706 ///< A coefficient used in modelling the minimum required flow for Francis turbine to be productive
-    #define FRANCIS_COEFFICIENT_MAX 1.1952933 ///< A coefficient used in modelling the maximum flow that a Francis turbine can support
-
-#endif  /* TURBINE_COEFFICIENTS */
+enum HydroInterpKeys {
+    GENERATOR_EFFICIENCY_INTERP_KEY, ///< The key for generator efficiency interpolation
+    TURBINE_EFFICIENCY_INTERP_KEY, ///< The key for turbine efficiency interpolation
+    FLOW_TO_POWER_INTERP_KEY, ///< The key for flow to power interpolation
+    N_HYDRO_INTERP_KEYS ///< A simple hack to get the number of elements in HydroInterpKeys
+};
 
 
 ///
@@ -66,7 +69,7 @@ struct HydroInputs {
     double operation_maintenance_cost_kWh = -1; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced. -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD/kWh].
     
     double fluid_density_kgm3 = 1000; ///< The density [kg/m3] of the hydroelectric working fluid.
-    double net_head_m = 10; ///< The net head [m] of the asset.
+    double net_head_m = 500; ///< The net head [m] of the asset.
     
     double reservoir_capacity_m3 = 0; ///< The capacity [m3] of the hydro reservoir.
     double init_reservoir_state = 0; ///< The initial state of the reservoir (where state is volume of stored fluid divided by capacity).
@@ -91,8 +94,12 @@ class Hydro : public Noncombustion {
         //  2. methods
         void __checkInputs(HydroInputs);
         
+        void __initInterpolator(void);
+        
         double __getGenericCapitalCost(void);
         double __getGenericOpMaintCost(void);
+        
+        double __getEfficiencyFactor(double);
         
         double __getMinimumFlowm3hr(void);
         double __getMaximumFlowm3hr(void);
@@ -101,6 +108,7 @@ class Hydro : public Noncombustion {
         double __powerToFlow(double);
         
         double __getAvailableFlow(double, double);
+        double __getAcceptableFlow(double);
         
         void __updateState(int, double, double, double);
         
@@ -123,10 +131,13 @@ class Hydro : public Noncombustion {
         double init_reservoir_state; ///< The initial state of the reservoir (where state is volume of stored fluid divided by capacity).
         double stored_volume_m3; ///< The volume [m3] of stored fluid.
         
-        double minimum_flow_m3hr; ///< The minimum required flow [m3/hr] for the asset to produce.
+        double minimum_power_kW; ///< The minimum power [kW] that the asset can produce. Corresponds to minimum productive flow.
+        
+        double minimum_flow_m3hr; ///< The minimum required flow [m3/hr] for the asset to produce. Corresponds to minimum power.
         double maximum_flow_m3hr; ///< The maximum productive flow [m3/hr] that the asset can support.
         
         std::vector<double> turbine_flow_vec_m3hr; ///< A vector of the turbine flow [m3/hr] at each point in the modelling time series.
+        std::vector<double> spill_rate_vec_m3hr; ///< A vector of the spill rate [m3/hr] at each point in the modelling time series.
         std::vector<double> stored_volume_vec_m3; ///< A vector of the stored volume [m3] in the reservoir at each point in the modelling time series.
         
         

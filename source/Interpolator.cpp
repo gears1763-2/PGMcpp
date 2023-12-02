@@ -128,7 +128,11 @@ void Interpolator :: __checkBounds1D(int data_key, double interp_x)
         std::string error_str = "ERROR:  Interpolator::interp1D()  ";
         error_str += "interpolation value ";
         error_str += std::to_string(interp_x);
-        error_str += " is outside of the given interpolation data domain";
+        error_str += " is outside of the given interpolation data domain [";
+        error_str += std::to_string(this->interp_map_1D[data_key].min_x);
+        error_str += " , ";
+        error_str += std::to_string(this->interp_map_1D[data_key].max_x);
+        error_str += "]";
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;
@@ -184,7 +188,11 @@ void Interpolator :: __checkBounds2D(int data_key, double interp_x, double inter
         std::string error_str = "ERROR:  Interpolator::interp2D()  ";
         error_str += "interpolation value interp_x = ";
         error_str += std::to_string(interp_x);
-        error_str += " is outside of the given interpolation data domain";
+        error_str += " is outside of the given interpolation data domain [";
+        error_str += std::to_string(this->interp_map_2D[data_key].min_x);
+        error_str += " , ";
+        error_str += std::to_string(this->interp_map_2D[data_key].max_x);
+        error_str += "]";
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;
@@ -201,7 +209,11 @@ void Interpolator :: __checkBounds2D(int data_key, double interp_x, double inter
         std::string error_str = "ERROR:  Interpolator::interp2D()  ";
         error_str += "interpolation value interp_y = ";
         error_str += std::to_string(interp_y);
-        error_str += " is outside of the given interpolation data domain";
+        error_str += " is outside of the given interpolation data domain [";
+        error_str += std::to_string(this->interp_map_2D[data_key].min_y);
+        error_str += " , ";
+        error_str += std::to_string(this->interp_map_2D[data_key].max_y);
+        error_str += "]";
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;

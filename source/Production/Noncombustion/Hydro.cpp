@@ -95,6 +95,172 @@ void Hydro :: __checkInputs(HydroInputs hydro_inputs)
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void Hydro :: __initInterpolator(void)
+///
+/// \brief Helper method to set up turbine and generator efficiency interpolation
+///
+/// Ref: \cite Hydro_2023\n
+///
+
+void Hydro :: __initInterpolator(void)
+{
+    //  1. set up generator efficiency interpolation
+    InterpolatorStruct1D generator_interp_struct_1D;
+    
+    generator_interp_struct_1D.n_points = 12;
+    
+    generator_interp_struct_1D.x_vec = {
+        0,   0.1, 0.2,  0.3, 0.4, 0.5,
+        0.6, 0.7, 0.75, 0.8, 0.9, 1
+    };
+    
+    generator_interp_struct_1D.min_x = 0;
+    generator_interp_struct_1D.max_x = 1;
+    
+    generator_interp_struct_1D.y_vec = {
+        0.000, 0.800, 0.900, 0.913,
+        0.925, 0.943, 0.947, 0.950,
+        0.953, 0.954, 0.956, 0.958
+    };
+    
+    this->interpolator.interp_map_1D.insert(
+        std::pair<int, InterpolatorStruct1D>(
+            HydroInterpKeys :: GENERATOR_EFFICIENCY_INTERP_KEY,
+            generator_interp_struct_1D
+        )
+    );
+    
+    //  2. set up efficiency interpolation
+    InterpolatorStruct1D turbine_interp_struct_1D;
+    
+    turbine_interp_struct_1D.n_points = 11;
+    
+    turbine_interp_struct_1D.x_vec = {
+        0,   0.1, 0.2, 0.3, 0.4,
+        0.5, 0.6, 0.7, 0.8, 0.9,
+        1
+    };
+    
+    turbine_interp_struct_1D.min_x = 0;
+    turbine_interp_struct_1D.max_x = 1;
+    
+    std::vector<double> efficiency_vec;
+    
+    switch (this->turbine_type) {
+        case(HydroTurbineType :: HYDRO_TURBINE_PELTON): {
+            efficiency_vec = {
+                0.000, 0.780, 0.855, 0.875, 0.890,
+                0.900, 0.908, 0.913, 0.918, 0.908,
+                0.880
+            };
+            
+            break;
+        }
+        
+        case(HydroTurbineType :: HYDRO_TURBINE_FRANCIS): {
+            efficiency_vec = {
+                0.000, 0.400, 0.625, 0.745, 0.810,
+                0.845, 0.880, 0.900, 0.910, 0.900,
+                0.850
+            };
+            
+            break;
+        }
+        
+        case(HydroTurbineType :: HYDRO_TURBINE_KAPLAN): {
+            efficiency_vec = {
+                0.000, 0.265, 0.460, 0.550, 0.650,
+                0.740, 0.805, 0.845, 0.900, 0.880,
+                0.850
+            };
+            
+            break;
+        }
+        
+        default: {
+            std::string error_str = "ERROR:  Hydro():  turbine type ";
+            error_str += std::to_string(this->turbine_type);
+            error_str += " not recognized";
+        
+            #ifdef _WIN32
+                std::cout << error_str << std::endl;
+            #endif
+
+            throw std::runtime_error(error_str);
+            
+            break;
+        }
+    }
+    
+    turbine_interp_struct_1D.y_vec = efficiency_vec;
+    
+    this->interpolator.interp_map_1D.insert(
+        std::pair<int, InterpolatorStruct1D>(
+            HydroInterpKeys :: TURBINE_EFFICIENCY_INTERP_KEY,
+            turbine_interp_struct_1D
+        )
+    );
+    
+    //  3. set up flow to power interpolation
+    InterpolatorStruct1D flow_to_power_interp_struct_1D;
+    
+    double power_ratio = 0.1;
+    std::vector<double> power_ratio_vec (91, 0);
+    
+    for (size_t i = 0; i < power_ratio_vec.size(); i++) {
+        power_ratio_vec[i] = power_ratio;
+        
+        power_ratio += 0.01;
+        
+        if (power_ratio < 0) {
+            power_ratio = 0;
+        }
+        
+        else if (power_ratio > 1) {
+            power_ratio = 1;
+        }
+    }
+    
+    flow_to_power_interp_struct_1D.n_points = power_ratio_vec.size();
+    
+    std::vector<double> flow_vec_m3hr;
+    std::vector<double> power_vec_kW;
+    flow_vec_m3hr.resize(power_ratio_vec.size(), 0);
+    power_vec_kW.resize(power_ratio_vec.size(), 0);
+    
+    for (size_t i = 0; i < power_ratio_vec.size(); i++) {
+        flow_vec_m3hr[i] = this->__powerToFlow(power_ratio_vec[i] * this->capacity_kW);
+        power_vec_kW[i] = power_ratio_vec[i] * this->capacity_kW;
+        /*
+        std::cout << flow_vec_m3hr[i] << "\t" << power_vec_kW[i] << " (" <<
+            power_ratio_vec[i] << ")" << std::endl;
+        */
+    }
+    
+    flow_to_power_interp_struct_1D.x_vec = flow_vec_m3hr;
+    
+    flow_to_power_interp_struct_1D.min_x = flow_vec_m3hr[0];
+    flow_to_power_interp_struct_1D.max_x = flow_vec_m3hr[flow_vec_m3hr.size() - 1];
+    
+    flow_to_power_interp_struct_1D.y_vec = power_vec_kW;
+    
+    this->interpolator.interp_map_1D.insert(
+        std::pair<int, InterpolatorStruct1D>(
+            HydroInterpKeys :: FLOW_TO_POWER_INTERP_KEY,
+            flow_to_power_interp_struct_1D
+        )
+    );
+    
+    return;
+}   /* __initInterpolator() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn double Hydro :: __getGenericCapitalCost(void)
 ///
 /// \brief Helper method to generate a generic hydroelectric capital cost.
@@ -106,7 +272,7 @@ void Hydro :: __checkInputs(HydroInputs hydro_inputs)
 
 double Hydro :: __getGenericCapitalCost(void)
 {
-    double capital_cost_per_kW = 0; //<-- WIP: need something better here
+    double capital_cost_per_kW = 15000000 + 1000 * this->capacity_kW; //<-- WIP: need something better here
     
     return capital_cost_per_kW * this->capacity_kW;
 }   /* __getGenericCapitalCost() */
@@ -131,10 +297,51 @@ double Hydro :: __getGenericCapitalCost(void)
 
 double Hydro :: __getGenericOpMaintCost(void)
 {
-    double operation_maintenance_cost_kWh = 0;  //<-- WIP: need something better here
+    double operation_maintenance_cost_kWh = 0.05;  //<-- WIP: need something better here
     
     return operation_maintenance_cost_kWh;
 }   /* __getGenericOpMaintCost() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double Hydro :: __getEfficiencyFactor(double power_kW)
+///
+/// \brief Helper method to compute the efficiency factor (product of turbine and
+///     generator efficiencies).
+///
+/// Ref: \cite Hydro_2023\n
+///
+/// \param power_kW The 
+
+double Hydro :: __getEfficiencyFactor(double power_kW)
+{
+    //  1. return on zero
+    if (power_kW <= 0) {
+        return 0;
+    }
+    
+    //  2. compute power ratio (clip to [0, 1])
+    double power_ratio = power_kW / this->capacity_kW;
+    
+    //  3. init efficiency factor to the turbine efficiency
+    double efficiency_factor = this->interpolator.interp1D(
+        HydroInterpKeys :: TURBINE_EFFICIENCY_INTERP_KEY,
+        power_ratio
+    );
+    
+    //  4. include generator efficiency
+    efficiency_factor *= this->interpolator.interp1D(
+        HydroInterpKeys :: GENERATOR_EFFICIENCY_INTERP_KEY,
+        power_ratio
+    );
+    
+    return efficiency_factor;
+}   /* __getEfficiencyFactor() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -148,51 +355,17 @@ double Hydro :: __getGenericOpMaintCost(void)
 /// \brief Helper method to compute and return the minimum required flow for production,
 ///     based on turbine type.
 ///
-/// This model was obtained by way of surveying an assortment of published hydroeletric 
-/// operational data, and then constructing a best fit model.
+/// This helper method assumes that the minimum flow is that which is associated with
+/// a power ratio of 0.1. See constructor for initialization of minimum_power_kW.
 ///
-/// Ref: \cite Marks_2007\n
+/// Ref: \cite Hydro_2023\n
 ///
 /// \return The minimum required flow [m3/hr] for production.
 ///
 
 double Hydro :: __getMinimumFlowm3hr(void)
 {
-    double coefficient = 0;
-    
-    switch (this->turbine_type) {
-        case (HydroTurbineType :: HYDRO_TURBINE_PELTON): {
-            coefficient = PELTON_COEFFICIENT_MIN;
-            
-            break;
-        }
-        
-        case (HydroTurbineType :: HYDRO_TURBINE_FRANCIS): {
-            coefficient = FRANCIS_COEFFICIENT_MIN;
-            
-            break;
-        }
-        
-        default: {
-            std::string error_str = "ERROR:  Hydro::__getMinimumFlowm3hr()  ";
-            error_str += "turbine type ";
-            error_str += std::to_string(this->turbine_type);
-            error_str += " not recognized";
-            
-            #ifdef _WIN32
-                std::cout << error_str << std::endl;
-            #endif
-
-            throw std::runtime_error(error_str);
-            
-            break;
-        }
-    }
-    
-    double minimum_flow_m3hr = (1000 * 3600 * coefficient * this->capacity_kW) /
-                (this->fluid_density_kgm3 * 9.81 * this->net_head_m);
-    
-    return minimum_flow_m3hr;
+    return this->__powerToFlow(this->minimum_power_kW);
 }   /* __getMinimumFlowm3hr() */
 
 // ---------------------------------------------------------------------------------- //
@@ -207,51 +380,17 @@ double Hydro :: __getMinimumFlowm3hr(void)
 /// \brief Helper method to compute and return the maximum productive flow, based on
 ///     turbine type.
 ///
-/// This model was obtained by way of surveying an assortment of published hydroeletric 
-/// operational data, and then constructing a best fit model.
+/// This helper method assumes that the maximum flow is that which is associated with
+/// a power ratio of 1.
 ///
-/// Ref: \cite Marks_2007\n
+/// Ref: \cite Hydro_2023\n
 ///
 /// \return The maximum productive flow [m3/hr].
 ///
 
 double Hydro :: __getMaximumFlowm3hr(void)
 {
-    double coefficient = 0;
-    
-    switch (this->turbine_type) {
-        case (HydroTurbineType :: HYDRO_TURBINE_PELTON): {
-            coefficient = PELTON_COEFFICIENT_MAX;
-            
-            break;
-        }
-        
-        case (HydroTurbineType :: HYDRO_TURBINE_FRANCIS): {
-            coefficient = FRANCIS_COEFFICIENT_MAX;
-            
-            break;
-        }
-        
-        default: {
-            std::string error_str = "ERROR:  Hydro::__getMaximumFlowm3hr()  ";
-            error_str += "turbine type ";
-            error_str += std::to_string(this->turbine_type);
-            error_str += " not recognized";
-            
-            #ifdef _WIN32
-                std::cout << error_str << std::endl;
-            #endif
-
-            throw std::runtime_error(error_str);
-            
-            break;
-        }
-    }
-    
-    double maximum_flow_m3hr = (1000 * 3600 * coefficient * this->capacity_kW) /
-                (this->fluid_density_kgm3 * 9.81 * this->net_head_m);
-    
-    return maximum_flow_m3hr;
+    return this->__powerToFlow(this->capacity_kW);
 }   /* __getMaximumFlowm3hr() */
 
 // ---------------------------------------------------------------------------------- //
@@ -265,10 +404,9 @@ double Hydro :: __getMaximumFlowm3hr(void)
 ///
 /// \brief Helper method to translate a given flow into a corresponding power output.
 ///
-/// This model was obtained by way of surveying an assortment of published hydroeletric 
-/// operational data, and then constructing a best fit model.
+/// Ref: \cite Hydro_2023\n
 ///
-/// Ref: \cite Marks_2007\n
+/// \param flow_m3hr The flow [m3/hr] through the turbine.
 ///
 /// \return The power output [kW] corresponding to a given flow [m3/hr].
 ///
@@ -280,70 +418,13 @@ double Hydro :: __flowToPower(double flow_m3hr)
         return 0;
     }
     
-    //  2. compute power ratio
-    double power_ratio =
-        this->fluid_density_kgm3 * 9.81 * this->net_head_m * (flow_m3hr / 3600);
+    //  2. interpolate flow to power
+    double power_kW = this->interpolator.interp1D(
+        HydroInterpKeys :: FLOW_TO_POWER_INTERP_KEY,
+        flow_m3hr
+    );
     
-    power_ratio /= 1000 * this->capacity_kW;
-    
-    //  3. get normalized power
-    double normalized_power = 0;
-    
-    switch (this->turbine_type) {
-        case (HydroTurbineType :: HYDRO_TURBINE_PELTON): {
-            if (power_ratio <= PELTON_COEFFICIENT_MIN) {
-                normalized_power = 0;
-            }
-            else if (power_ratio >= PELTON_COEFFICIENT_MAX) {
-                normalized_power = 1;
-            }
-            else {
-                normalized_power = 0.87448308 * power_ratio - 0.02108607;
-            }
-            
-            break;
-        }
-        
-        case (HydroTurbineType :: HYDRO_TURBINE_FRANCIS): {
-            if (power_ratio <= FRANCIS_COEFFICIENT_MIN) {
-                normalized_power = 0;
-            }
-            else if (power_ratio >= FRANCIS_COEFFICIENT_MAX) {
-                normalized_power = 1;
-            }
-            else {
-                normalized_power = (
-                    1.61681669 * pow(power_ratio, 0.49508545) - 0.76355563
-                );
-            }
-            
-            break;
-        }
-        
-        default: {
-            std::string error_str = "ERROR:  Hydro::__flowToPower()  ";
-            error_str += "turbine type ";
-            error_str += std::to_string(this->turbine_type);
-            error_str += " not recognized";
-            
-            #ifdef _WIN32
-                std::cout << error_str << std::endl;
-            #endif
-
-            throw std::runtime_error(error_str);
-            
-            break;
-        }
-    }
-    
-    if (normalized_power < 0) {
-        normalized_power = 0;
-    }
-    else if (normalized_power > 1) {
-        normalized_power = 1;
-    }
-    
-    return normalized_power * this->capacity_kW;
+    return power_kW;
 }   /* __flowToPower() */
 
 // ---------------------------------------------------------------------------------- //
@@ -357,10 +438,9 @@ double Hydro :: __flowToPower(double flow_m3hr)
 ///
 /// \brief Helper method to translate a given power output into a corresponding flow.
 ///
-/// This model was obtained by way of surveying an assortment of published hydroeletric 
-/// operational data, and then constructing a best fit model.
+/// Ref: \cite Hydro_2023\n
 ///
-/// Ref: \cite Marks_2007\n
+/// \param power_kW The power output [kW] of the hydroelectric generator.
 ///
 /// \return
 ///
@@ -372,45 +452,12 @@ double Hydro :: __powerToFlow(double power_kW)
         return 0;
     }
     
-    //  2. compute flow
-    double flow_m3hr = 0;
+    //  2. get efficiency factor
+    double efficiency_factor = this->__getEfficiencyFactor(power_kW);
     
-    switch (this->turbine_type) {
-        case (HydroTurbineType :: HYDRO_TURBINE_PELTON): {
-            flow_m3hr = 3600.0 / 0.87448308;
-            flow_m3hr *= (power_kW / this->capacity_kW) + 0.02108607;
-            flow_m3hr *= 1000 * this->capacity_kW;
-            flow_m3hr /= this->fluid_density_kgm3 * 9.81 * this->net_head_m;
-            
-            break;
-        }
-        
-        case (HydroTurbineType :: HYDRO_TURBINE_FRANCIS): {
-            flow_m3hr = pow(
-                (1.0 / 1.61681669) * ((power_kW / this->capacity_kW) + 0.76355563),
-                1.0 / 0.49508545
-            );
-            flow_m3hr *= 3600 * 1000 * this->capacity_kW;
-            flow_m3hr /= this->fluid_density_kgm3 * 9.81 * this->net_head_m;
-            
-            break;
-        }
-        
-        default: {
-            std::string error_str = "ERROR:  Hydro::__powerToFlow()  ";
-            error_str += "turbine type ";
-            error_str += std::to_string(this->turbine_type);
-            error_str += " not recognized";
-            
-            #ifdef _WIN32
-                std::cout << error_str << std::endl;
-            #endif
-
-            throw std::runtime_error(error_str);
-            
-            break;
-        }
-    }
+    //  3. compute flow
+    double flow_m3hr = 3600 * 1000 * power_kW;
+    flow_m3hr /= efficiency_factor * this->fluid_density_kgm3 * 9.81 * this->net_head_m;
     
     return flow_m3hr;
 }   /* __powerToFlow() */
@@ -424,8 +471,7 @@ double Hydro :: __powerToFlow(double power_kW)
 ///
 /// \fn double Hydro :: __getAvailableFlow(double dt_hrs, double hydro_resource_m3hr)
 ///
-/// \brief Helper method to determine what flow is currently available through the
-///     turbine.
+/// \brief Helper method to determine what flow is currently available to the turbine.
 ///
 /// \param dt_hrs The interval of time [hrs] associated with the timestep.
 ///
@@ -436,10 +482,8 @@ double Hydro :: __powerToFlow(double power_kW)
 
 double Hydro :: __getAvailableFlow(double dt_hrs, double hydro_resource_m3hr)
 {
-    double flow_m3hr = 0;
-    
-    //  1. add flow available from reservoir
-    flow_m3hr += this->stored_volume_m3 / dt_hrs;
+    //  1. init to flow available from stored volume in reservoir
+    double flow_m3hr = this->stored_volume_m3 / dt_hrs;
     
     //  2. add flow available from resource
     flow_m3hr += hydro_resource_m3hr;
@@ -451,6 +495,37 @@ double Hydro :: __getAvailableFlow(double dt_hrs, double hydro_resource_m3hr)
     
     return flow_m3hr;
 }   /* __getAvailableFlow() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double Hydro :: __getAcceptableFlow(double dt_hrs)
+///
+/// \brief Helper method to determine what flow is currently acceptable by the
+///     reservoir.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the timestep.
+///
+/// \return The flow [m3/hr] currently acceptable by the reservoir.
+///
+
+double Hydro :: __getAcceptableFlow(double dt_hrs)
+{
+    //  1. if no reservoir, return
+    if (this->reservoir_capacity_m3 <= 0) {
+        return 0;
+    }
+    
+    //  2. compute acceptable based on room in reservoir
+    double acceptable_m3hr = (this->reservoir_capacity_m3 - this->stored_volume_m3) /
+        dt_hrs;
+    
+    return acceptable_m3hr;
+}   /* __getAcceptableFlow() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -484,25 +559,34 @@ void Hydro :: __updateState(
     double hydro_resource_m3hr
 )
 {
-    //  1. get flow, log
-    double flow_m3hr = this->__powerToFlow(production_kW);
+    //  1. get turbine flow, log
+    double flow_m3hr = 0;
+    
+    if (production_kW >= this->minimum_power_kW) {
+        flow_m3hr = this->__powerToFlow(production_kW);
+    }
+    
     this->turbine_flow_vec_m3hr[timestep] = flow_m3hr;
     
-    //  2. update reservoir state, log (if applicable)
-    if (this->reservoir_capacity_m3 > 0) {
-        this->stored_volume_m3 += hydro_resource_m3hr * dt_hrs;
-        this->stored_volume_m3 -= flow_m3hr * dt_hrs;
-        
-        if (this->stored_volume_m3 < 1e-6) {
-            this->stored_volume_m3 = 0;
-        }
-        
-        else if (this->stored_volume_m3 > this->reservoir_capacity_m3) {
-            this->stored_volume_m3 = this->reservoir_capacity_m3;
-        }
-        
-        this->stored_volume_vec_m3[timestep] = this->stored_volume_m3;
+    //  3. compute net reservoir flow
+    double net_flow_m3hr = hydro_resource_m3hr - flow_m3hr;
+    
+    //  4. compute flow acceptable by reservoir
+    double acceptable_flow_m3hr = this->__getAcceptableFlow(dt_hrs);
+    
+    //  5. compute spill, update net flow (if applicable), log
+    double spill_m3hr = 0;
+    
+    if (acceptable_flow_m3hr < net_flow_m3hr) {
+        spill_m3hr = net_flow_m3hr - acceptable_flow_m3hr;
+        net_flow_m3hr = acceptable_flow_m3hr;
     }
+    
+    this->spill_rate_vec_m3hr[timestep] = spill_m3hr;
+    
+    //  6. update reservoir state, log
+    this->stored_volume_m3 += net_flow_m3hr;
+    this->stored_volume_vec_m3[timestep] = this->stored_volume_m3;
     
     return;
 }   /* __updateState() */
@@ -590,6 +674,12 @@ void Hydro :: __writeSummary(std::string write_path)
             break;
         }
         
+        case(HydroTurbineType :: HYDRO_TURBINE_KAPLAN): {
+            ofs << "KAPLAN";
+            
+            break;
+        }
+        
         default: {
             // write nothing!
             
@@ -670,6 +760,7 @@ void Hydro :: __writeTimeSeries(
     ofs << "Curtailment [kW],";
     ofs << "Is Running (N = 0 / Y = 1),";
     ofs << "Turbine Flow [m3/hr],";
+    ofs << "Spill Rate [m3/hr],";
     ofs << "Stored Volume [m3],";
     ofs << "Capital Cost (actual),";
     ofs << "Operation and Maintenance Cost (actual),";
@@ -683,6 +774,7 @@ void Hydro :: __writeTimeSeries(
         ofs << this->curtailment_vec_kW[i] << ",";
         ofs << this->is_running_vec[i] << ",";
         ofs << this->turbine_flow_vec_m3hr[i] << ",";
+        ofs << this->spill_rate_vec_m3hr[i] << ",";
         ofs << this->stored_volume_vec_m3[i] << ",";
         ofs << this->capital_cost_vec[i] << ",";
         ofs << this->operation_maintenance_cost_vec[i] << ",";
@@ -766,10 +858,15 @@ Noncombustion(
     this->stored_volume_m3 =
         hydro_inputs.init_reservoir_state * hydro_inputs.reservoir_capacity_m3;
     
+    this->minimum_power_kW = 0.1 * this->capacity_kW;
+    
+    this->__initInterpolator();
+    
     this->minimum_flow_m3hr = this->__getMinimumFlowm3hr();
     this->maximum_flow_m3hr = this->__getMaximumFlowm3hr();
     
     this->turbine_flow_vec_m3hr.resize(this->n_points, 0);
+    this->spill_rate_vec_m3hr.resize(this->n_points, 0);
     this->stored_volume_vec_m3.resize(this->n_points, 0);
     
     if (hydro_inputs.capital_cost < 0) {
@@ -848,35 +945,32 @@ double Hydro :: requestProductionkW(
     double hydro_resource_m3hr
 )
 {
-    //  1. return on request of zero
-    if (request_kW <= 0) {
+    //  1. return on request of less than minimum power
+    if (request_kW < this->minimum_power_kW) {
         return 0;
     }
     
-    //  2. set flow to available
-    double flow_m3hr = this->__getAvailableFlow(dt_hrs, hydro_resource_m3hr);
+    //  2. check available flow, return if less than minimum flow
+    double available_flow_m3hr = this->__getAvailableFlow(dt_hrs, hydro_resource_m3hr);
     
-    if (flow_m3hr < this->minimum_flow_m3hr) {
+    if (available_flow_m3hr < this->minimum_flow_m3hr) {
         return 0;
     }
     
-    //  3. limit flow to request (and max)
-    double request_m3hr = this->__powerToFlow(request_kW);
+    //  3. init production to request, enforce capacity constraint (which also accounts
+    //     for maximum flow constraint).
+    double production_kW = request_kW;
     
-    if (flow_m3hr > request_m3hr) {
-        flow_m3hr = request_m3hr;
-    }
-    
-    if (flow_m3hr > this->maximum_flow_m3hr) {
-        flow_m3hr = this->maximum_flow_m3hr;
-    }
-    
-    //  4. map flow to production
-    double production_kW = this->__flowToPower(flow_m3hr);
-    
-    //  5. limit production to capacity
     if (production_kW > this->capacity_kW) {
         production_kW = this->capacity_kW;
+    }
+    
+    //  4. map production to flow
+    double flow_m3hr = this->__powerToFlow(production_kW);
+    
+    //  5. if flow is in excess of available, then adjust production accordingly
+    if (flow_m3hr > available_flow_m3hr) {
+        production_kW = this->__flowToPower(available_flow_m3hr);
     }
     
     return production_kW;

@@ -52,7 +52,7 @@ Resources test_resources;
 HydroInputs hydro_inputs;
 int hydro_resource_key = 0;
 
-hydro_inputs.reservoir_capacity_m3 = 1000;
+hydro_inputs.reservoir_capacity_m3 = 10000;
 hydro_inputs.resource_key = hydro_resource_key;
 
 test_hydro_ptr =  new Hydro(8760, 1, hydro_inputs);
@@ -83,11 +83,105 @@ testTruth(
 );
 
 testFloatEquals(
-    ((Hydro*)test_hydro_ptr)->reservoir_capacity_m3,
-    1000,
+    ((Hydro*)test_hydro_ptr)->turbine_type,
+    HydroTurbineType :: HYDRO_TURBINE_PELTON,
     __FILE__,
     __LINE__
 );
+
+testFloatEquals(
+    ((Hydro*)test_hydro_ptr)->reservoir_capacity_m3,
+    10000,
+    __FILE__,
+    __LINE__
+);
+
+std::vector<double> expected_gen_power_ratios = {
+    0,   0.1, 0.2,  0.3, 0.4, 0.5,
+    0.6, 0.7, 0.75, 0.8, 0.9, 1
+};
+
+std::vector<double> expected_gen_efficiencies = {
+    0.000, 0.800, 0.900, 0.913,
+    0.925, 0.943, 0.947, 0.950,
+    0.953, 0.954, 0.956, 0.958
+};
+
+double query = 0;
+for (size_t i = 0; i < expected_gen_power_ratios.size(); i++) {
+    testFloatEquals(
+        test_hydro_ptr->interpolator.interp_map_1D[
+            HydroInterpKeys :: GENERATOR_EFFICIENCY_INTERP_KEY
+        ].x_vec[i],
+        expected_gen_power_ratios[i],
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_hydro_ptr->interpolator.interp_map_1D[
+            HydroInterpKeys :: GENERATOR_EFFICIENCY_INTERP_KEY
+        ].y_vec[i],
+        expected_gen_efficiencies[i],
+        __FILE__,
+        __LINE__
+    );
+    
+    if (i < expected_gen_power_ratios.size() - 1) {
+        query = expected_gen_power_ratios[i] + ((double)rand() / RAND_MAX) *
+            (expected_gen_power_ratios[i + 1] - expected_gen_power_ratios[i]);
+        
+        test_hydro_ptr->interpolator.interp1D(
+            HydroInterpKeys :: GENERATOR_EFFICIENCY_INTERP_KEY,
+            query
+        );
+    }
+}
+
+std::vector<double> expected_turb_power_ratios = {
+    0,   0.1, 0.2, 0.3, 0.4,
+    0.5, 0.6, 0.7, 0.8, 0.9,
+    1
+};
+
+std::vector<double> expected_turb_efficiencies = {
+    0.000, 0.780, 0.855, 0.875, 0.890,
+    0.900, 0.908, 0.913, 0.918, 0.908,
+    0.880
+};
+
+for (size_t i = 0; i < expected_turb_power_ratios.size(); i++) {
+    testFloatEquals(
+        test_hydro_ptr->interpolator.interp_map_1D[
+            HydroInterpKeys :: TURBINE_EFFICIENCY_INTERP_KEY
+        ].x_vec[i],
+        expected_turb_power_ratios[i],
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_hydro_ptr->interpolator.interp_map_1D[
+            HydroInterpKeys :: TURBINE_EFFICIENCY_INTERP_KEY
+        ].y_vec[i],
+        expected_turb_efficiencies[i],
+        __FILE__,
+        __LINE__
+    );
+    
+    if (i < expected_turb_power_ratios.size() - 1) {
+        query = expected_turb_power_ratios[i] + ((double)rand() / RAND_MAX) *
+            (expected_turb_power_ratios[i + 1] - expected_turb_power_ratios[i]);
+        
+        test_hydro_ptr->interpolator.interp1D(
+            HydroInterpKeys :: TURBINE_EFFICIENCY_INTERP_KEY,
+            query
+        );
+    }
+}
+
+
+
 
 
 // ======== END ATTRIBUTES ========================================================== //

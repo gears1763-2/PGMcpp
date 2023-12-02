@@ -299,18 +299,24 @@ void Production :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
     
     /// 2. compute levellized cost of energy (per unit dispatched)
     //     assuming 8,760 hours per year
-    double n_years = time_vec_hrs_ptr->at(this->n_points - 1) / 8760;
+    if (this->total_dispatch_kWh <= 0) {
+        this->levellized_cost_of_energy_kWh = this->net_present_cost;
+    }
     
-    double capital_recovery_factor = 
-        (this->real_discount_annual * pow(1 + this->real_discount_annual, n_years)) / 
-        (pow(1 + this->real_discount_annual, n_years) - 1);
+    else {
+        double n_years = time_vec_hrs_ptr->at(this->n_points - 1) / 8760;
+    
+        double capital_recovery_factor = 
+            (this->real_discount_annual * pow(1 + this->real_discount_annual, n_years)) / 
+            (pow(1 + this->real_discount_annual, n_years) - 1);
 
-    double total_annualized_cost = capital_recovery_factor *
-        this->net_present_cost;
-    
-    this->levellized_cost_of_energy_kWh =
-        (n_years * total_annualized_cost) /
-        this->total_dispatch_kWh;
+        double total_annualized_cost = capital_recovery_factor *
+            this->net_present_cost;
+        
+        this->levellized_cost_of_energy_kWh =
+            (n_years * total_annualized_cost) /
+            this->total_dispatch_kWh;
+    }
     
     return;
 }   /* computeEconomics() */
