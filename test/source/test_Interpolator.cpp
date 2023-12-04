@@ -38,7 +38,7 @@ Interpolator* testConstruct_Interpolator(void)
     Interpolator* test_interpolator_ptr = new Interpolator();
 
     return test_interpolator_ptr;
-}   /* constructInterpolator() */
+}   /* testConstruct_Interpolator() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -236,7 +236,7 @@ void testInvalidInterpolation1D_Interpolator(
     if (not error_flag) {
         expectedErrorNotDetected(__FILE__, __LINE__);
     }
-
+    
     try {
         test_interpolator_ptr->interp1D(data_key_1D, 2);
         error_flag = false;
@@ -256,8 +256,7 @@ void testInvalidInterpolation1D_Interpolator(
     if (not error_flag) {
         expectedErrorNotDetected(__FILE__, __LINE__);
     }
-
-
+    
     try {
         test_interpolator_ptr->interp1D(data_key_1D, 1 + FLOAT_TOLERANCE);
         error_flag = false;
@@ -554,9 +553,9 @@ void testInvalidInterpolation2D_Interpolator(
 )
 {
     bool error_flag = true;
-    /*
+    
     try {
-        test_interpolator_ptr->interp2D(data_key_2D, -1);
+        test_interpolator_ptr->interp2D(data_key_2D, -1, 6);
         error_flag = false;
     } catch (...) {
         // Task failed successfully! =P
@@ -566,7 +565,7 @@ void testInvalidInterpolation2D_Interpolator(
     }
 
     try {
-        test_interpolator_ptr->interp2D(data_key_2D, 2);
+        test_interpolator_ptr->interp2D(data_key_2D, 99, 6);
         error_flag = false;
     } catch (...) {
         // Task failed successfully! =P
@@ -576,7 +575,7 @@ void testInvalidInterpolation2D_Interpolator(
     }
     
     try {
-        test_interpolator_ptr->interp2D(data_key_2D, 0 - FLOAT_TOLERANCE);
+        test_interpolator_ptr->interp2D(data_key_2D, 0.75, -1);
         error_flag = false;
     } catch (...) {
         // Task failed successfully! =P
@@ -584,10 +583,9 @@ void testInvalidInterpolation2D_Interpolator(
     if (not error_flag) {
         expectedErrorNotDetected(__FILE__, __LINE__);
     }
-
 
     try {
-        test_interpolator_ptr->interp2D(data_key_2D, 1 + FLOAT_TOLERANCE);
+        test_interpolator_ptr->interp2D(data_key_2D, 0.75, 99);
         error_flag = false;
     } catch (...) {
         // Task failed successfully! =P
@@ -595,7 +593,7 @@ void testInvalidInterpolation2D_Interpolator(
     if (not error_flag) {
         expectedErrorNotDetected(__FILE__, __LINE__);
     }
-    */
+    
     return;
 }   /* testInvalidInterpolation2D_Interpolator() */
 
@@ -721,6 +719,7 @@ int main(int argc, char** argv)
         testBadIndexing1D_Interpolator(test_interpolator_ptr, -99);
         testInvalidInterpolation1D_Interpolator(test_interpolator_ptr, data_key_1D);
         testInterpolation1D_Interpolator(test_interpolator_ptr, data_key_1D);
+
 
         int data_key_2D = 2;
         std::string path_2_data_2D =

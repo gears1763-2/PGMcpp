@@ -49,7 +49,7 @@ ElectricalLoad* testConstruct_ElectricalLoad(void)
     );
 
     return test_electrical_load_ptr;
-}   /* constructElectricalLoad() */
+}   /* testConstruct_ElectricalLoad() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -108,7 +108,7 @@ void testPostConstructionAttributes_ElectricalLoad(
     );
     
     return;
-}   /* testPostConstructionAttributes() */
+}   /* testPostConstructionAttributes_ElectricalLoad() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -119,7 +119,7 @@ void testPostConstructionAttributes_ElectricalLoad(
 ///
 /// \fn void testDataRead_ElectricalLoad(ElectricalLoad* test_electrical_load_ptr)
 ///
-/// \brief A function to check the values read into the ElectricalLoad object.
+/// \brief A function to check the values read into the test ElectricalLoad object.
 ///
 /// \param test_electrical_load_ptr A pointer to the test ElectricalLoad object.
 ///
@@ -211,7 +211,7 @@ void testDataRead_ElectricalLoad(ElectricalLoad* test_electrical_load_ptr)
     }
     
     return;
-}   /* testDataRead() */
+}   /* testDataRead_ElectricalLoad() */
 
 // ---------------------------------------------------------------------------------- //
 

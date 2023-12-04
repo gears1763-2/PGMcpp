@@ -38,7 +38,7 @@ Controller* testConstruct_Controller(void)
     Controller* test_controller_ptr = new Controller();
     
     return test_controller_ptr;
-}   /* constructController() */
+}   /* testConstruct_Controller() */
 
 // ---------------------------------------------------------------------------------- //
 
