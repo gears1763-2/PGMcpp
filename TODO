@@ -1,2 +1,3 @@
+*   improve testing and documentation
 *   add production lookup functionality to Tidal and Wind
 *   implement model predictive control in Controller
