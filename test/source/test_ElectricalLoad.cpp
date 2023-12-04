@@ -258,18 +258,3 @@ int main(int argc, char** argv)
 }   /* main() */
 
 // ---------------------------------------------------------------------------------- //
-
-
-
-/*
-bool error_flag = true;
-try {
-    testTruth(1 == 0, __FILE__, __LINE__);
-    error_flag = false;
-} catch (...) {
-    // Task failed successfully! =P
-}
-if (not error_flag) {
-    expectedErrorNotDetected(__FILE__, __LINE__);
-}
-*/

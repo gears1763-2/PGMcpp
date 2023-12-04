@@ -721,6 +721,684 @@ void testAddWindResource_Model(
 
 // ---------------------------------------------------------------------------------- //
 
+///
+/// \fn void testAddHydroResource_Model(
+///         Model* test_model_ptr,
+///         std::string path_2_hydro_resource_data,
+///         int hydro_resource_key
+///     )
+///
+/// \brief Function to test adding a hydro resource and then check the values read into
+///     the Resources component of the test Model object.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+/// \param path_2_hydro_resource_data A path (either relative or absolute) to the hydro
+///     resource data.
+///
+/// \param hydro_resource_key A key used to index into the Resources component of the 
+///     test Model object.
+///
+
+void testAddHydroResource_Model(
+    Model* test_model_ptr,
+    std::string path_2_hydro_resource_data,
+    int hydro_resource_key
+)
+{
+    test_model_ptr->addResource(
+        NoncombustionType :: HYDRO,
+        path_2_hydro_resource_data,
+        hydro_resource_key
+    );
+    
+    std::vector<double> expected_hydro_resource_vec_ms = {
+        2167.91531556942,
+        2046.58261560569,
+        2007.85941123153,
+        2000.11477247929,
+        1917.50527264453,
+        1963.97311577093,
+        1908.46985899809,
+        1886.5267112678,
+        1965.26388854254,
+        1953.64692935289,
+        2084.01504296306,
+        2272.46796101188,
+        2520.29645627096,
+        2715.203242423,
+        2720.36633563203,
+        3130.83228077221,
+        3289.59741021591,
+        3981.45195965772,
+        5295.45929491303,
+        7084.47124360523,
+        7709.20557708454,
+        7436.85238642936,
+        7235.49173429668,
+        6710.14695517339,
+        6015.71085806577,
+        5279.97001316337,
+        4877.24870889801,
+        4421.60569340303,
+        3919.49483690424,
+        3498.70270322341,
+        3274.10813058883,
+        3147.61233529349,
+        2904.94693324343,
+        2805.55738101,
+        2418.32535637171,
+        2398.96375630723,
+        2260.85100182222,
+        2157.58912702878,
+        2019.47637254377,
+        1913.63295220712,
+        1863.29279076589,
+        1748.41395678279,
+        1695.49224555317,
+        1599.97501375715,
+        1559.96103873397,
+        1505.74855473274,
+        1438.62833664765,
+        1384.41585476901
+    };
+
+    for (size_t i = 0; i < expected_hydro_resource_vec_ms.size(); i++) {
+        testFloatEquals(
+            test_model_ptr->resources.resource_map_1D[hydro_resource_key][i],
+            expected_hydro_resource_vec_ms[i],
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    return;
+}   /* testAddHydroResource_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testAddHydro_Model(
+///         Model* test_model_ptr,
+///         int hydro_resource_key
+///     )
+///
+/// \brief Function to test adding a hydroelectric asset to the test Model object, and
+///     then spot check some post-add attributes.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+/// \param hydro_resource_key A key used to index into the Resources component of the 
+///     test Model object.
+///
+
+void testAddHydro_Model(
+    Model* test_model_ptr,
+    int hydro_resource_key
+)
+{
+    HydroInputs hydro_inputs;
+    hydro_inputs.noncombustion_inputs.production_inputs.capacity_kW = 300;
+    hydro_inputs.reservoir_capacity_m3 = 100000;
+    hydro_inputs.init_reservoir_state = 0.5;
+    hydro_inputs.noncombustion_inputs.production_inputs.is_sunk = true;
+    hydro_inputs.resource_key = hydro_resource_key;
+
+    test_model_ptr->addHydro(hydro_inputs);
+
+    testFloatEquals(
+        test_model_ptr->noncombustion_ptr_vec.size(),
+        1,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_model_ptr->noncombustion_ptr_vec[0]->type,
+        NoncombustionType :: HYDRO,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_model_ptr->noncombustion_ptr_vec[0]->resource_key,
+        hydro_resource_key,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testAddHydro_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testAddDiesel_Model(Model* test_model_ptr)
+///
+/// \brief Function to test adding a suite of diesel generators to the test Model object,
+///     and then spot check some post-add attributes.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+
+void testAddDiesel_Model(Model* test_model_ptr)
+{
+    DieselInputs diesel_inputs;
+    diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 100;
+    diesel_inputs.combustion_inputs.production_inputs.is_sunk = true;
+
+    test_model_ptr->addDiesel(diesel_inputs);
+
+    testFloatEquals(
+        test_model_ptr->combustion_ptr_vec.size(),
+        1,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_model_ptr->combustion_ptr_vec[0]->type,
+        CombustionType :: DIESEL,
+        __FILE__,
+        __LINE__
+    );
+
+    diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 150;
+
+    test_model_ptr->addDiesel(diesel_inputs);
+
+    diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 250;
+
+    test_model_ptr->addDiesel(diesel_inputs);
+
+    testFloatEquals(
+        test_model_ptr->combustion_ptr_vec.size(),
+        3,
+        __FILE__,
+        __LINE__
+    );
+
+    std::vector<int> expected_diesel_capacity_vec_kW = {100, 150, 250};
+
+    for (int i = 0; i < 3; i++) {
+        testFloatEquals(
+            test_model_ptr->combustion_ptr_vec[i]->capacity_kW,
+            expected_diesel_capacity_vec_kW[i],
+            __FILE__,
+            __LINE__
+        );
+    }
+
+    diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 100;
+
+    for (int i = 0; i < 2 * ((double)rand() / RAND_MAX); i++) {
+        test_model_ptr->addDiesel(diesel_inputs);
+    }
+    
+    return;
+}   /* testAddDiesel_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testAddSolar_Model(
+///         Model* test_model_ptr,
+///         int solar_resource_key
+///     )
+///
+/// \brief Function to test adding a solar PV array to the test Model object and then 
+///     spot check some post-add attributes.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+/// \param solar_resource_key A key used to index into the Resources component of the 
+///     test Model object.
+///
+
+void testAddSolar_Model(
+    Model* test_model_ptr,
+    int solar_resource_key
+)
+{
+    SolarInputs solar_inputs;
+    solar_inputs.resource_key = solar_resource_key;
+
+    test_model_ptr->addSolar(solar_inputs);
+
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec.size(),
+        1,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec[0]->type,
+        RenewableType :: SOLAR,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testAddSolar_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testAddTidal_Model(
+///         Model* test_model_ptr,
+///         int tidal_resource_key
+///     )
+///
+/// \brief Function to test adding a tidal turbine to the test Model object and then 
+///     spot check some post-add attributes.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+/// \param tidal_resource_key A key used to index into the Resources component of the 
+///     test Model object.
+///
+
+void testAddTidal_Model(
+    Model* test_model_ptr,
+    int tidal_resource_key
+)
+{
+    TidalInputs tidal_inputs;
+    tidal_inputs.resource_key = tidal_resource_key;
+
+    test_model_ptr->addTidal(tidal_inputs);
+
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec.size(),
+        2,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec[1]->type,
+        RenewableType :: TIDAL,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testAddTidal_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testAddWave_Model(
+///         Model* test_model_ptr,
+///         int wave_resource_key
+///     )
+///
+/// \brief Function to test adding a wave energy converter to the test Model object and
+///     then spot check some post-add attributes.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+/// \param wave_resource_key A key used to index into the Resources component of the 
+///     test Model object.
+///
+
+void testAddWave_Model(
+    Model* test_model_ptr,
+    int wave_resource_key
+)
+{
+    WaveInputs wave_inputs;
+    wave_inputs.resource_key = wave_resource_key;
+
+    test_model_ptr->addWave(wave_inputs);
+
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec.size(),
+        3,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec[2]->type,
+        RenewableType :: WAVE,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testAddWave_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testAddWind_Model(
+///         Model* test_model_ptr,
+///         int wind_resource_key
+///     )
+///
+/// \brief Function to test adding a wind turbine to the test Model object and then 
+///     spot check some post-add attributes.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+/// \param wind_resource_key A key used to index into the Resources component of the 
+///     test Model object.
+///
+
+void testAddWind_Model(
+    Model* test_model_ptr,
+    int wind_resource_key
+)
+{
+    WindInputs wind_inputs;
+    wind_inputs.resource_key = wind_resource_key;
+
+    test_model_ptr->addWind(wind_inputs);
+
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec.size(),
+        4,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec[3]->type,
+        RenewableType :: WIND,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testAddWind_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testAddLiIon_Model(Model* test_model_ptr)
+///
+/// \brief Function to test adding a lithium ion battery energy storage system to the
+///     test Model object and then spot check some post-add attributes.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+
+void testAddLiIon_Model(Model* test_model_ptr)
+{
+    LiIonInputs liion_inputs;
+
+    test_model_ptr->addLiIon(liion_inputs);
+
+    testFloatEquals(
+        test_model_ptr->storage_ptr_vec.size(),
+        1,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_model_ptr->storage_ptr_vec[0]->type,
+        StorageType :: LIION,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testAddLiIon_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testLoadBalance_Model(Model* test_model_ptr)
+///
+/// \brief Function to check that the post-run load data is as expected. That is, the
+///     added renewable, production, and storage assets are handled by the Controller
+///     as expected.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+
+void testLoadBalance_Model(Model* test_model_ptr)
+{
+    double net_load_kW = 0;
+
+    Combustion* combustion_ptr;
+    Noncombustion* noncombustion_ptr;
+    Renewable* renewable_ptr;
+    Storage* storage_ptr;
+
+    for (int i = 0; i < test_model_ptr->electrical_load.n_points; i++) {
+        net_load_kW = test_model_ptr->controller.net_load_vec_kW[i];
+        
+        testLessThanOrEqualTo(
+            test_model_ptr->controller.net_load_vec_kW[i],
+            test_model_ptr->electrical_load.max_load_kW,
+            __FILE__,
+            __LINE__
+        );
+        
+        for (size_t j = 0; j < test_model_ptr->combustion_ptr_vec.size(); j++) {
+            combustion_ptr = test_model_ptr->combustion_ptr_vec[j];
+            
+            testFloatEquals(
+                combustion_ptr->production_vec_kW[i] -
+                combustion_ptr->dispatch_vec_kW[i] -
+                combustion_ptr->curtailment_vec_kW[i] -
+                combustion_ptr->storage_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            net_load_kW -= combustion_ptr->production_vec_kW[i];
+        }
+        
+        for (size_t j = 0; j < test_model_ptr->noncombustion_ptr_vec.size(); j++) {
+            noncombustion_ptr = test_model_ptr->noncombustion_ptr_vec[j];
+            
+            testFloatEquals(
+                noncombustion_ptr->production_vec_kW[i] -
+                noncombustion_ptr->dispatch_vec_kW[i] -
+                noncombustion_ptr->curtailment_vec_kW[i] -
+                noncombustion_ptr->storage_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            net_load_kW -= noncombustion_ptr->production_vec_kW[i];
+        }
+        
+        for (size_t j = 0; j < test_model_ptr->renewable_ptr_vec.size(); j++) {
+            renewable_ptr = test_model_ptr->renewable_ptr_vec[j];
+            
+            testFloatEquals(
+                renewable_ptr->production_vec_kW[i] -
+                renewable_ptr->dispatch_vec_kW[i] -
+                renewable_ptr->curtailment_vec_kW[i] -
+                renewable_ptr->storage_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            net_load_kW -= renewable_ptr->production_vec_kW[i];
+        }
+        
+        for (size_t j = 0; j < test_model_ptr->storage_ptr_vec.size(); j++) {
+            storage_ptr = test_model_ptr->storage_ptr_vec[j];
+            
+            testTruth(
+                not (
+                    storage_ptr->charging_power_vec_kW[i] > 0 and
+                    storage_ptr->discharging_power_vec_kW[i] > 0
+                ),
+                __FILE__,
+                __LINE__
+            );
+            
+            net_load_kW -= storage_ptr->discharging_power_vec_kW[i];
+        }
+        
+        testLessThanOrEqualTo(
+            net_load_kW,
+            0,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    testFloatEquals(
+        test_model_ptr->total_dispatch_discharge_kWh,
+        2263351.62026685,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testLoadBalance_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testEconomics_Model(Model* test_model_ptr)
+///
+/// \brief Function to check that the modelled economic metrics are > 0.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+
+void testEconomics_Model(Model* test_model_ptr)
+{
+    testGreaterThan(
+        test_model_ptr->net_present_cost,
+        0,
+        __FILE__,
+        __LINE__
+    );
+
+    testGreaterThan(
+        test_model_ptr->levellized_cost_of_energy_kWh,
+        0,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testEconomics_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testFuelConsumptionEmissions_Model(Model* test_model_ptr)
+///
+/// \brief Function to check that the modelled fuel consumption and emissions are > 0.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+
+void testFuelConsumptionEmissions_Model(Model* test_model_ptr)
+{
+    testGreaterThan(
+        test_model_ptr->total_fuel_consumed_L,
+        0,
+        __FILE__,
+        __LINE__
+    );
+
+    testGreaterThan(
+        test_model_ptr->total_emissions.CO2_kg,
+        0,
+        __FILE__,
+        __LINE__
+    );
+
+    testGreaterThan(
+        test_model_ptr->total_emissions.CO_kg,
+        0,
+        __FILE__,
+        __LINE__
+    );
+
+    testGreaterThan(
+        test_model_ptr->total_emissions.NOx_kg,
+        0,
+        __FILE__,
+        __LINE__
+    );
+
+    testGreaterThan(
+        test_model_ptr->total_emissions.SOx_kg,
+        0,
+        __FILE__,
+        __LINE__
+    );
+
+    testGreaterThan(
+        test_model_ptr->total_emissions.CH4_kg,
+        0,
+        __FILE__,
+        __LINE__
+    );
+
+    testGreaterThan(
+        test_model_ptr->total_emissions.PM_kg,
+        0,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testFuelConsumptionEmissions_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
 int main(int argc, char** argv)
 {
     #ifdef _WIN32
@@ -790,6 +1468,34 @@ int main(int argc, char** argv)
             path_2_wind_resource_data,
             wind_resource_key
         );
+        
+        
+        int hydro_resource_key = 4;
+        std::string path_2_hydro_resource_data =
+            "data/test/resources/hydro_inflow_peak-20000m3hr_1yr_dt-1hr.csv";
+        
+        testAddHydroResource_Model(
+            test_model_ptr,
+            path_2_hydro_resource_data,
+            hydro_resource_key
+        );
+        
+        
+        testAddHydro_Model(test_model_ptr, hydro_resource_key);
+        testAddDiesel_Model(test_model_ptr);
+        testAddSolar_Model(test_model_ptr, solar_resource_key);
+        testAddTidal_Model(test_model_ptr, tidal_resource_key);
+        testAddWave_Model(test_model_ptr, wave_resource_key);
+        testAddWind_Model(test_model_ptr, wind_resource_key);
+        
+        
+        test_model_ptr->run();
+        test_model_ptr->writeResults("test/test_results/");
+        
+        
+        testLoadBalance_Model(test_model_ptr);
+        testEconomics_Model(test_model_ptr);
+        testFuelConsumptionEmissions_Model(test_model_ptr);
     }
 
 
@@ -812,396 +1518,3 @@ int main(int argc, char** argv)
 }   /* main() */
 
 // ---------------------------------------------------------------------------------- //
-
-
-
-/*
-bool error_flag = true;
-try {
-    testTruth(1 == 0, __FILE__, __LINE__);
-    error_flag = false;
-} catch (...) {
-    // Task failed successfully! =P
-}
-if (not error_flag) {
-    expectedErrorNotDetected(__FILE__, __LINE__);
-}
-*/
-
-
-
-/*
-
-// ======== METHODS ================================================================= //
-
-//  add Hydro resource
-int hydro_resource_key = 4;
-std::string path_2_hydro_resource_data =
-    "data/test/resources/hydro_inflow_peak-20000m3hr_1yr_dt-1hr.csv";
-
-test_model.addResource(
-    NoncombustionType :: HYDRO,
-    path_2_hydro_resource_data,
-    hydro_resource_key
-);
-
-
-//  add Hydro asset
-HydroInputs hydro_inputs;
-hydro_inputs.noncombustion_inputs.production_inputs.capacity_kW = 300;
-hydro_inputs.reservoir_capacity_m3 = 100000;
-hydro_inputs.init_reservoir_state = 0.5;
-hydro_inputs.noncombustion_inputs.production_inputs.is_sunk = true;
-hydro_inputs.resource_key = hydro_resource_key;
-
-test_model.addHydro(hydro_inputs);
-
-testFloatEquals(
-    test_model.noncombustion_ptr_vec.size(),
-    1,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.noncombustion_ptr_vec[0]->type,
-    NoncombustionType :: HYDRO,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.noncombustion_ptr_vec[0]->resource_key,
-    hydro_resource_key,
-    __FILE__,
-    __LINE__
-);
-
-
-//  add Diesel assets
-DieselInputs diesel_inputs;
-diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 100;
-diesel_inputs.combustion_inputs.production_inputs.is_sunk = true;
-
-test_model.addDiesel(diesel_inputs);
-
-testFloatEquals(
-    test_model.combustion_ptr_vec.size(),
-    1,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.combustion_ptr_vec[0]->type,
-    CombustionType :: DIESEL,
-    __FILE__,
-    __LINE__
-);
-
-diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 150;
-
-test_model.addDiesel(diesel_inputs);
-
-diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 250;
-
-test_model.addDiesel(diesel_inputs);
-
-testFloatEquals(
-    test_model.combustion_ptr_vec.size(),
-    3,
-    __FILE__,
-    __LINE__
-);
-
-std::vector<int> expected_diesel_capacity_vec_kW = {100, 150, 250};
-
-for (int i = 0; i < 3; i++) {
-    testFloatEquals(
-        test_model.combustion_ptr_vec[i]->capacity_kW,
-        expected_diesel_capacity_vec_kW[i],
-        __FILE__,
-        __LINE__
-    );
-}
-
-diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 100;
-
-for (int i = 0; i < 2 * ((double)rand() / RAND_MAX); i++) {
-    test_model.addDiesel(diesel_inputs);
-}
-
-
-//  add Solar asset
-SolarInputs solar_inputs;
-solar_inputs.resource_key = solar_resource_key;
-
-test_model.addSolar(solar_inputs);
-
-testFloatEquals(
-    test_model.renewable_ptr_vec.size(),
-    1,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.renewable_ptr_vec[0]->type,
-    RenewableType :: SOLAR,
-    __FILE__,
-    __LINE__
-);
-
-
-//  add Tidal asset
-TidalInputs tidal_inputs;
-tidal_inputs.resource_key = tidal_resource_key;
-
-test_model.addTidal(tidal_inputs);
-
-testFloatEquals(
-    test_model.renewable_ptr_vec.size(),
-    2,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.renewable_ptr_vec[1]->type,
-    RenewableType :: TIDAL,
-    __FILE__,
-    __LINE__
-);
-
-
-//  add Wave asset
-WaveInputs wave_inputs;
-wave_inputs.resource_key = wave_resource_key;
-
-test_model.addWave(wave_inputs);
-
-testFloatEquals(
-    test_model.renewable_ptr_vec.size(),
-    3,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.renewable_ptr_vec[2]->type,
-    RenewableType :: WAVE,
-    __FILE__,
-    __LINE__
-);
-
-
-//  add Wind asset
-WindInputs wind_inputs;
-wind_inputs.resource_key = wind_resource_key;
-
-test_model.addWind(wind_inputs);
-
-testFloatEquals(
-    test_model.renewable_ptr_vec.size(),
-    4,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.renewable_ptr_vec[3]->type,
-    RenewableType :: WIND,
-    __FILE__,
-    __LINE__
-);
-
-
-//  add LiIon asset
-LiIonInputs liion_inputs;
-
-test_model.addLiIon(liion_inputs);
-
-testFloatEquals(
-    test_model.storage_ptr_vec.size(),
-    1,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.storage_ptr_vec[0]->type,
-    StorageType :: LIION,
-    __FILE__,
-    __LINE__
-);
-
-
-//  run
-test_model.run();
-
-
-//  write results
-test_model.writeResults("test/test_results/");
-
-
-//  test post-run attributes
-double net_load_kW;
-
-Combustion* combustion_ptr;
-Noncombustion* noncombustion_ptr;
-Renewable* renewable_ptr;
-Storage* storage_ptr;
-
-for (int i = 0; i < test_model.electrical_load.n_points; i++) {
-    net_load_kW = test_model.controller.net_load_vec_kW[i];
-    
-    testLessThanOrEqualTo(
-        test_model.controller.net_load_vec_kW[i],
-        test_model.electrical_load.max_load_kW,
-        __FILE__,
-        __LINE__
-    );
-    
-    for (size_t j = 0; j < test_model.combustion_ptr_vec.size(); j++) {
-        combustion_ptr = test_model.combustion_ptr_vec[j];
-        
-        testFloatEquals(
-            combustion_ptr->production_vec_kW[i] -
-            combustion_ptr->dispatch_vec_kW[i] -
-            combustion_ptr->curtailment_vec_kW[i] -
-            combustion_ptr->storage_vec_kW[i],
-            0,
-            __FILE__,
-            __LINE__
-        );
-        
-        net_load_kW -= combustion_ptr->production_vec_kW[i];
-    }
-    
-    for (size_t j = 0; j < test_model.noncombustion_ptr_vec.size(); j++) {
-        noncombustion_ptr = test_model.noncombustion_ptr_vec[j];
-        
-        testFloatEquals(
-            noncombustion_ptr->production_vec_kW[i] -
-            noncombustion_ptr->dispatch_vec_kW[i] -
-            noncombustion_ptr->curtailment_vec_kW[i] -
-            noncombustion_ptr->storage_vec_kW[i],
-            0,
-            __FILE__,
-            __LINE__
-        );
-        
-        net_load_kW -= noncombustion_ptr->production_vec_kW[i];
-    }
-    
-    for (size_t j = 0; j < test_model.renewable_ptr_vec.size(); j++) {
-        renewable_ptr = test_model.renewable_ptr_vec[j];
-        
-        testFloatEquals(
-            renewable_ptr->production_vec_kW[i] -
-            renewable_ptr->dispatch_vec_kW[i] -
-            renewable_ptr->curtailment_vec_kW[i] -
-            renewable_ptr->storage_vec_kW[i],
-            0,
-            __FILE__,
-            __LINE__
-        );
-        
-        net_load_kW -= renewable_ptr->production_vec_kW[i];
-    }
-    
-    for (size_t j = 0; j < test_model.storage_ptr_vec.size(); j++) {
-        storage_ptr = test_model.storage_ptr_vec[j];
-        
-        testTruth(
-            not (
-                storage_ptr->charging_power_vec_kW[i] > 0 and
-                storage_ptr->discharging_power_vec_kW[i] > 0
-            ),
-            __FILE__,
-            __LINE__
-        );
-        
-        net_load_kW -= storage_ptr->discharging_power_vec_kW[i];
-    }
-    
-    testLessThanOrEqualTo(
-        net_load_kW,
-        0,
-        __FILE__,
-        __LINE__
-    );
-}
-
-testGreaterThan(
-    test_model.net_present_cost,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_model.total_dispatch_discharge_kWh,
-    2263351.62026685,
-    __FILE__,
-    __LINE__
-);
-
-testGreaterThan(
-    test_model.levellized_cost_of_energy_kWh,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testGreaterThan(
-    test_model.total_fuel_consumed_L,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testGreaterThan(
-    test_model.total_emissions.CO2_kg,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testGreaterThan(
-    test_model.total_emissions.CO_kg,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testGreaterThan(
-    test_model.total_emissions.NOx_kg,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testGreaterThan(
-    test_model.total_emissions.SOx_kg,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testGreaterThan(
-    test_model.total_emissions.CH4_kg,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testGreaterThan(
-    test_model.total_emissions.PM_kg,
-    0,
-    __FILE__,
-    __LINE__
-);
-
-// ======== END METHODS ============================================================= //
-*/
