@@ -23,6 +23,29 @@
 #include "../../header/Controller.h"
 
 
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn Controller* testConstruct_Controller(void)
+///
+/// \brief A function to construct a Controller object.
+///
+/// \return A pointer to a test Controller object.
+///
+
+Controller* testConstruct_Controller(void)
+{
+    Controller* test_controller_ptr = new Controller();
+    
+    return test_controller_ptr;
+}   /* constructController() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
 int main(int argc, char** argv)
 {
     #ifdef _WIN32
@@ -32,50 +55,36 @@ int main(int argc, char** argv)
     printGold("\tTesting Controller");
     
     srand(time(NULL));
-    
-    
-try {
-
-// ======== CONSTRUCTION ============================================================ //
-
-Controller test_controller;
-
-// ======== END CONSTRUCTION =========================================================//
 
 
-
-// ======== ATTRIBUTES ============================================================== //
-
-//...
-
-// ======== END ATTRIBUTES ========================================================== //
+    Controller* test_controller_ptr = testConstruct_Controller();
 
 
-
-// ======== METHODS ================================================================= //
-
-//...
-
-// ======== END METHODS ============================================================= //
-
-}   /* try */
+    try {
+        //...
+    }
 
 
-catch (...) {
-    //...
-    
+    catch (...) {
+        delete test_controller_ptr;
+        
+        printGold(" ............................... ");
+        printRed("FAIL");
+        std::cout << std::endl;
+        throw;
+    }
+
+
+    delete test_controller_ptr;
+
     printGold(" ............................... ");
-    printRed("FAIL");
+    printGreen("PASS");
     std::cout << std::endl;
-    throw;
-}
-
-
-printGold(" ............................... ");
-printGreen("PASS");
-std::cout << std::endl;
-return 0;
+    return 0;
 }   /* main() */
+
+// ---------------------------------------------------------------------------------- //
+
 
 
 /*
