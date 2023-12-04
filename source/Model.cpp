@@ -106,7 +106,8 @@ void Model :: __computeFuelAndEmissions(void)
 /// \fn void Model :: __computeNetPresentCost(void)
 ///
 /// \brief Helper method to compute the overall net present cost, for the Model
-///     run, from the asset-wise net present costs.
+///     run, from the asset-wise net present costs. Also tallies up total dispatch
+///     and discharge.
 ///
 
 void Model :: __computeNetPresentCost(void)
@@ -147,6 +148,9 @@ void Model :: __computeNetPresentCost(void)
         this->net_present_cost += this->renewable_ptr_vec[i]->net_present_cost;
         
         this->total_dispatch_discharge_kWh +=
+            this->renewable_ptr_vec[i]->total_dispatch_kWh;
+        
+        this->total_renewable_dispatch_kWh +=
             this->renewable_ptr_vec[i]->total_dispatch_kWh;
     }
     
@@ -407,6 +411,11 @@ void Model :: __writeSummary(std::string write_path)
     
     ofs << "Total Dispatch + Discharge: " << this->total_dispatch_discharge_kWh
         << " kWh  \n";
+    
+    ofs << "Renewable Penetration: "
+        << this->total_renewable_dispatch_kWh / this->total_dispatch_discharge_kWh
+        << "  \n";
+    ofs << "\n";
         
     ofs << "Levellized Cost of Energy: " << this->levellized_cost_of_energy_kWh
         << " per kWh dispatched/discharged  \n";
@@ -594,6 +603,7 @@ Model :: Model(ModelInputs model_inputs)
     this->total_fuel_consumed_L = 0;
     this->net_present_cost = 0;
     this->total_dispatch_discharge_kWh = 0;
+    this->total_renewable_dispatch_kWh = 0;
     this->levellized_cost_of_energy_kWh = 0;
     
     return;
@@ -960,6 +970,7 @@ void Model :: reset(void)
     
     this->net_present_cost = 0;
     this->total_dispatch_discharge_kWh = 0;
+    this->total_renewable_dispatch_kWh = 0;
     this->levellized_cost_of_energy_kWh = 0;
     
     return;

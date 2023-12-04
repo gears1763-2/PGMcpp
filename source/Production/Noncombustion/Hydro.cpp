@@ -948,19 +948,24 @@ double Hydro :: requestProductionkW(
     double hydro_resource_m3hr
 )
 {
-    //  1. return on request of less than minimum power
-    if (request_kW < this->minimum_power_kW) {
+    //  1. return on request of zero
+    if (request_kW <= 0) {
         return 0;
     }
     
-    //  2. check available flow, return if less than minimum flow
+    //  2. if request is less than minimum power, set to minimum power
+    if (request_kW < this->minimum_power_kW) {
+        request_kW = this->minimum_power_kW;
+    }
+    
+    //  3. check available flow, return if less than minimum flow
     double available_flow_m3hr = this->__getAvailableFlow(dt_hrs, hydro_resource_m3hr);
     
     if (available_flow_m3hr < this->minimum_flow_m3hr) {
         return 0;
     }
     
-    //  3. init production to request, enforce capacity constraint (which also accounts
+    //  4. init production to request, enforce capacity constraint (which also accounts
     //     for maximum flow constraint).
     double production_kW = request_kW;
     
@@ -968,10 +973,10 @@ double Hydro :: requestProductionkW(
         production_kW = this->capacity_kW;
     }
     
-    //  4. map production to flow
+    //  5. map production to flow
     double flow_m3hr = this->__powerToFlow(production_kW);
     
-    //  5. if flow is in excess of available, then adjust production accordingly
+    //  6. if flow is in excess of available, then adjust production accordingly
     if (flow_m3hr > available_flow_m3hr) {
         production_kW = this->__flowToPower(available_flow_m3hr);
     }

@@ -85,6 +85,7 @@ class Model {
         Emissions total_emissions; ///< An Emissions structure for holding total emissions [kg].
         
         double net_present_cost; ///< The net present cost of the Model (undefined currency).
+        double total_renewable_dispatch_kWh; ///< The total energy dispatched [kWh] by all renewable assets over the Model run.
         double total_dispatch_discharge_kWh; ///< The total energy dispatched/discharged [kWh] over the Model run.
         double levellized_cost_of_energy_kWh; ///< The levellized cost of energy, per unit energy dispatched/discharged, of the Model [1/kWh] (undefined currency).
         
