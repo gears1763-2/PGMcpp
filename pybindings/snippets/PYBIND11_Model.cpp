@@ -37,6 +37,7 @@ pybind11::class_<Model>(m, "Model")
     .def_readwrite("total_fuel_consumed_L", &Model::total_fuel_consumed_L)
     .def_readwrite("total_emissions", &Model::total_emissions)
     .def_readwrite("net_present_cost", &Model::net_present_cost)
+    .def_readwrite("total_renewable_dispatch_kWh", &Model::total_renewable_dispatch_kWh)
     .def_readwrite("total_dispatch_discharge_kWh", &Model::total_dispatch_discharge_kWh)
     .def_readwrite(
         "levellized_cost_of_energy_kWh",
@@ -46,6 +47,7 @@ pybind11::class_<Model>(m, "Model")
     .def_readwrite("electrical_load", &Model::electrical_load)
     .def_readwrite("resources", &Model::resources)
     .def_readwrite("combustion_ptr_vec", &Model::combustion_ptr_vec)
+    .def_readwrite("noncombustion_ptr_vec", &Model::noncombustion_ptr_vec)
     .def_readwrite("renewable_ptr_vec", &Model::renewable_ptr_vec)
     .def_readwrite("storage_ptr_vec", &Model::storage_ptr_vec)
     
@@ -60,6 +62,7 @@ pybind11::class_<Model>(m, "Model")
         "addResource",
         pybind11::overload_cast<RenewableType, std::string, int>(&Model::addResource)
     )
+    .def("addHydro", &Model::addHydro)
     .def("addSolar", &Model::addSolar)
     .def("addTidal", &Model::addTidal)
     .def("addWave", &Model::addWave)

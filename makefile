@@ -476,6 +476,7 @@ clean:
 	rm -frv projects/example_cpp
 	rm -frv projects/example_py
 	rm -frv pybindings/PGMcpp.*
+	rm -frv pybindings/test_results/
 	rm -frv test/bin
 	rm -frv test/object
 	rm -frv test/test_results

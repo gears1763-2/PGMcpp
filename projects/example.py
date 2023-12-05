@@ -13,7 +13,7 @@
 
 import os
 import sys
-sys.path.insert(0, "../pybindings")  # <-- just need to point to a directory with the PGMcpp bindings
+sys.path.insert(0, "../pybindings/precompiled_bindings/")  # <-- just need to point to a directory with the PGMcpp bindings
 
 import PGMcpp
 

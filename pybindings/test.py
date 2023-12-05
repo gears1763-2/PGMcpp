@@ -15,6 +15,7 @@
 
 import os
 import sys
+sys.path.insert(0, "precompiled_bindings/")  # <-- just need to point to a directory with the PGMcpp bindings
 
 os.system("color")
 end = "\n"
@@ -104,6 +105,7 @@ if __name__ == "__main__":
         )
         
         test_diesel_inputs = PGMcpp.DieselInputs()
+        test_diesel_inputs.combustion_inputs.production_inputs.is_sunk = True
         
         test_diesel = PGMcpp.Diesel(8760, 1, test_diesel_inputs)
         
@@ -136,9 +138,10 @@ if __name__ == "__main__":
             "\033[0m"
         )
         
-        test_hydro_inputs = PGMcpp.NoncombustionInputs()
+        test_hydro_inputs = PGMcpp.HydroInputs()
+        test_hydro_inputs.noncombustion_inputs.production_inputs.is_sunk= True
         
-        test_hydro = PGMcpp.Noncombustion(8760, 1, test_hydro_inputs)
+        test_hydro = PGMcpp.Hydro(8760, 1, test_hydro_inputs)
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -326,6 +329,7 @@ if __name__ == "__main__":
         
         
         ## ================ test Model ================ ##
+        ## ====== essentially repeats example.py ====== ##
         sys.stdout.write(
             "\x1B[33m" +
             "  Testing Model " +
@@ -334,29 +338,140 @@ if __name__ == "__main__":
             "\033[0m"
         )
         
-        test_model_inputs = PGMcpp.ModelInputs();
-        
+        #   construct Model
         path_2_electrical_load_time_series = (
             "../data/test/electrical_load/" +
             "electrical_load_generic_peak-500kW_1yr_dt-1hr.csv"
         )
-        
+
+        test_model_inputs = PGMcpp.ModelInputs()
+
         test_model_inputs.path_2_electrical_load_time_series = (
             path_2_electrical_load_time_series
         )
-        
+        test_model_inputs.control_mode = PGMcpp.ControlMode.LOAD_FOLLOWING
+
         test_model = PGMcpp.Model(test_model_inputs)
-        
+
         assert (
             test_model.controller.control_mode == PGMcpp.ControlMode.LOAD_FOLLOWING
         )
         
         assert (test_model.controller.control_string == "LOAD_FOLLOWING")
         
+        #   add Diesel assets
+        test_diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 200
+        
         for i in range(0, 3):
             test_model.addDiesel(test_diesel_inputs)
         
+        #   add renewable resources
+        solar_resource_key = 0
+        path_2_solar_resource_data = (
+            "../data/test/resources/solar_GHI_peak-1kWm2_1yr_dt-1hr.csv"
+        )
+
+        test_model.addResource(
+            PGMcpp.RenewableType.SOLAR,
+            path_2_solar_resource_data,
+            solar_resource_key
+        )
+        
+        tidal_resource_key = 1
+        path_2_tidal_resource_data = (
+            "../data/test/resources/tidal_speed_peak-3ms_1yr_dt-1hr.csv"
+        )
+
+        test_model.addResource(
+            PGMcpp.RenewableType.TIDAL,
+            path_2_tidal_resource_data,
+            tidal_resource_key
+        )
+        
+        wave_resource_key = 2
+        path_2_wave_resource_data = (
+            "../data/test/resources/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr.csv"
+        )
+
+        test_model.addResource(
+            PGMcpp.RenewableType.WAVE,
+            path_2_wave_resource_data,
+            wave_resource_key
+        )
+        
+        wind_resource_key = 3
+        path_2_wind_resource_data = (
+            "../data/test/resources/wind_speed_peak-25ms_1yr_dt-1hr.csv"
+        )
+
+        test_model.addResource(
+            PGMcpp.RenewableType.WIND,
+            path_2_wind_resource_data,
+            wind_resource_key
+        )
+        
+        hydro_resource_key = 4
+        path_2_hydro_resource_data = (
+            "../data/test/resources/hydro_inflow_peak-20000m3hr_1yr_dt-1hr.csv"
+        )
+
+        test_model.addResource(
+            PGMcpp.NoncombustionType.HYDRO,
+            path_2_hydro_resource_data,
+            hydro_resource_key
+        )
+        
+        #   add Hydro asset
+        hydro_inputs = PGMcpp.HydroInputs()
+        hydro_inputs.noncombustion_inputs.production_inputs.capacity_kW = 300
+        hydro_inputs.reservoir_capacity_m3 = 10000
+        hydro_inputs.init_reservoir_state = 0.5
+        hydro_inputs.noncombustion_inputs.production_inputs.is_sunk = True
+        hydro_inputs.resource_key = hydro_resource_key
+
+        test_model.addHydro(hydro_inputs);
+        
+        #   add Renewable assets
+        solar_inputs = PGMcpp.SolarInputs()
+
+        solar_inputs.renewable_inputs.production_inputs.capacity_kW = 250
+        solar_inputs.resource_key = solar_resource_key
+
+        test_model.addSolar(solar_inputs)
+        
+        tidal_inputs = PGMcpp.TidalInputs()
+
+        tidal_inputs.renewable_inputs.production_inputs.capacity_kW = 120
+        tidal_inputs.design_speed_ms = 2.5
+        tidal_inputs.resource_key = tidal_resource_key
+
+        test_model.addTidal(tidal_inputs)
+        
+        wind_inputs = PGMcpp.WindInputs()
+
+        wind_inputs.renewable_inputs.production_inputs.capacity_kW = 150
+        wind_inputs.resource_key = wind_resource_key
+
+        test_model.addWind(wind_inputs)
+        
+        wave_inputs = PGMcpp.WaveInputs()
+
+        wave_inputs.renewable_inputs.production_inputs.capacity_kW = 100
+        wave_inputs.resource_key = wave_resource_key
+
+        test_model.addWave(wave_inputs)
+        
+        #   add LiIon asset
+        liion_inputs = PGMcpp.LiIonInputs()
+
+        liion_inputs.storage_inputs.power_capacity_kW = 500
+        liion_inputs.storage_inputs.energy_capacity_kWh = 1050
+
+        test_model.addLiIon(liion_inputs)
+        
+        #   run and write
         test_model.run()
+        test_model.writeResults("test_results/")
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
 
