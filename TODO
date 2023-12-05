@@ -1,3 +1,5 @@
-*   improve testing and documentation
+*   improve testing and documentation (always ...)
+*   add pre-processed production lookup functionality to the Production hierarchy (to allow users to pass their own production time series)
 *   add production lookup functionality to Tidal and Wind
 *   implement model predictive control in Controller
+*   implement Python Controller API (to allow users to define their own control algorithms)
