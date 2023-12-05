@@ -23,6 +23,302 @@
 #include "../../../../header/Production/Renewable/Tidal.h"
 
 
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn Tidal* testConstruct_Tidal(void)
+///
+/// \brief A function to construct a Tidal object and spot check some
+///     post-construction attributes.
+///
+/// \return A Renewable pointer to a test Tidal object.
+///
+
+Renewable* testConstruct_Tidal(void)
+{
+    TidalInputs tidal_inputs;
+
+    Renewable* test_tidal_ptr = new Tidal(8760, 1, tidal_inputs);
+    
+    testTruth(
+        not tidal_inputs.renewable_inputs.production_inputs.print_flag,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_tidal_ptr->n_points,
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_tidal_ptr->type,
+        RenewableType :: TIDAL,
+        __FILE__,
+        __LINE__
+    );
+
+    testTruth(
+        test_tidal_ptr->type_str == "TIDAL",
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_tidal_ptr->capital_cost,
+        500237.446725,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_tidal_ptr->operation_maintenance_cost_kWh,
+        0.069905,
+        __FILE__,
+        __LINE__
+    );
+
+    return test_tidal_ptr;
+}   /* testConstruct_Tidal() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testBadConstruct_Tidal(void)
+///
+/// \brief Function to test the trying to construct a Tidal object given bad 
+///     inputs is being handled as expected.
+///
+
+void testBadConstruct_Tidal(void)
+{
+    bool error_flag = true;
+
+    try {
+        TidalInputs bad_tidal_inputs;
+        bad_tidal_inputs.design_speed_ms = -1;
+        
+        Tidal bad_tidal(8760, 1, bad_tidal_inputs);
+        
+        error_flag = false;
+    } catch (...) {
+        // Task failed successfully! =P
+    }
+    if (not error_flag) {
+        expectedErrorNotDetected(__FILE__, __LINE__);
+    }
+    
+    return;
+}   /* testBadConstruct_Tidal() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testProductionConstraint_Tidal(Renewable* test_tidal_ptr)
+///
+/// \brief Function to test that the production constraint is active and behaving as
+///     expected.
+///
+/// \param test_tidal_ptr A Renewable pointer to the test Tidal object.
+///
+
+void testProductionConstraint_Tidal(Renewable* test_tidal_ptr)
+{
+    testFloatEquals(
+        test_tidal_ptr->computeProductionkW(0, 1, 1e6),
+        0,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_tidal_ptr->computeProductionkW(
+            0,
+            1,
+            ((Tidal*)test_tidal_ptr)->design_speed_ms
+        ),
+        test_tidal_ptr->capacity_kW,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_tidal_ptr->computeProductionkW(0, 1, -1),
+        0,
+        __FILE__,
+        __LINE__
+    );
+        
+    return;
+}   /* testProductionConstraint_Tidal() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testCommit_Tidal(Renewable* test_tidal_ptr)
+///
+/// \brief Function to test if the commit method is working as expected, by checking
+///     some post-call attributes of the test Tidal object. Uses a randomized resource
+///     input.
+///
+/// \param test_tidal_ptr A Renewable pointer to the test Tidal object.
+///
+
+void testCommit_Tidal(Renewable* test_tidal_ptr)
+{
+    std::vector<double> dt_vec_hrs (48, 1);
+
+    std::vector<double> load_vec_kW = {
+        1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1,
+        1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+        1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+        1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0
+    };
+
+    double load_kW = 0;
+    double production_kW = 0;
+    double roll = 0;
+    double tidal_resource_ms = 0;
+
+    for (int i = 0; i < 48; i++) {
+        roll = (double)rand() / RAND_MAX;
+        
+        tidal_resource_ms = roll * ((Tidal*)test_tidal_ptr)->design_speed_ms;
+        
+        roll = (double)rand() / RAND_MAX;
+        
+        if (roll <= 0.1) {
+            tidal_resource_ms = 0;
+        }
+        
+        else if (roll >= 0.95) {
+            tidal_resource_ms = 3 * ((Tidal*)test_tidal_ptr)->design_speed_ms;
+        }
+        
+        roll = (double)rand() / RAND_MAX;
+        
+        if (roll >= 0.95) {
+            roll = 1.25;
+        }
+        
+        load_vec_kW[i] *= roll * test_tidal_ptr->capacity_kW;
+        load_kW = load_vec_kW[i];
+        
+        production_kW = test_tidal_ptr->computeProductionkW(
+            i,
+            dt_vec_hrs[i],
+            tidal_resource_ms
+        );
+        
+        load_kW = test_tidal_ptr->commit(
+            i,
+            dt_vec_hrs[i],
+            production_kW,
+            load_kW
+        );
+        
+        // is running (or not) as expected
+        if (production_kW > 0) {
+            testTruth(
+                test_tidal_ptr->is_running,
+                __FILE__,
+                __LINE__
+            );
+        }
+        
+        else {
+            testTruth(
+                not test_tidal_ptr->is_running,
+                __FILE__,
+                __LINE__
+            );
+        }
+        
+        // load_kW <= load_vec_kW (i.e., after vs before)
+        testLessThanOrEqualTo(
+            load_kW,
+            load_vec_kW[i],
+            __FILE__,
+            __LINE__
+        );
+        
+        // production = dispatch + storage + curtailment
+        testFloatEquals(
+            test_tidal_ptr->production_vec_kW[i] -
+            test_tidal_ptr->dispatch_vec_kW[i] -
+            test_tidal_ptr->storage_vec_kW[i] -
+            test_tidal_ptr->curtailment_vec_kW[i],
+            0,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    return;
+}   /* testCommit_Tidal() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testEconomics_Tidal(Combustion* test_tidal_ptr)
+///
+/// \brief Function to test that the post-commit model economics for the test Tidal
+///     object are as expected (> 0 when running, = 0 when not).
+///
+/// \param test_tidal_ptr A Combustion pointer to the test Tidal object.
+///
+
+void testEconomics_Tidal(Renewable* test_tidal_ptr)
+{
+    for (int i = 0; i < 48; i++) {
+        // resource, O&M > 0 whenever tidal is running (i.e., producing)
+        if (test_tidal_ptr->is_running_vec[i]) {
+            testGreaterThan(
+                test_tidal_ptr->operation_maintenance_cost_vec[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+        }
+        
+        // resource, O&M = 0 whenever tidal is not running (i.e., not producing)
+        else {
+            testFloatEquals(
+                test_tidal_ptr->operation_maintenance_cost_vec[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+        }
+    }
+    
+    return;
+}   /* testEconomics_Tidal() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
 int main(int argc, char** argv)
 {
     #ifdef _WIN32
@@ -33,254 +329,37 @@ int main(int argc, char** argv)
     
     srand(time(NULL));
     
-    Renewable* test_tidal_ptr;
     
-try {
-
-// ======== CONSTRUCTION ============================================================ //
-
-bool error_flag = true;
-
-try {
-    TidalInputs bad_tidal_inputs;
-    bad_tidal_inputs.design_speed_ms = -1;
+    Renewable* test_tidal_ptr = testConstruct_Tidal();
     
-    Tidal bad_tidal(8760, 1, bad_tidal_inputs);
     
-    error_flag = false;
-} catch (...) {
-    // Task failed successfully! =P
-}
-if (not error_flag) {
-    expectedErrorNotDetected(__FILE__, __LINE__);
-}
-
-TidalInputs tidal_inputs;
-
-test_tidal_ptr = new Tidal(8760, 1, tidal_inputs);
-
-// ======== END CONSTRUCTION ======================================================== //
-
-
-
-// ======== ATTRIBUTES ============================================================== //
-
-testTruth(
-    not tidal_inputs.renewable_inputs.production_inputs.print_flag,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_tidal_ptr->type,
-    RenewableType :: TIDAL,
-    __FILE__,
-    __LINE__
-);
-
-testTruth(
-    test_tidal_ptr->type_str == "TIDAL",
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_tidal_ptr->capital_cost,
-    500237.446725,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_tidal_ptr->operation_maintenance_cost_kWh,
-    0.069905,
-    __FILE__,
-    __LINE__
-);
-
-// ======== END ATTRIBUTES ========================================================== //
-
-
-
-// ======== METHODS ================================================================= //
-
-// test production constraints
-testFloatEquals(
-    test_tidal_ptr->computeProductionkW(0, 1, 1e6),
-    0,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_tidal_ptr->computeProductionkW(
-        0,
-        1,
-        ((Tidal*)test_tidal_ptr)->design_speed_ms
-    ),
-    test_tidal_ptr->capacity_kW,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_tidal_ptr->computeProductionkW(0, 1, -1),
-    0,
-    __FILE__,
-    __LINE__
-);
-
-// test commit()
-std::vector<double> dt_vec_hrs (48, 1);
-
-std::vector<double> load_vec_kW = {
-    1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1,
-    1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0,
-    1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
-    1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0
-};
-
-double load_kW = 0;
-double production_kW = 0;
-double roll = 0;
-double tidal_resource_ms = 0;
-
-for (int i = 0; i < 48; i++) {
-    roll = (double)rand() / RAND_MAX;
-    
-    tidal_resource_ms = roll * ((Tidal*)test_tidal_ptr)->design_speed_ms;
-    
-    roll = (double)rand() / RAND_MAX;
-    
-    if (roll <= 0.1) {
-        tidal_resource_ms = 0;
-    }
-    
-    else if (roll >= 0.95) {
-        tidal_resource_ms = 3 * ((Tidal*)test_tidal_ptr)->design_speed_ms;
-    }
-    
-    roll = (double)rand() / RAND_MAX;
-    
-    if (roll >= 0.95) {
-        roll = 1.25;
-    }
-    
-    load_vec_kW[i] *= roll * test_tidal_ptr->capacity_kW;
-    load_kW = load_vec_kW[i];
-    
-    production_kW = test_tidal_ptr->computeProductionkW(
-        i,
-        dt_vec_hrs[i],
-        tidal_resource_ms
-    );
-    
-    load_kW = test_tidal_ptr->commit(
-        i,
-        dt_vec_hrs[i],
-        production_kW,
-        load_kW
-    );
-    
-    // is running (or not) as expected
-    if (production_kW > 0) {
-        testTruth(
-            test_tidal_ptr->is_running,
-            __FILE__,
-            __LINE__
-        );
-    }
-    
-    else {
-        testTruth(
-            not test_tidal_ptr->is_running,
-            __FILE__,
-            __LINE__
-        );
-    }
-    
-    // load_kW <= load_vec_kW (i.e., after vs before)
-    testLessThanOrEqualTo(
-        load_kW,
-        load_vec_kW[i],
-        __FILE__,
-        __LINE__
-    );
-    
-    // production = dispatch + storage + curtailment
-    testFloatEquals(
-        test_tidal_ptr->production_vec_kW[i] -
-        test_tidal_ptr->dispatch_vec_kW[i] -
-        test_tidal_ptr->storage_vec_kW[i] -
-        test_tidal_ptr->curtailment_vec_kW[i],
-        0,
-        __FILE__,
-        __LINE__
-    );
-    
-    // resource, O&M > 0 whenever tidal is running (i.e., producing)
-    if (test_tidal_ptr->is_running) {
-        testGreaterThan(
-            tidal_resource_ms,
-            0,
-            __FILE__,
-            __LINE__
-        );
+    try {
+        testBadConstruct_Tidal();
         
-        testGreaterThan(
-            test_tidal_ptr->operation_maintenance_cost_vec[i],
-            0,
-            __FILE__,
-            __LINE__
-        );
+        testProductionConstraint_Tidal(test_tidal_ptr);
+        
+        testCommit_Tidal(test_tidal_ptr);
+        testEconomics_Tidal(test_tidal_ptr);
     }
-    
-    // O&M = 0 whenever tidal is not running (i.e., not producing)
-    else {
-        testFloatEquals(
-            test_tidal_ptr->operation_maintenance_cost_vec[i],
-            0,
-            __FILE__,
-            __LINE__
-        );
+
+
+    catch (...) {
+        delete test_tidal_ptr;
+        
+        printGold(" ....... ");
+        printRed("FAIL");
+        std::cout << std::endl;
+        throw;
     }
-}
 
 
-// ======== END METHODS ============================================================= //
-
-}   /* try */
-
-
-catch (...) {
     delete test_tidal_ptr;
-    
+
     printGold(" ....... ");
-    printRed("FAIL");
+    printGreen("PASS");
     std::cout << std::endl;
-    throw;
-}
+    return 0;
 
-
-delete test_tidal_ptr;
-
-printGold(" ....... ");
-printGreen("PASS");
-std::cout << std::endl;
-return 0;
 }   /* main() */
 
-
-
-/*
-bool error_flag = true;
-try {
-    testTruth(1 == 0, __FILE__, __LINE__);
-    error_flag = false;
-} catch (...) {
-    // Task failed successfully! =P
-}
-if (not error_flag) {
-    expectedErrorNotDetected(__FILE__, __LINE__);
-}
-*/
+// ---------------------------------------------------------------------------------- //
