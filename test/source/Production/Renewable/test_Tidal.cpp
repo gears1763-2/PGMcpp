@@ -26,7 +26,7 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Tidal* testConstruct_Tidal(void)
+/// \fn Renewable* testConstruct_Tidal(void)
 ///
 /// \brief A function to construct a Tidal object and spot check some
 ///     post-construction attributes.

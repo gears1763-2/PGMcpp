@@ -26,7 +26,7 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Solar* testConstruct_Solar(void)
+/// \fn Renewable* testConstruct_Solar(void)
 ///
 /// \brief A function to construct a Solar object and spot check some
 ///     post-construction attributes.

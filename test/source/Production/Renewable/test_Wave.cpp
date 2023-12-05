@@ -26,7 +26,7 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Wave* testConstruct_Wave(void)
+/// \fn Renewable* testConstruct_Wave(void)
 ///
 /// \brief A function to construct a Wave object and spot check some
 ///     post-construction attributes.

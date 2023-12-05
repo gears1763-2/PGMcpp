@@ -26,7 +26,7 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Wind* testConstruct_Wind(void)
+/// \fn Renewable* testConstruct_Wind(void)
 ///
 /// \brief A function to construct a Wind object and spot check some
 ///     post-construction attributes.
