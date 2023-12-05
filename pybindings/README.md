@@ -25,7 +25,7 @@ a setup file, a test file, and various bindings source files organized as follow
 
     PYBIND11_PGM.cpp        ties all of the bindings snippets together
     snippets/               to hold the various bindings snippets (has the same file structure as `source/`)
-    precompiled_bindings/   to hold some pre-compiled bindings (which may or may not work for your OS/architecture)
+    precompiled_bindings/   to hold some pre-compiled bindings (which may or may not work for your OS/architecture/Python version)
 
 Note that each `pybindings/snippets/../PYBIND11_<>.cpp` contains the bindings
 definitions corresponding to `source/../<>.cpp`.
