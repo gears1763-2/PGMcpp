@@ -23,6 +23,45 @@
 #include "../../../../header/Production/Noncombustion/Noncombustion.h"
 
 
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn Noncombustion* testConstruct_Noncombustion(void)
+///
+/// \brief A function to construct a Noncombustion object and spot check some
+///     post-construction attributes.
+///
+/// \return A pointer to a test Noncombustion object.
+///
+
+Noncombustion* testConstruct_Noncombustion(void)
+{
+    NoncombustionInputs noncombustion_inputs;
+
+    Noncombustion* test_noncombustion_ptr =
+        new Noncombustion(8760, 1, noncombustion_inputs);
+    
+    testTruth(
+        not noncombustion_inputs.production_inputs.print_flag,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_noncombustion_ptr->n_points,
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    return test_noncombustion_ptr;
+}   /* testConstruct_Noncombustion() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
 
 int main(int argc, char** argv)
 {
@@ -35,59 +74,31 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-try {
-
-// ======== CONSTRUCTION ============================================================ //
-
-NoncombustionInputs noncombustion_inputs;
-
-Noncombustion test_noncombustion(8760, 1, noncombustion_inputs);
-
-// ======== END CONSTRUCTION ======================================================== //
-
-
-
-// ======== ATTRIBUTES ============================================================== //
-
-testTruth(
-    not noncombustion_inputs.production_inputs.print_flag,
-    __FILE__,
-    __LINE__
-);
-
-// ======== END ATTRIBUTES ========================================================== //
-
-}   /* try */
-
-
-catch (...) {
-    //...
+    Noncombustion* test_noncombustion_ptr = testConstruct_Noncombustion();
     
+    
+    try {
+        //...
+    }
+
+
+    catch (...) {
+        delete test_noncombustion_ptr;
+        
+        printGold(" ............. ");
+        printRed("FAIL");
+        std::cout << std::endl;
+        throw;
+    }
+
+
+    delete test_noncombustion_ptr;
+
     printGold(" ............. ");
-    printRed("FAIL");
+    printGreen("PASS");
     std::cout << std::endl;
-    throw;
-}
-
-
-printGold(" ............. ");
-printGreen("PASS");
-std::cout << std::endl;
-return 0;
+    return 0;
 
 }   /* main() */
 
-
-/*
-bool error_flag = true;
-
-try {
-    testTruth(1 == 0, __FILE__, __LINE__);
-    error_flag = false;
-} catch (...) {
-    // Task failed successfully! =P
-}
-if (not error_flag) {
-    expectedErrorNotDetected(__FILE__, __LINE__);
-}
-*/
+// ---------------------------------------------------------------------------------- //

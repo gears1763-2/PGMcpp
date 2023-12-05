@@ -23,6 +23,45 @@
 #include "../../../../header/Production/Renewable/Renewable.h"
 
 
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn Renewable* testConstruct_Renewable(void)
+///
+/// \brief A function to construct a Renewable object and spot check some
+///     post-construction attributes.
+///
+/// \return A pointer to a test Renewable object.
+///
+
+Renewable* testConstruct_Renewable(void)
+{
+    RenewableInputs renewable_inputs;
+
+    Renewable* test_renewable_ptr = new Renewable(8760, 1, renewable_inputs);
+    
+    testTruth(
+        not renewable_inputs.production_inputs.print_flag,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_renewable_ptr->n_points,
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    return test_renewable_ptr;
+}   /* testConstruct_Renewable() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
 int main(int argc, char** argv)
 {
     #ifdef _WIN32
@@ -34,57 +73,31 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-try {
-
-// ======== CONSTRUCTION ============================================================ //
-
-RenewableInputs renewable_inputs;
-
-Renewable test_renewable(8760, 1, renewable_inputs);
-
-// ======== END CONSTRUCTION ======================================================== //
-
-
-
-// ======== ATTRIBUTES ============================================================== //
-
-testTruth(
-    not renewable_inputs.production_inputs.print_flag,
-    __FILE__,
-    __LINE__
-);
-
-// ======== END ATTRIBUTES ========================================================== //
-
-}   /* try */
-
-
-catch (...) {
-    //...
+    Renewable* test_renewable_ptr = testConstruct_Renewable();
     
+    
+    try {
+        //...
+    }
+
+
+    catch (...) {
+        delete test_renewable_ptr;
+        
+        printGold(" ................. ");
+        printRed("FAIL");
+        std::cout << std::endl;
+        throw;
+    }
+
+
+    delete test_renewable_ptr;
+
     printGold(" ................. ");
-    printRed("FAIL");
+    printGreen("PASS");
     std::cout << std::endl;
-    throw;
-}
+    return 0;
 
-
-printGold(" ................. ");
-printGreen("PASS");
-std::cout << std::endl;
-return 0;
 }   /* main() */
 
-
-/*
-bool error_flag = true;
-try {
-    testTruth(1 == 0, __FILE__, __LINE__);
-    error_flag = false;
-} catch (...) {
-    // Task failed successfully! =P
-}
-if (not error_flag) {
-    expectedErrorNotDetected(__FILE__, __LINE__);
-}
-*/
+// ---------------------------------------------------------------------------------- //

@@ -23,6 +23,94 @@
 #include "../../../../header/Production/Combustion/Combustion.h"
 
 
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn Combustion* testConstruct_Combustion(void)
+///
+/// \brief A function to construct a Combustion object and spot check some
+///     post-construction attributes.
+///
+/// \return A pointer to a test Combustion object.
+///
+
+Combustion* testConstruct_Combustion(void)
+{
+    CombustionInputs combustion_inputs;
+
+    Combustion* test_combustion_ptr = new Combustion(8760, 1, combustion_inputs);
+    
+    testTruth(
+        not combustion_inputs.production_inputs.print_flag,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_combustion_ptr->fuel_consumption_vec_L.size(),
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_combustion_ptr->fuel_cost_vec.size(),
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_combustion_ptr->CO2_emissions_vec_kg.size(),
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_combustion_ptr->CO_emissions_vec_kg.size(),
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_combustion_ptr->NOx_emissions_vec_kg.size(),
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_combustion_ptr->SOx_emissions_vec_kg.size(),
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_combustion_ptr->CH4_emissions_vec_kg.size(),
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    testFloatEquals(
+        test_combustion_ptr->PM_emissions_vec_kg.size(),
+        8760,
+        __FILE__,
+        __LINE__
+    );
+
+    return test_combustion_ptr;
+}   /* testConstruct_Combustion() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
 int main(int argc, char** argv)
 {
     #ifdef _WIN32
@@ -34,115 +122,31 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-try {
-
-// ======== CONSTRUCTION ============================================================ //
-
-CombustionInputs combustion_inputs;
-
-Combustion test_combustion(8760, 1, combustion_inputs);
-
-// ======== END CONSTRUCTION ======================================================== //
-
-
-
-// ======== ATTRIBUTES ============================================================== //
-
-testTruth(
-    not combustion_inputs.production_inputs.print_flag,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_combustion.fuel_consumption_vec_L.size(),
-    8760,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_combustion.fuel_cost_vec.size(),
-    8760,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_combustion.CO2_emissions_vec_kg.size(),
-    8760,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_combustion.CO_emissions_vec_kg.size(),
-    8760,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_combustion.NOx_emissions_vec_kg.size(),
-    8760,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_combustion.SOx_emissions_vec_kg.size(),
-    8760,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_combustion.CH4_emissions_vec_kg.size(),
-    8760,
-    __FILE__,
-    __LINE__
-);
-
-testFloatEquals(
-    test_combustion.PM_emissions_vec_kg.size(),
-    8760,
-    __FILE__,
-    __LINE__
-);
-
-// ======== END ATTRIBUTES ========================================================== //
-
-}   /* try */
-
-
-catch (...) {
-    //...
+    Combustion* test_combustion_ptr = testConstruct_Combustion();
     
+    
+    try {
+        //...
+    }
+
+
+    catch (...) {
+        delete test_combustion_ptr;
+        
+        printGold(" ................ ");
+        printRed("FAIL");
+        std::cout << std::endl;
+        throw;
+    }
+
+
+    delete test_combustion_ptr;
+
     printGold(" ................ ");
-    printRed("FAIL");
+    printGreen("PASS");
     std::cout << std::endl;
-    throw;
-}
-
-
-printGold(" ................ ");
-printGreen("PASS");
-std::cout << std::endl;
-return 0;
+    return 0;
 
 }   /* main() */
 
-
-/*
-bool error_flag = true;
-
-try {
-    testTruth(1 == 0, __FILE__, __LINE__);
-    error_flag = false;
-} catch (...) {
-    // Task failed successfully! =P
-}
-if (not error_flag) {
-    expectedErrorNotDetected(__FILE__, __LINE__);
-}
-*/
+// ---------------------------------------------------------------------------------- //

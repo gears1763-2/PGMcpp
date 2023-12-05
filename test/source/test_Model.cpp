@@ -47,7 +47,7 @@ Model* testConstruct_Model(ModelInputs test_model_inputs)
     );
 
     return test_model_ptr;
-}   /* constructModel() */
+}   /* testConstruct_Model() */
 
 // ---------------------------------------------------------------------------------- //
 
