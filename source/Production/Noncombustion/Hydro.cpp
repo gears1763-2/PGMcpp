@@ -861,7 +861,7 @@ Noncombustion(
     this->stored_volume_m3 =
         hydro_inputs.init_reservoir_state * hydro_inputs.reservoir_capacity_m3;
     
-    this->minimum_power_kW = 0.1 * this->capacity_kW;
+    this->minimum_power_kW = 0.1 * this->capacity_kW;   // <-- NEED TO DOUBLE CHECK THAT THIS MAKES SENSE IN GENERAL
     
     this->__initInterpolator();
     
@@ -875,9 +875,16 @@ Noncombustion(
     if (hydro_inputs.capital_cost < 0) {
         this->capital_cost = this->__getGenericCapitalCost();
     }
+    else {
+        this->capital_cost = hydro_inputs.capital_cost;
+    }
     
     if (hydro_inputs.operation_maintenance_cost_kWh < 0) {
         this->operation_maintenance_cost_kWh = this->__getGenericOpMaintCost();
+    }
+    else {
+        this->operation_maintenance_cost_kWh =
+            hydro_inputs.operation_maintenance_cost_kWh;
     }
     
     if (not this->is_sunk) {

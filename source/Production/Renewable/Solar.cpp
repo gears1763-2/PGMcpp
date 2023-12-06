@@ -331,9 +331,16 @@ Renewable(
     if (solar_inputs.capital_cost < 0) {
         this->capital_cost = this->__getGenericCapitalCost();
     }
+    else {
+        this->capital_cost = solar_inputs.capital_cost;
+    }
     
     if (solar_inputs.operation_maintenance_cost_kWh < 0) {
         this->operation_maintenance_cost_kWh = this->__getGenericOpMaintCost();
+    }
+    else {
+        this->operation_maintenance_cost_kWh =
+            solar_inputs.operation_maintenance_cost_kWh;
     }
     
     if (not this->is_sunk) {

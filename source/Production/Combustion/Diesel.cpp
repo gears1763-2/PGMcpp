@@ -655,17 +655,30 @@ Combustion(
     if (diesel_inputs.linear_fuel_slope_LkWh < 0) {
         this->linear_fuel_slope_LkWh = this->__getGenericFuelSlope();
     }
+    else {
+        this->linear_fuel_slope_LkWh = diesel_inputs.linear_fuel_slope_LkWh;
+    }
     
     if (diesel_inputs.linear_fuel_intercept_LkWh < 0) {
         this->linear_fuel_intercept_LkWh = this->__getGenericFuelIntercept();
+    }
+    else {
+        this->linear_fuel_intercept_LkWh = diesel_inputs.linear_fuel_intercept_LkWh;
     }
     
     if (diesel_inputs.capital_cost < 0) {
         this->capital_cost = this->__getGenericCapitalCost();
     }
+    else {
+        this->capital_cost = diesel_inputs.capital_cost;
+    }
     
     if (diesel_inputs.operation_maintenance_cost_kWh < 0) {
         this->operation_maintenance_cost_kWh = this->__getGenericOpMaintCost();
+    }
+    else {
+        this->operation_maintenance_cost_kWh =
+            diesel_inputs.operation_maintenance_cost_kWh;
     }
     
     if (not this->is_sunk) {

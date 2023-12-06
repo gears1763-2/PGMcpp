@@ -714,9 +714,16 @@ Storage(
     if (liion_inputs.capital_cost < 0) {
         this->capital_cost = this->__getGenericCapitalCost();
     }
+    else {
+        this->capital_cost = liion_inputs.capital_cost;
+    }
     
     if (liion_inputs.operation_maintenance_cost_kWh < 0) {
         this->operation_maintenance_cost_kWh = this->__getGenericOpMaintCost();
+    }
+    else {
+        this->operation_maintenance_cost_kWh =
+            liion_inputs.operation_maintenance_cost_kWh;
     }
     
     if (not this->is_sunk) {
