@@ -87,3 +87,18 @@ depending on your setup (either `python` or `python3`). If you see `PASS` across
 board, then the bindings were successfully built.
 
 --------
+
+
+## Notes on Pre-Compiled Bindings
+
+It has been found that whether or not the pre-compiled bindings will work depends on
+architecture (not surprising), but also on the specific version of CPython being used
+(which was not anticipated). For instance, the pre-compiled Windows bindings made 
+available here are both for amd64 and cover CPython 3.10 and 3.12. However, trying to
+use them even with CPython 3.11 fails (a `ModuleNotFoundError` results), and so it seems
+that the bindings are not forward compatible.
+
+For now, the most portable solution is to build the bindings yourself using the
+instructions above. However, a better solution would be to make PGMcpp available on PyPI
+(so that one can simply `pip install` it). I've never attemped this before, however, so
+I have some learning to do before I can offer that. More to follow.
