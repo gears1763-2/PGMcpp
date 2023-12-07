@@ -26,19 +26,26 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Combustion* testConstruct_Combustion(void)
+/// \fn Combustion* testConstruct_Combustion(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Combustion object and spot check some
 ///     post-construction attributes.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 /// \return A pointer to a test Combustion object.
 ///
 
-Combustion* testConstruct_Combustion(void)
+Combustion* testConstruct_Combustion(std::vector<double>* time_vec_hrs_ptr)
 {
     CombustionInputs combustion_inputs;
 
-    Combustion* test_combustion_ptr = new Combustion(8760, 1, combustion_inputs);
+    Combustion* test_combustion_ptr = new Combustion(
+        8760,
+        1,
+        combustion_inputs,
+        time_vec_hrs_ptr
+    );
     
     testTruth(
         not combustion_inputs.production_inputs.print_flag,
@@ -122,7 +129,12 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    Combustion* test_combustion_ptr = testConstruct_Combustion();
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
+    Combustion* test_combustion_ptr = testConstruct_Combustion(&time_vec_hrs);
     
     
     try {

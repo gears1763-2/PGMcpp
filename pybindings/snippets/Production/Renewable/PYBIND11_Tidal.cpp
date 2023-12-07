@@ -56,7 +56,7 @@ pybind11::class_<Tidal>(m, "Tidal")
     .def_readwrite("power_model_string", &Tidal::power_model_string)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, TidalInputs>())
+    .def(pybind11::init<int, double, TidalInputs, std::vector<double>*>())
     .def("handleReplacement", &Tidal::handleReplacement)
     .def("computeProductionkW", &Tidal::computeProductionkW)
     .def("commit", &Tidal::commit);

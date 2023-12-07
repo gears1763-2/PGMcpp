@@ -108,7 +108,7 @@ class Wave : public Renewable {
         
         //  2. methods
         Wave(void);
-        Wave(int, double, WaveInputs);
+        Wave(int, double, WaveInputs, std::vector<double>*);
         void handleReplacement(int);
         
         double computeProductionkW(int, double, double, double);

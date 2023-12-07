@@ -26,19 +26,26 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Combustion* testConstruct_Diesel(void)
+/// \fn Combustion* testConstruct_Diesel(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Diesel object and spot check some
 ///     post-construction attributes.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 /// \return A Combustion pointer to a test Diesel object.
 ///
 
-Combustion* testConstruct_Diesel(void)
+Combustion* testConstruct_Diesel(std::vector<double>* time_vec_hrs_ptr)
 {
     DieselInputs diesel_inputs;
 
-    Combustion* test_diesel_ptr =  new Diesel(8760, 1, diesel_inputs);
+    Combustion* test_diesel_ptr =  new Diesel(
+        8760,
+        1,
+        diesel_inputs,
+        time_vec_hrs_ptr
+    );
     
     testTruth(
         not diesel_inputs.combustion_inputs.production_inputs.print_flag,
@@ -118,14 +125,16 @@ Combustion* testConstruct_Diesel(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Combustion* testConstructLookup_Diesel(void)
+/// \fn Combustion* testConstructLookup_Diesel(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Diesel object using fuel consumption lookup.
+///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
 ///
 /// \return A Combustion pointer to a test Diesel object.
 ///
 
-Combustion* testConstructLookup_Diesel(void)
+Combustion* testConstructLookup_Diesel(std::vector<double>* time_vec_hrs_ptr)
 {
     DieselInputs diesel_inputs;
     
@@ -133,7 +142,12 @@ Combustion* testConstructLookup_Diesel(void)
     diesel_inputs.combustion_inputs.path_2_fuel_interp_data =
         "data/test/interpolation/diesel_fuel_curve.csv";
 
-    Combustion* test_diesel_lookup_ptr = new Diesel(8760, 1, diesel_inputs);
+    Combustion* test_diesel_lookup_ptr = new Diesel(
+        8760,
+        1,
+        diesel_inputs,
+        time_vec_hrs_ptr
+    );
     
     return test_diesel_lookup_ptr;
 }   /* testConstructLookup_Diesel() */
@@ -145,13 +159,15 @@ Combustion* testConstructLookup_Diesel(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void testBadConstruct_Diesel(void)
+/// \fn void testBadConstruct_Diesel(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief Function to test the trying to construct a Diesel object given bad 
 ///     inputs is being handled as expected.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
-void testBadConstruct_Diesel(void)
+void testBadConstruct_Diesel(std::vector<double>* time_vec_hrs_ptr)
 {
     bool error_flag = true;
 
@@ -159,7 +175,12 @@ void testBadConstruct_Diesel(void)
         DieselInputs bad_diesel_inputs;
         bad_diesel_inputs.fuel_cost_L = -1;
         
-        Diesel bad_diesel(8760, 1, bad_diesel_inputs);
+        Diesel bad_diesel(
+            8760,
+            1,
+            bad_diesel_inputs,
+            time_vec_hrs_ptr
+        );
         
         error_flag = false;
     } catch (...) {
@@ -684,11 +705,17 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    Combustion* test_diesel_ptr = testConstruct_Diesel();
-    Combustion* test_diesel_lookup_ptr = testConstructLookup_Diesel();
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
+    
+    Combustion* test_diesel_ptr = testConstruct_Diesel(&time_vec_hrs);
+    Combustion* test_diesel_lookup_ptr = testConstructLookup_Diesel(&time_vec_hrs);
     
     try {
-        testBadConstruct_Diesel();
+        testBadConstruct_Diesel(&time_vec_hrs);
         
         testCapacityConstraint_Diesel(test_diesel_ptr);
         testMinimumLoadRatioConstraint_Diesel(test_diesel_ptr);

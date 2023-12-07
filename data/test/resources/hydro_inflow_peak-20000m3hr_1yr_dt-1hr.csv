@@ -1,6 +1,6 @@
-Datetime [  ],Time (since start of data) [hrs],Hydro Inflow [m3/hr],||,Be sure to leave the last two column headers as is! PGMcpp is looking for these specifically when reading in hydro resource data.,Notes (no commas in notes!)
-2010-01-01 00:00,0,2167.91531556942,||,The || marks where data ends and comments begin.,blah blah blah ...
-2010-01-01 01:00,1,2046.58261560569,||,,
+Datetime [  ],Time (since start of data) [hrs],Hydro Inflow [m3/hr],||,Notes (NO COMMAS IN NOTES!),Notes (NO COMMAS IN NOTES!)
+2010-01-01 00:00,0,2167.91531556942,||,Be sure to leave the last two column headers as is! PGMcpp is looking for these specifically when reading in hydro resource data.,blah blah blah ...
+2010-01-01 01:00,1,2046.58261560569,||,The || marks where data ends and comments begin.,
 2010-01-01 02:00,2,2007.85941123153,||,,
 2010-01-01 03:00,3,2000.11477247929,||,,
 2010-01-01 04:00,4,1917.50527264453,||,,

@@ -335,6 +335,14 @@ void Wave :: __writeSummary(std::string write_path)
     ofs << "Capacity: " << this->capacity_kW << "kW  \n";
     ofs << "\n";
     
+    ofs << "Production Override: (N = 0 / Y = 1): "
+        << this->normalized_production_series_given << "  \n";
+    if (this->normalized_production_series_given) {
+        ofs << "Path to Normalized Production Time Series: "
+            << this->path_2_normalized_production_time_series << "  \n";
+    }
+    ofs << "\n";
+    
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
     ofs << "Capital Cost: " << this->capital_cost << "  \n";
     ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
@@ -512,7 +520,8 @@ Wave :: Wave(void)
 /// \fn Wave :: Wave(
 ///         int n_points,
 ///         double n_years,
-///         WaveInputs wave_inputs
+///         WaveInputs wave_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Wave class.
@@ -523,16 +532,20 @@ Wave :: Wave(void)
 ///
 /// \param wave_inputs A structure of Wave constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Wave :: Wave(
     int n_points,
     double n_years,
-    WaveInputs wave_inputs
+    WaveInputs wave_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Renewable(
     n_points,
     n_years,
-    wave_inputs.renewable_inputs
+    wave_inputs.renewable_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs
@@ -678,6 +691,13 @@ double Wave :: computeProductionkW(
     double energy_period_s
 )
 {
+    //  given production time series override
+    if (this->normalized_production_series_given) {
+        double production_kW = Production :: getProductionkW(timestep);
+        
+        return production_kW;
+    }
+    
     // check if no resource
     if (significant_wave_height_m <= 0 or energy_period_s <= 0) {
         return 0;

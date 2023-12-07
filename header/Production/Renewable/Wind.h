@@ -101,7 +101,7 @@ class Wind : public Renewable {
         
         //  2. methods
         Wind(void);
-        Wind(int, double, WindInputs);
+        Wind(int, double, WindInputs, std::vector<double>*);
         void handleReplacement(int);
         
         double computeProductionkW(int, double, double);

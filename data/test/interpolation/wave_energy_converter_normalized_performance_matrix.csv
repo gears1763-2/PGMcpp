@@ -1,11 +1,11 @@
-DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,||,The DATA column headers are dummy strings. You can have as many columns as you need.,Notes (no commas in notes!)
-DUM,0.25,0.75,1.25,1.75,2.25,2.75,3.25,3.75,4.25,4.75,5.25,5.75,6.25,6.75,7.25,7.75,||,The || marks where data ends and comments begin. All columns to the right are ignored.,blah blah blah ...
-5,0,0.129128125,0.268078125,0.404253125,0.537653125,0.668278125,0.796128125,0.921203125,1,1,1,0,0,0,0,0,||,,
-6,0,0.11160375,0.24944375,0.38395375,0.51513375,0.64298375,0.76750375,0.88869375,1,1,1,1,1,1,1,1,||,"DUM is a dummy value, which will be ignored. You can put anything here, really.",
-7,0,0.094079375,0.230809375,0.363654375,0.492614375,0.617689375,0.738879375,0.856184375,0.969604375,1,1,1,1,1,1,1,||,The first column (after DUM) is the energy period [s].,
-8,0,0.076555,0.212175,0.343355,0.470095,0.592395,0.710255,0.823675,0.932655,1,1,1,1,1,1,1,||,The first row (after DUM) is the significant wave height [m].,
-9,0,0.059030625,0.193540625,0.323055625,0.447575625,0.567100625,0.681630625,0.791165625,0.895705625,0.995250625,1,1,1,1,1,1,||,All other numerical values are normalized performance values (so production divided by capacity). These are dimensionless.,
-10,0,0.04150625,0.17490625,0.30275625,0.42505625,0.54180625,0.65300625,0.75865625,0.85875625,0.95330625,1,1,1,1,1,1,||,,
+DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,DATA,||,Notes (NO COMMAS IN NOTES!),Notes (NO COMMAS IN NOTES!)
+DUM,0.25,0.75,1.25,1.75,2.25,2.75,3.25,3.75,4.25,4.75,5.25,5.75,6.25,6.75,7.25,7.75,||,The DATA column headers are dummy strings. You can have as many columns as you need.,blah blah blah ...
+5,0,0.129128125,0.268078125,0.404253125,0.537653125,0.668278125,0.796128125,0.921203125,1,1,1,0,0,0,0,0,||,The || marks where data ends and comments begin. All columns to the right are ignored.,
+6,0,0.11160375,0.24944375,0.38395375,0.51513375,0.64298375,0.76750375,0.88869375,1,1,1,1,1,1,1,1,||,,
+7,0,0.094079375,0.230809375,0.363654375,0.492614375,0.617689375,0.738879375,0.856184375,0.969604375,1,1,1,1,1,1,1,||,"DUM is a dummy value, which will be ignored. You can put anything here, really.",
+8,0,0.076555,0.212175,0.343355,0.470095,0.592395,0.710255,0.823675,0.932655,1,1,1,1,1,1,1,||,The first column (after DUM) is the energy period [s].,
+9,0,0.059030625,0.193540625,0.323055625,0.447575625,0.567100625,0.681630625,0.791165625,0.895705625,0.995250625,1,1,1,1,1,1,||,The first row (after DUM) is the significant wave height [m].,
+10,0,0.04150625,0.17490625,0.30275625,0.42505625,0.54180625,0.65300625,0.75865625,0.85875625,0.95330625,1,1,1,1,1,1,||,All other numerical values are normalized performance values (so production divided by capacity). These are dimensionless.,
 11,0,0.023981875,0.156271875,0.282456875,0.402536875,0.516511875,0.624381875,0.726146875,0.821806875,0.911361875,0.994811875,1,1,1,1,1,||,,
 12,0,0.0064575,0.1376375,0.2621575,0.3800175,0.4912175,0.5957575,0.6936375,0.7848575,0.8694175,0.9473175,1,1,1,1,1,||,,
 13,0,0,0.119003125,0.241858125,0.357498125,0.465923125,0.567133125,0.661128125,0.747908125,0.827473125,0.899823125,0.964958125,1,1,1,1,||,,

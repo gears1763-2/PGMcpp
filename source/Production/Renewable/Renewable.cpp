@@ -113,7 +113,8 @@ Renewable :: Renewable(void)
 /// \fn Renewable :: Renewable(
 ///         int n_points,
 ///         double n_years,
-///         RenewableInputs renewable_inputs
+///         RenewableInputs renewable_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Renewable class.
@@ -124,16 +125,20 @@ Renewable :: Renewable(void)
 ///
 /// \param renewable_inputs A structure of Renewable constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Renewable :: Renewable(
     int n_points,
     double n_years,
-    RenewableInputs renewable_inputs
+    RenewableInputs renewable_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Production(
     n_points,
     n_years,
-    renewable_inputs.production_inputs
+    renewable_inputs.production_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs

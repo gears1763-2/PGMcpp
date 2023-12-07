@@ -52,7 +52,7 @@ pybind11::class_<Wind>(m, "Wind")
     .def_readwrite("power_model_string", &Wind::power_model_string)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, WindInputs>())
+    .def(pybind11::init<int, double, WindInputs, std::vector<double>*>())
     .def("handleReplacement", &Wind::handleReplacement)
     .def("computeProductionkW", &Wind::computeProductionkW)
     .def("commit", &Wind::commit);

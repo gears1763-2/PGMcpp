@@ -26,19 +26,26 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Production* testConstruct_Production(void)
+/// \fn Production* testConstruct_Production(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Production object and spot check some
 ///     post-construction attributes.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 /// \return A pointer to a test Production object.
 ///
 
-Production* testConstruct_Production(void)
+Production* testConstruct_Production(std::vector<double>* time_vec_hrs_ptr)
 {
     ProductionInputs production_inputs;
 
-    Production* test_production_ptr = new Production(8760, 1, production_inputs);
+    Production* test_production_ptr = new Production(
+        8760,
+        1,
+        production_inputs,
+        time_vec_hrs_ptr
+    );
     
     testTruth(
         not production_inputs.print_flag,
@@ -133,20 +140,22 @@ Production* testConstruct_Production(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void testBadConstruct_Production(void)
+/// \fn void testBadConstruct_Production(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief Function to test the trying to construct a Production object given bad 
 ///     inputs is being handled as expected.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
-void testBadConstruct_Production(void)
+void testBadConstruct_Production(std::vector<double>* time_vec_hrs_ptr)
 {
     bool error_flag = true;
 
     try {
         ProductionInputs production_inputs;
         
-        Production bad_production(0, 1, production_inputs);
+        Production bad_production(0, 1, production_inputs, time_vec_hrs_ptr);
         
         error_flag = false;
     } catch (...) {
@@ -176,11 +185,16 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    Production* test_production_ptr = testConstruct_Production();
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
+    Production* test_production_ptr = testConstruct_Production(&time_vec_hrs);
     
         
     try {
-        testBadConstruct_Production();
+        testBadConstruct_Production(&time_vec_hrs);
     }
 
 

@@ -361,6 +361,14 @@ void Diesel :: __writeSummary(std::string write_path)
     ofs << "Capacity: " << this->capacity_kW << " kW  \n";
     ofs << "\n";
     
+    ofs << "Production Override: (N = 0 / Y = 1): "
+        << this->normalized_production_series_given << "  \n";
+    if (this->normalized_production_series_given) {
+        ofs << "Path to Normalized Production Time Series: "
+            << this->path_2_normalized_production_time_series << "  \n";
+    }
+    ofs << "\n";
+    
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
     ofs << "Capital Cost: " << this->capital_cost << "  \n";
     ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
@@ -607,7 +615,8 @@ Diesel :: Diesel(void)
 /// \fn Diesel :: Diesel(
 ///         int n_points,
 ///         double n_years,
-///         DieselInputs diesel_inputs
+///         DieselInputs diesel_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Diesel class.
@@ -618,16 +627,20 @@ Diesel :: Diesel(void)
 ///
 /// \param diesel_inputs A structure of Diesel constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Diesel :: Diesel(
     int n_points,
     double n_years,
-    DieselInputs diesel_inputs
+    DieselInputs diesel_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Combustion(
     n_points,
     n_years,
-    diesel_inputs.combustion_inputs
+    diesel_inputs.combustion_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs
@@ -750,6 +763,13 @@ double Diesel :: requestProductionkW(
     double request_kW
 )
 {
+    //  0. given production time series override
+    if (this->normalized_production_series_given) {
+        double production_kW = Production :: getProductionkW(timestep);
+        
+        return production_kW;
+    }
+    
     //  1. return on request of zero
     if (request_kW <= 0) {
         return 0;

@@ -26,19 +26,21 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Renewable* testConstruct_Wind(void)
+/// \fn Renewable* testConstruct_Wind(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Wind object and spot check some
 ///     post-construction attributes.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 /// \return A Renewable pointer to a test Wind object.
 ///
 
-Renewable* testConstruct_Wind(void)
+Renewable* testConstruct_Wind(std::vector<double>* time_vec_hrs_ptr)
 {
     WindInputs wind_inputs;
 
-    Renewable* test_wind_ptr = new Wind(8760, 1, wind_inputs);
+    Renewable* test_wind_ptr = new Wind(8760, 1, wind_inputs, time_vec_hrs_ptr);
     
     testTruth(
         not wind_inputs.renewable_inputs.production_inputs.print_flag,
@@ -90,13 +92,15 @@ Renewable* testConstruct_Wind(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void testBadConstruct_Wind(void)
+/// \fn void testBadConstruct_Wind(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief Function to test the trying to construct a Wind object given bad 
 ///     inputs is being handled as expected.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
-void testBadConstruct_Wind(void)
+void testBadConstruct_Wind(std::vector<double>* time_vec_hrs_ptr)
 {
     bool error_flag = true;
 
@@ -104,7 +108,7 @@ void testBadConstruct_Wind(void)
         WindInputs bad_wind_inputs;
         bad_wind_inputs.design_speed_ms = -1;
         
-        Wind bad_wind(8760, 1, bad_wind_inputs);
+        Wind bad_wind(8760, 1, bad_wind_inputs, time_vec_hrs_ptr);
         
         error_flag = false;
     } catch (...) {
@@ -330,11 +334,16 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    Renewable* test_wind_ptr = testConstruct_Wind();
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
+    Renewable* test_wind_ptr = testConstruct_Wind(&time_vec_hrs);
     
     
     try {
-        testBadConstruct_Wind();
+        testBadConstruct_Wind(&time_vec_hrs);
         
         testProductionConstraint_Wind(test_wind_ptr);
         

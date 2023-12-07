@@ -80,7 +80,7 @@ class Solar : public Renewable {
         
         //  2. methods
         Solar(void);
-        Solar(int, double, SolarInputs);
+        Solar(int, double, SolarInputs, std::vector<double>*);
         void handleReplacement(int);
         
         double computeProductionkW(int, double, double);

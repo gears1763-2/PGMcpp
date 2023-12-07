@@ -84,7 +84,7 @@ class Noncombustion : public Production {
         
         //  2. methods
         Noncombustion(void);
-        Noncombustion(int, double, NoncombustionInputs);
+        Noncombustion(int, double, NoncombustionInputs, std::vector<double>*);
         virtual void handleReplacement(int);
         
         void computeEconomics(std::vector<double>*);

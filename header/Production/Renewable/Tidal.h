@@ -104,7 +104,7 @@ class Tidal : public Renewable {
         
         //  2. methods
         Tidal(void);
-        Tidal(int, double, TidalInputs);
+        Tidal(int, double, TidalInputs, std::vector<double>*);
         void handleReplacement(int);
         
         double computeProductionkW(int, double, double);

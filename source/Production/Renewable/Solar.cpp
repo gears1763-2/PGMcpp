@@ -139,6 +139,14 @@ void Solar :: __writeSummary(std::string write_path)
     ofs << "Capacity: " << this->capacity_kW << "kW  \n";
     ofs << "\n";
     
+    ofs << "Production Override: (N = 0 / Y = 1): "
+        << this->normalized_production_series_given << "  \n";
+    if (this->normalized_production_series_given) {
+        ofs << "Path to Normalized Production Time Series: "
+            << this->path_2_normalized_production_time_series << "  \n";
+    }
+    ofs << "\n";
+    
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
     ofs << "Capital Cost: " << this->capital_cost << "  \n";
     ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
@@ -294,7 +302,8 @@ Solar :: Solar(void)
 /// \fn Solar :: Solar(
 ///         int n_points,
 ///         double n_years,
-///         SolarInputs solar_inputs
+///         SolarInputs solar_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Solar class.
@@ -305,16 +314,20 @@ Solar :: Solar(void)
 ///
 /// \param solar_inputs A structure of Solar constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Solar :: Solar(
     int n_points,
     double n_years,
-    SolarInputs solar_inputs
+    SolarInputs solar_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Renewable(
     n_points,
     n_years,
-    solar_inputs.renewable_inputs
+    solar_inputs.renewable_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs
@@ -414,6 +427,13 @@ double Solar :: computeProductionkW(
     double solar_resource_kWm2
 )
 {
+    //  given production time series override
+    if (this->normalized_production_series_given) {
+        double production_kW = Production :: getProductionkW(timestep);
+        
+        return production_kW;
+    }
+    
     // check if no resource
     if (solar_resource_kWm2 <= 0) {
         return 0;

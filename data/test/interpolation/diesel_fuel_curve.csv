@@ -1,6 +1,6 @@
-Load Ratio [ ],Fuel Consumption [L/hr],||,You can make the first two column headers whatever you want.,Notes (no commas in notes!)
-0,4.68079520372916,||,The || marks where data ends and comments begin. All columns to the right are ignored.,blah blah blah ...
-0.3,11.1278522361839,||,,
+Load Ratio [ ],Fuel Consumption [L/hr],||,Notes (NO COMMAS IN NOTES!),Notes (NO COMMAS IN NOTES!)
+0,4.68079520372916,||,You can make the first two column headers whatever you want.,blah blah blah ...
+0.3,11.1278522361839,||,The || marks where data ends and comments begin. All columns to the right are ignored.,
 0.35,12.4787834830748,||,,
 0.4,13.7808847600209,||,,
 0.45,15.0417468303382,||,,

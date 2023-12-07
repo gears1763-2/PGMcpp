@@ -115,7 +115,7 @@ pybind11::class_<Combustion>(m, "Combustion")
     .def_readwrite("PM_emissions_vec_kg", &Combustion::PM_emissions_vec_kg)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, CombustionInputs>())
+    .def(pybind11::init<int, double, CombustionInputs, std::vector<double>*>())
     .def("handleReplacement", &Combustion::handleReplacement)
     .def("computeFuelAndEmissions", &Combustion::computeFuelAndEmissions)
     .def("computeEconomics", &Combustion::computeEconomics)

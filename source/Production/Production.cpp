@@ -94,6 +94,176 @@ void Production :: __checkInputs(
 
 // ---------------------------------------------------------------------------------- //
 
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Production :: __checkTimePoint(
+///         double time_received_hrs,
+///         double time_expected_hrs
+///     )
+///
+/// \brief Helper method to check received time point against expected time point. The
+///     given time series should align point-wise with the previously given electrical
+///     load time series.
+///
+/// \param time_received_hrs The point in time received from the given data.
+///
+/// \param time_expected_hrs The point in time expected (this comes from the electrical
+///     load time series).
+///
+
+void Production :: __checkTimePoint(
+    double time_received_hrs,
+    double time_expected_hrs
+)
+{
+    if (time_received_hrs != time_expected_hrs) {
+        std::string error_str = "ERROR:  Production():  ";
+        error_str += "the given normalized production time series at ";
+        error_str += this->path_2_normalized_production_time_series;
+        error_str += " does not align with the ";
+        error_str += "previously given electrical load time series";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::runtime_error(error_str);
+    }
+    
+    return;
+}   /* __checkTimePoint() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+///
+/// \fn void Production :: __throwLengthError(void)
+///
+/// \brief Helper method to throw data length error (if not the same as the given 
+///     electrical load time series).
+///
+
+void Production :: __throwLengthError(void)
+{
+    std::string error_str = "ERROR:  Production():  ";
+    error_str += "the given normalized production time series at ";
+    error_str += this->path_2_normalized_production_time_series;
+    error_str += " is not the same length as the previously given electrical";
+    error_str += " load time series";
+    
+    #ifdef _WIN32
+        std::cout << error_str << std::endl;
+    #endif
+
+    throw std::runtime_error(error_str);
+    
+    return;
+}   /* __throwLengthError() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Production :: __checkNormalizedProduction(double normalized_production)
+///
+/// \brief Helper method to check that given data values are everywhere contained in
+///     the closed interval [0, 1]. A normalized production time series is expected, so
+///     this must be true everywhere.
+///
+/// \param normalized_production The normalized production value to check
+///
+
+void Production :: __checkNormalizedProduction(double normalized_production)
+{
+    if (normalized_production < 0 or normalized_production > 1) {
+        std::string error_str = "ERROR:  Production():  ";
+        error_str += "the given normalized production time series at ";
+        error_str += this->path_2_normalized_production_time_series;
+        error_str += " contains normalized production values outside the closed ";
+        error_str += "interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::runtime_error(error_str);
+    }
+    
+    return;
+}   /* __throwValueError() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Production :: __readNormalizedProductionData(
+///         std::vector<double>* time_vec_hrs_ptr
+///     )
+///
+/// \brief Helper method to read in a given time series of normalized production.
+///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
+
+void Production :: __readNormalizedProductionData(
+    std::vector<double>* time_vec_hrs_ptr
+)
+{
+    //  1. init CSV reader
+    io::CSVReader<2> CSV(this->path_2_normalized_production_time_series);
+    
+    CSV.read_header(
+        io::ignore_extra_column,
+        "Time (since start of data) [hrs]",
+        "Normalized Production [ ]"
+    );
+    
+    //  2. read in normalized performance data,
+    //     check values and check against time series (point-wise and length)
+    int n_points = 0;
+    double time_hrs = 0;
+    double time_expected_hrs = 0;
+    double normalized_production = 0;
+    
+    while (CSV.read_row(time_hrs, normalized_production)) {
+        //  2.1. check length of data
+        if (n_points > this->n_points) {
+            this->__throwLengthError();
+        }
+    
+        //  2.2. check normalized production value
+        this->__checkNormalizedProduction(normalized_production);
+        
+        //  2.3. check time point
+        time_expected_hrs = time_vec_hrs_ptr->at(n_points);
+        this->__checkTimePoint(time_hrs, time_expected_hrs);
+        
+        //  2.4. write to normalized production vector, increment n_points
+        this->normalized_production_vec[n_points] = normalized_production;
+        n_points++;
+    }
+    
+    //  3. check length of data
+    if (n_points != this->n_points) {
+        this->__throwLengthError();
+    }
+    
+    return;
+}   /* __readNormalizedProductionData() */
+
+// ---------------------------------------------------------------------------------- //
+
 // ======== END PRIVATE ============================================================= //
 
 
@@ -123,7 +293,8 @@ Production :: Production(void)
 /// \fn Production :: Production(
 ///         int n_points,
 ///         double n_years,
-///         ProductionInputs production_inputs
+///         ProductionInputs production_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Production class.
@@ -134,11 +305,14 @@ Production :: Production(void)
 ///
 /// \param production_inputs A structure of Production constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Production :: Production(
     int n_points,
     double n_years,
-    ProductionInputs production_inputs
+    ProductionInputs production_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 )
 {
     //  1. check inputs
@@ -148,6 +322,7 @@ Production :: Production(
     this->print_flag = production_inputs.print_flag;
     this->is_running = false;
     this->is_sunk = production_inputs.is_sunk;
+    this->normalized_production_series_given = false;
     
     this->n_points = n_points;
     this->n_starts = 0;
@@ -174,8 +349,11 @@ Production :: Production(
     this->total_dispatch_kWh = 0;
     this->levellized_cost_of_energy_kWh = 0;
     
+    this->path_2_normalized_production_time_series = "";
+    
     this->is_running_vec.resize(this->n_points, 0);
     
+    this->normalized_production_vec.resize(this->n_points, 0);
     this->production_vec_kW.resize(this->n_points, 0);
     this->dispatch_vec_kW.resize(this->n_points, 0);
     this->storage_vec_kW.resize(this->n_points, 0);
@@ -184,7 +362,17 @@ Production :: Production(
     this->capital_cost_vec.resize(this->n_points, 0);
     this->operation_maintenance_cost_vec.resize(this->n_points, 0);
     
-    //  3. construction print
+    //  3. read in normalized production time series (if given)
+    if (not production_inputs.path_2_normalized_production_time_series.empty()) {
+        this->normalized_production_series_given = true;
+        
+        this->path_2_normalized_production_time_series = 
+            production_inputs.path_2_normalized_production_time_series;
+        
+        this->__readNormalizedProductionData(time_vec_hrs_ptr);
+    }
+    
+    //  4. construction print
     if (this->print_flag) {
         std::cout << "Production object constructed at " << this << std::endl;
     }
@@ -320,6 +508,31 @@ void Production :: computeEconomics(std::vector<double>* time_vec_hrs_ptr)
     
     return;
 }   /* computeEconomics() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn double Production :: getProductionkW(int timestep)
+///
+/// \brief A method to simply fetch the normalized production at a particular point in
+///     the given normalized production time series, multiply by the rated capacity
+///     of the asset, and return.
+///
+/// \return The production [kW] for the asset at the given point in time, as defined by
+///     the given normalized production time series.
+///
+
+double Production :: getProductionkW(int timestep)
+{
+    double production_kW =
+        this->normalized_production_vec[timestep] * this->capacity_kW;
+    
+    return production_kW;
+}   /* getProductionkW() */
 
 // ---------------------------------------------------------------------------------- //
 

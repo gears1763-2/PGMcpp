@@ -44,6 +44,8 @@ struct ProductionInputs {
     double nominal_discount_annual = 0.04; ///< The nominal, annual discount rate to use in computing model economics.
     
     double replace_running_hrs = 90000; ///< The number of running hours after which the asset must be replaced.
+    
+    std::string path_2_normalized_production_time_series = ""; ///< A string defining the path (either relative or absolute) to the given normalized production time series.
 };
 
 
@@ -63,6 +65,11 @@ class Production {
         //  2. methods
         void __checkInputs(int, double, ProductionInputs);
         
+        void __checkTimePoint(double, double);
+        void __throwLengthError(void);
+        void __checkNormalizedProduction(double);
+        void __readNormalizedProductionData(std::vector<double>*);
+        
         
     public:
         //  1. attributes
@@ -71,6 +78,7 @@ class Production {
         bool print_flag; ///< A flag which indicates whether or not object construct/destruction should be verbose.
         bool is_running; ///< A boolean which indicates whether or not the asset is running.
         bool is_sunk; ///< A boolean which indicates whether or not the asset should be considered a sunk cost (i.e., capital cost incurred at the start of the model, or no).
+        bool normalized_production_series_given; ///< A boolen which indicates whether or not a normalized production time series is given
         
         int n_points; ///< The number of points in the modelling time series.
         int n_starts; ///< The number of times the asset has been started.
@@ -94,9 +102,11 @@ class Production {
         double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatch.
         
         std::string type_str; ///< A string describing the type of the asset.
+        std::string path_2_normalized_production_time_series; ///< A string defining the path (either relative or absolute) to the given normalized production time series.
         
         std::vector<bool> is_running_vec; ///< A boolean vector for tracking if the asset is running at a particular point in time.
         
+        std::vector<double> normalized_production_vec; ///< A vector of normalizd production [ ] at each point in the modelling time series.
         std::vector<double> production_vec_kW; ///< A vector of production [kW] at each point in the modelling time series.
         std::vector<double> dispatch_vec_kW; ///< A vector of dispatch [kW] at each point in the modelling time series. Dispatch is the amount of production that is sent to the grid to satisfy load.
         std::vector<double> storage_vec_kW; ///< A vector of storage [kW] at each point in the modelling time series. Storage is the amount of production that is sent to storage.
@@ -108,11 +118,13 @@ class Production {
         
         //  2. methods
         Production(void);
-        Production(int, double, ProductionInputs);
+        Production(int, double, ProductionInputs, std::vector<double>*);
         virtual void handleReplacement(int);
-        double computeRealDiscountAnnual(double, double);
         
+        double computeRealDiscountAnnual(double, double);
         virtual void computeEconomics(std::vector<double>*);
+        
+        double getProductionkW(int);
         virtual double commit(int, double, double, double);
         
         virtual ~Production(void);

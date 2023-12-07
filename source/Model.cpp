@@ -628,7 +628,8 @@ void Model :: addDiesel(DieselInputs diesel_inputs)
     Combustion* diesel_ptr = new Diesel(
         this->electrical_load.n_points,
         this->electrical_load.n_years,
-        diesel_inputs
+        diesel_inputs,
+        &(this->electrical_load.time_vec_hrs)
     );
     
     this->combustion_ptr_vec.push_back(diesel_ptr);
@@ -731,7 +732,8 @@ void Model :: addHydro(HydroInputs hydro_inputs)
     Noncombustion* hydro_ptr = new Hydro(
         this->electrical_load.n_points,
         this->electrical_load.n_years,
-        hydro_inputs
+        hydro_inputs,
+        &(this->electrical_load.time_vec_hrs)
     );
     
     this->noncombustion_ptr_vec.push_back(hydro_ptr);
@@ -758,7 +760,8 @@ void Model :: addSolar(SolarInputs solar_inputs)
     Renewable* solar_ptr = new Solar(
         this->electrical_load.n_points,
         this->electrical_load.n_years,
-        solar_inputs
+        solar_inputs,
+        &(this->electrical_load.time_vec_hrs)
     );
     
     this->renewable_ptr_vec.push_back(solar_ptr);
@@ -785,7 +788,8 @@ void Model :: addTidal(TidalInputs tidal_inputs)
     Renewable* tidal_ptr = new Tidal(
         this->electrical_load.n_points,
         this->electrical_load.n_years,
-        tidal_inputs
+        tidal_inputs,
+        &(this->electrical_load.time_vec_hrs)
     );
     
     this->renewable_ptr_vec.push_back(tidal_ptr);
@@ -812,7 +816,8 @@ void Model :: addWave(WaveInputs wave_inputs)
     Renewable* wave_ptr = new Wave(
         this->electrical_load.n_points,
         this->electrical_load.n_years,
-        wave_inputs
+        wave_inputs,
+        &(this->electrical_load.time_vec_hrs)
     );
     
     this->renewable_ptr_vec.push_back(wave_ptr);
@@ -839,7 +844,8 @@ void Model :: addWind(WindInputs wind_inputs)
     Renewable* wind_ptr = new Wind(
         this->electrical_load.n_points,
         this->electrical_load.n_years,
-        wind_inputs
+        wind_inputs,
+        &(this->electrical_load.time_vec_hrs)
     );
     
     this->renewable_ptr_vec.push_back(wind_ptr);

@@ -101,7 +101,7 @@ class Diesel : public Combustion {
         
         //  2. methods
         Diesel(void);
-        Diesel (int, double, DieselInputs);
+        Diesel (int, double, DieselInputs, std::vector<double>*);
         void handleReplacement(int);
         
         double requestProductionkW(int, double, double);

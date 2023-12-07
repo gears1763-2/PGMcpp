@@ -65,7 +65,7 @@ pybind11::class_<Wave>(m, "Wave")
     .def_readwrite("power_model_string", &Wave::power_model_string)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, WaveInputs>())
+    .def(pybind11::init<int, double, WaveInputs, std::vector<double>*>())
     .def("handleReplacement", &Wave::handleReplacement)
     .def("computeProductionkW", &Wave::computeProductionkW)
     .def("commit", &Wave::commit);

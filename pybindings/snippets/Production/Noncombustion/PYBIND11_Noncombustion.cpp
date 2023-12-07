@@ -39,7 +39,7 @@ pybind11::class_<Noncombustion>(m, "Noncombustion")
     .def_readwrite("resource_key", &Noncombustion::resource_key)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, NoncombustionInputs>())
+    .def(pybind11::init<int, double, NoncombustionInputs, std::vector<double>*>())
     .def("handleReplacement", &Noncombustion::handleReplacement)
     .def("computeEconomics", &Noncombustion::computeEconomics)
     .def(

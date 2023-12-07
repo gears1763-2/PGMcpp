@@ -284,6 +284,14 @@ void Tidal :: __writeSummary(std::string write_path)
     ofs << "Capacity: " << this->capacity_kW << "kW  \n";
     ofs << "\n";
     
+    ofs << "Production Override: (N = 0 / Y = 1): "
+        << this->normalized_production_series_given << "  \n";
+    if (this->normalized_production_series_given) {
+        ofs << "Path to Normalized Production Time Series: "
+            << this->path_2_normalized_production_time_series << "  \n";
+    }
+    ofs << "\n";
+    
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
     ofs << "Capital Cost: " << this->capital_cost << "  \n";
     ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
@@ -438,7 +446,8 @@ Tidal :: Tidal(void)
 /// \fn Tidal :: Tidal(
 ///         int n_points,
 ///         double n_years,
-///         TidalInputs tidal_inputs
+///         TidalInputs tidal_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Tidal class.
@@ -449,16 +458,20 @@ Tidal :: Tidal(void)
 ///
 /// \param tidal_inputs A structure of Tidal constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Tidal :: Tidal(
     int n_points,
     double n_years,
-    TidalInputs tidal_inputs
+    TidalInputs tidal_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Renewable(
     n_points,
     n_years,
-    tidal_inputs.renewable_inputs
+    tidal_inputs.renewable_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs
@@ -593,6 +606,13 @@ double Tidal :: computeProductionkW(
     double tidal_resource_ms
 )
 {
+    //  given production time series override
+    if (this->normalized_production_series_given) {
+        double production_kW = Production :: getProductionkW(timestep);
+        
+        return production_kW;
+    }
+    
     // check if no resource
     if (tidal_resource_ms <= 0) {
         return 0;

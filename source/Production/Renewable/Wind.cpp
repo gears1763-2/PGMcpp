@@ -230,6 +230,14 @@ void Wind :: __writeSummary(std::string write_path)
     ofs << "Capacity: " << this->capacity_kW << "kW  \n";
     ofs << "\n";
     
+    ofs << "Production Override: (N = 0 / Y = 1): "
+        << this->normalized_production_series_given << "  \n";
+    if (this->normalized_production_series_given) {
+        ofs << "Path to Normalized Production Time Series: "
+            << this->path_2_normalized_production_time_series << "  \n";
+    }
+    ofs << "\n";
+    
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
     ofs << "Capital Cost: " << this->capital_cost << "  \n";
     ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
@@ -401,7 +409,8 @@ Wind :: Wind(void)
 /// \fn Wind :: Wind(
 ///         int n_points,
 ///         double n_years,
-///         WindInputs wind_inputs
+///         WindInputs wind_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Wind class.
@@ -412,16 +421,20 @@ Wind :: Wind(void)
 ///
 /// \param wind_inputs A structure of Wind constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Wind :: Wind(
     int n_points,
     double n_years,
-    WindInputs wind_inputs
+    WindInputs wind_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Renewable(
     n_points,
     n_years,
-    wind_inputs.renewable_inputs
+    wind_inputs.renewable_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs
@@ -550,6 +563,13 @@ double Wind :: computeProductionkW(
     double wind_resource_ms
 )
 {
+    //  given production time series override
+    if (this->normalized_production_series_given) {
+        double production_kW = Production :: getProductionkW(timestep);
+        
+        return production_kW;
+    }
+    
     // check if no resource
     if (wind_resource_ms <= 0) {
         return 0;

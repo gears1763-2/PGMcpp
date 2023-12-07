@@ -210,7 +210,9 @@ void Resources :: __checkResourceKey2D(
 ///         ElectricalLoad* electrical_load_ptr
 ///     )
 ///
-/// \brief Helper method to check received time point against expected time point.
+/// \brief Helper method to check received time point against expected time point. The
+///     given time series should align point-wise with the previously given electrical
+///     load time series.
 ///
 /// \param time_received_hrs The point in time received from the given data.
 ///
@@ -260,7 +262,8 @@ void Resources :: __checkTimePoint(
 ///         ElectricalLoad* electrical_load_ptr
 ///     )
 ///
-/// \brief Helper method to throw data length error.
+/// \brief Helper method to throw data length error (if not the same as the given 
+///     electrical load time series).
 ///
 /// \param path_2_resource_data The path (either relative or absolute) to the given 
 ///     resource time series.

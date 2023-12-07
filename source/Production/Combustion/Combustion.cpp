@@ -88,7 +88,8 @@ Combustion :: Combustion(void)
 /// \fn Combustion :: Combustion(
 ///         int n_points,
 ///         double n_years,
-///         CombustionInputs combustion_inputs
+///         CombustionInputs combustion_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Combustion class.
@@ -99,16 +100,20 @@ Combustion :: Combustion(void)
 ///
 /// \param combustion_inputs A structure of Combustion constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Combustion :: Combustion(
     int n_points,
     double n_years,
-    CombustionInputs combustion_inputs
+    CombustionInputs combustion_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Production(
     n_points,
     n_years,
-    combustion_inputs.production_inputs
+    combustion_inputs.production_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs

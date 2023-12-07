@@ -1,6 +1,6 @@
-Datetime [  ],Time (since start of data) [hrs],Significant Wave Height [m],Energy Period [s],||,Be sure to leave the last three column headers as is! PGMcpp is looking for these specifically when reading in wave resource data.,Notes (no commas in notes!)
-2010-01-01 00:00,0,4.26175222125028,10.4456008226821,||,The || marks where data ends and comments begin.,blah blah blah ...
-2010-01-01 01:00,1,4.25020976167872,10.4614151137651,||,,
+Datetime [  ],Time (since start of data) [hrs],Significant Wave Height [m],Energy Period [s],||,Notes (NO COMMAS IN NOTES!),Notes (NO COMMAS IN NOTES!)
+2010-01-01 00:00,0,4.26175222125028,10.4456008226821,||,Be sure to leave the last three column headers as is! PGMcpp is looking for these specifically when reading in wave resource data.,blah blah blah ...
+2010-01-01 01:00,1,4.25020976167872,10.4614151137651,||,The || marks where data ends and comments begin.,
 2010-01-01 02:00,2,4.25656524330349,10.4462827795433,||,,
 2010-01-01 03:00,3,4.27193854786718,10.4127692097884,||,,
 2010-01-01 04:00,4,4.28744955711233,10.3734397942723,||,,

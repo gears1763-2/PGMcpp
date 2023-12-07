@@ -62,7 +62,7 @@ pybind11::class_<Hydro>(m, "Hydro")
     .def_readwrite("stored_volume_vec_m3", &Hydro::stored_volume_vec_m3)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, HydroInputs>())
+    .def(pybind11::init<int, double, HydroInputs, std::vector<double>*>())
     .def("handleReplacement", &Hydro::handleReplacement)
     .def("requestProductionkW", &Hydro::requestProductionkW)
     .def("commit", &Hydro::commit);

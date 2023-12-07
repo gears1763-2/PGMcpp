@@ -26,19 +26,21 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Renewable* testConstruct_Tidal(void)
+/// \fn Renewable* testConstruct_Tidal(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Tidal object and spot check some
 ///     post-construction attributes.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 /// \return A Renewable pointer to a test Tidal object.
 ///
 
-Renewable* testConstruct_Tidal(void)
+Renewable* testConstruct_Tidal(std::vector<double>* time_vec_hrs_ptr)
 {
     TidalInputs tidal_inputs;
 
-    Renewable* test_tidal_ptr = new Tidal(8760, 1, tidal_inputs);
+    Renewable* test_tidal_ptr = new Tidal(8760, 1, tidal_inputs, time_vec_hrs_ptr);
     
     testTruth(
         not tidal_inputs.renewable_inputs.production_inputs.print_flag,
@@ -90,13 +92,15 @@ Renewable* testConstruct_Tidal(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void testBadConstruct_Tidal(void)
+/// \fn void testBadConstruct_Tidal(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief Function to test the trying to construct a Tidal object given bad 
 ///     inputs is being handled as expected.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
-void testBadConstruct_Tidal(void)
+void testBadConstruct_Tidal(std::vector<double>* time_vec_hrs_ptr)
 {
     bool error_flag = true;
 
@@ -104,7 +108,7 @@ void testBadConstruct_Tidal(void)
         TidalInputs bad_tidal_inputs;
         bad_tidal_inputs.design_speed_ms = -1;
         
-        Tidal bad_tidal(8760, 1, bad_tidal_inputs);
+        Tidal bad_tidal(8760, 1, bad_tidal_inputs, time_vec_hrs_ptr);
         
         error_flag = false;
     } catch (...) {
@@ -330,11 +334,16 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    Renewable* test_tidal_ptr = testConstruct_Tidal();
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
+    Renewable* test_tidal_ptr = testConstruct_Tidal(&time_vec_hrs);
     
     
     try {
-        testBadConstruct_Tidal();
+        testBadConstruct_Tidal(&time_vec_hrs);
         
         testProductionConstraint_Tidal(test_tidal_ptr);
         

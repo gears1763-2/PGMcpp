@@ -1,6 +1,6 @@
-Datetime [  ],Time (since start of data) [hrs],Wind Speed (hub height) [m/s],||,Be sure to leave the last two column headers as is! PGMcpp is looking for these specifically when reading in wind resource data.,Notes (no commas in notes!)
-2010-01-01 00:00,0,6.88566688469997,||,The || marks where data ends and comments begin.,blah blah blah ...
-2010-01-01 01:00,1,5.02177105466549,||,,
+Datetime [  ],Time (since start of data) [hrs],Wind Speed (hub height) [m/s],||,Notes (NO COMMAS IN NOTES!),Notes (NO COMMAS IN NOTES!)
+2010-01-01 00:00,0,6.88566688469997,||,Be sure to leave the last two column headers as is! PGMcpp is looking for these specifically when reading in wind resource data.,blah blah blah ...
+2010-01-01 01:00,1,5.02177105466549,||,The || marks where data ends and comments begin.,
 2010-01-01 02:00,2,3.74211715899568,||,,
 2010-01-01 03:00,3,5.67169579985362,||,,
 2010-01-01 04:00,4,4.90670669971858,||,,

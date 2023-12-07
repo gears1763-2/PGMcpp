@@ -26,20 +26,27 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Noncombustion* testConstruct_Noncombustion(void)
+/// \fn Noncombustion* testConstruct_Noncombustion(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Noncombustion object and spot check some
 ///     post-construction attributes.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 /// \return A pointer to a test Noncombustion object.
 ///
 
-Noncombustion* testConstruct_Noncombustion(void)
+Noncombustion* testConstruct_Noncombustion(std::vector<double>* time_vec_hrs_ptr)
 {
     NoncombustionInputs noncombustion_inputs;
 
     Noncombustion* test_noncombustion_ptr =
-        new Noncombustion(8760, 1, noncombustion_inputs);
+        new Noncombustion(
+            8760,
+            1,
+            noncombustion_inputs,
+            time_vec_hrs_ptr
+        );
     
     testTruth(
         not noncombustion_inputs.production_inputs.print_flag,
@@ -74,7 +81,12 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    Noncombustion* test_noncombustion_ptr = testConstruct_Noncombustion();
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
+    Noncombustion* test_noncombustion_ptr = testConstruct_Noncombustion(&time_vec_hrs);
     
     
     try {

@@ -42,7 +42,7 @@ pybind11::class_<Renewable>(m, "Renewable")
     .def_readwrite("resource_key", &Renewable::resource_key)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, RenewableInputs>())
+    .def(pybind11::init<int, double, RenewableInputs, std::vector<double>*>())
     .def("handleReplacement", &Renewable::handleReplacement)
     .def("computeEconomics", &Renewable::computeEconomics)
     .def(

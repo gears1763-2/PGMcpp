@@ -26,19 +26,26 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Renewable* testConstruct_Renewable(void)
+/// \fn Renewable* testConstruct_Renewable(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Renewable object and spot check some
 ///     post-construction attributes.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 /// \return A pointer to a test Renewable object.
 ///
 
-Renewable* testConstruct_Renewable(void)
+Renewable* testConstruct_Renewable(std::vector<double>* time_vec_hrs_ptr)
 {
     RenewableInputs renewable_inputs;
 
-    Renewable* test_renewable_ptr = new Renewable(8760, 1, renewable_inputs);
+    Renewable* test_renewable_ptr = new Renewable(
+        8760,
+        1,
+        renewable_inputs,
+        time_vec_hrs_ptr
+    );
     
     testTruth(
         not renewable_inputs.production_inputs.print_flag,
@@ -73,7 +80,12 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    Renewable* test_renewable_ptr = testConstruct_Renewable();
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
+    Renewable* test_renewable_ptr = testConstruct_Renewable(&time_vec_hrs);
     
     
     try {

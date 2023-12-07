@@ -30,6 +30,10 @@ pybind11::class_<ProductionInputs>(m, "ProductionInputs")
     .def_readwrite("nominal_inflation_annual", &ProductionInputs::nominal_inflation_annual)
     .def_readwrite("nominal_discount_annual", &ProductionInputs::nominal_discount_annual)
     .def_readwrite("replace_running_hrs", &ProductionInputs::replace_running_hrs)
+    .def_readwrite(
+        "path_2_normalized_production_time_series",
+        &ProductionInputs::path_2_normalized_production_time_series
+    )
     
     .def(pybind11::init());
 
@@ -39,6 +43,10 @@ pybind11::class_<Production>(m, "Production")
     .def_readwrite("print_flag", &Production::print_flag)
     .def_readwrite("is_running", &Production::is_running)
     .def_readwrite("is_sunk", &Production::is_sunk)
+    .def_readwrite(
+        "normalized_production_series_given",
+        &Production::normalized_production_series_given
+    )
     .def_readwrite("n_points", &Production::n_points)
     .def_readwrite("n_starts", &Production::n_starts)
     .def_readwrite("n_replacements", &Production::n_replacements)
@@ -61,7 +69,12 @@ pybind11::class_<Production>(m, "Production")
         &Production::levellized_cost_of_energy_kWh
     )
     .def_readwrite("type_str", &Production::type_str)
+    .def_readwrite(
+        "path_2_normalized_production_time_series",
+        &Production::path_2_normalized_production_time_series
+    )
     .def_readwrite("is_running_vec", &Production::is_running_vec)
+    .def_readwrite("normalized_production_vec", &Production::normalized_production_vec)
     .def_readwrite("production_vec_kW", &Production::production_vec_kW)
     .def_readwrite("dispatch_vec_kW", &Production::dispatch_vec_kW)
     .def_readwrite("storage_vec_kW", &Production::storage_vec_kW)
@@ -73,8 +86,9 @@ pybind11::class_<Production>(m, "Production")
     )
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, ProductionInputs>())
+    .def(pybind11::init<int, double, ProductionInputs, std::vector<double>*>())
     .def("handleReplacement", &Production::handleReplacement)
     .def("computeRealDiscountAnnual", &Production::computeRealDiscountAnnual)
     .def("computeEconomics", &Production::computeEconomics)
+    .def("getProductionkW", &Production::getProductionkW)
     .def("commit", &Production::commit);

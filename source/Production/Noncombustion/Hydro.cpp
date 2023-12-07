@@ -626,6 +626,14 @@ void Hydro :: __writeSummary(std::string write_path)
     ofs << "Capacity: " << this->capacity_kW << " kW  \n";
     ofs << "\n";
     
+    ofs << "Production Override: (N = 0 / Y = 1): "
+        << this->normalized_production_series_given << "  \n";
+    if (this->normalized_production_series_given) {
+        ofs << "Path to Normalized Production Time Series: "
+            << this->path_2_normalized_production_time_series << "  \n";
+    }
+    ofs << "\n";
+    
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
     ofs << "Capital Cost: " << this->capital_cost << "  \n";
     ofs << "Operation and Maintenance Cost: " << this->operation_maintenance_cost_kWh
@@ -819,7 +827,8 @@ Hydro :: Hydro(void)
 /// \fn Hydro :: Hydro(
 ///         int n_points,
 ///         double n_years,
-///         HydroInputs hydro_inputs
+///         HydroInputs hydro_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Hydro class.
@@ -830,16 +839,20 @@ Hydro :: Hydro(void)
 ///
 /// \param hydro_inputs A structure of Hydro constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Hydro :: Hydro(
     int n_points,
     double n_years,
-    HydroInputs hydro_inputs
+    HydroInputs hydro_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Noncombustion(
     n_points,
     n_years,
-    hydro_inputs.noncombustion_inputs
+    hydro_inputs.noncombustion_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs
@@ -955,6 +968,13 @@ double Hydro :: requestProductionkW(
     double hydro_resource_m3hr
 )
 {
+    //  0. given production time series override
+    if (this->normalized_production_series_given) {
+        double production_kW = Production :: getProductionkW(timestep);
+        
+        return production_kW;
+    }
+    
     //  1. return on request of zero
     if (request_kW <= 0) {
         return 0;

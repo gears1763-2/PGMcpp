@@ -143,7 +143,7 @@ class Hydro : public Noncombustion {
         
         //  2. methods
         Hydro(void);
-        Hydro (int, double, HydroInputs);
+        Hydro (int, double, HydroInputs, std::vector<double>*);
         void handleReplacement(int);
         
         double requestProductionkW(int, double, double, double);

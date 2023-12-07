@@ -88,7 +88,7 @@ class Renewable : public Production {
         
         //  2. methods
         Renewable(void);
-        Renewable(int, double, RenewableInputs);
+        Renewable(int, double, RenewableInputs, std::vector<double>*);
         virtual void handleReplacement(int);
         
         void computeEconomics(std::vector<double>*);

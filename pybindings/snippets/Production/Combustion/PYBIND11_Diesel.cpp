@@ -49,7 +49,7 @@ pybind11::class_<Diesel>(m, "Diesel")
     .def_readwrite("time_since_last_start_hrs", &Diesel::time_since_last_start_hrs)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, DieselInputs>())
+    .def(pybind11::init<int, double, DieselInputs, std::vector<double>*>())
     .def("handleReplacement", &Diesel::handleReplacement)
     .def("requestProductionkW", &Diesel::requestProductionkW)
     .def("commit", &Diesel::commit);

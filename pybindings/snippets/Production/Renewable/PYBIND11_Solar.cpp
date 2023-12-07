@@ -40,7 +40,7 @@ pybind11::class_<Solar>(m, "Solar")
     .def_readwrite("derating", &Solar::derating)
       
     .def(pybind11::init<>())
-    .def(pybind11::init<int, double, SolarInputs>())
+    .def(pybind11::init<int, double, SolarInputs, std::vector<double>*>())
     .def("handleReplacement", &Solar::handleReplacement)
     .def("computeProductionkW", &Solar::computeProductionkW)
     .def("commit", &Solar::commit);

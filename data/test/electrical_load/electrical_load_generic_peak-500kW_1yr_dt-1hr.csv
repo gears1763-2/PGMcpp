@@ -1,6 +1,6 @@
-Datetime [  ],Time (since start of data) [hrs],Electrical Load [kW],||,Be sure to leave the last two column headers as is! PGMcpp is looking for these specifically when reading in electrical load data.,Notes (no commas in notes!)
-2010-01-01 00:00,0,360.253836463674,||,The || marks where data ends and comments begin.,blah blah blah ...
-2010-01-01 01:00,1,355.171277826775,||,,
+Datetime [  ],Time (since start of data) [hrs],Electrical Load [kW],||,Notes (NO COMMAS IN NOTES!),Notes (NO COMMAS IN NOTES!)
+2010-01-01 00:00,0,360.253836463674,||,Be sure to leave the last two column headers as is! PGMcpp is looking for these specifically when reading in electrical load data.,blah blah blah ...
+2010-01-01 01:00,1,355.171277826775,||,The || marks where data ends and comments begin.,
 2010-01-01 02:00,2,353.776453532298,||,,
 2010-01-01 03:00,3,353.75405737934,||,,
 2010-01-01 04:00,4,346.592867404975,||,,

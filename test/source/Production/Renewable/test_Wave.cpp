@@ -26,19 +26,21 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Renewable* testConstruct_Wave(void)
+/// \fn Renewable* testConstruct_Wave(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Wave object and spot check some
 ///     post-construction attributes.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 /// \return A Renewable pointer to a test Wave object.
 ///
 
-Renewable* testConstruct_Wave(void)
+Renewable* testConstruct_Wave(std::vector<double>* time_vec_hrs_ptr)
 {
     WaveInputs wave_inputs;
 
-    Renewable* test_wave_ptr = new Wave(8760, 1, wave_inputs);
+    Renewable* test_wave_ptr = new Wave(8760, 1, wave_inputs, time_vec_hrs_ptr);
     
     testTruth(
         not wave_inputs.renewable_inputs.production_inputs.print_flag,
@@ -90,14 +92,16 @@ Renewable* testConstruct_Wave(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Renewable* testConstructLookup_Wave(void)
+/// \fn Renewable* testConstructLookup_Wave(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief A function to construct a Wave object using production lookup.
+///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
 ///
 /// \return A Renewable pointer to a test Wave object.
 ///
 
-Renewable* testConstructLookup_Wave(void)
+Renewable* testConstructLookup_Wave(std::vector<double>* time_vec_hrs_ptr)
 {
     WaveInputs wave_inputs;
     
@@ -105,7 +109,7 @@ Renewable* testConstructLookup_Wave(void)
     wave_inputs.path_2_normalized_performance_matrix =
         "data/test/interpolation/wave_energy_converter_normalized_performance_matrix.csv";
 
-    Renewable* test_wave_lookup_ptr = new Wave(8760, 1, wave_inputs);
+    Renewable* test_wave_lookup_ptr = new Wave(8760, 1, wave_inputs, time_vec_hrs_ptr);
     
     return test_wave_lookup_ptr;
 }   /* testConstructLookup_Wave() */
@@ -117,13 +121,15 @@ Renewable* testConstructLookup_Wave(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn void testBadConstruct_Wave(void)
+/// \fn void testBadConstruct_Wave(std::vector<double>* time_vec_hrs_ptr)
 ///
 /// \brief Function to test the trying to construct a Wave object given bad 
 ///     inputs is being handled as expected.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
-void testBadConstruct_Wave(void)
+void testBadConstruct_Wave(std::vector<double>* time_vec_hrs_ptr)
 {
     bool error_flag = true;
 
@@ -131,7 +137,7 @@ void testBadConstruct_Wave(void)
         WaveInputs bad_wave_inputs;
         bad_wave_inputs.design_significant_wave_height_m = -1;
         
-        Wave bad_wave(8760, 1, bad_wave_inputs);
+        Wave bad_wave(8760, 1, bad_wave_inputs, time_vec_hrs_ptr);
         
         error_flag = false;
     } catch (...) {
@@ -443,12 +449,17 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
-    Renewable* test_wave_ptr = testConstruct_Wave();
-    Renewable* test_wave_lookup_ptr = testConstructLookup_Wave();
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
+    Renewable* test_wave_ptr = testConstruct_Wave(&time_vec_hrs);
+    Renewable* test_wave_lookup_ptr = testConstructLookup_Wave(&time_vec_hrs);
     
     
     try {
-        testBadConstruct_Wave();
+        testBadConstruct_Wave(&time_vec_hrs);
         
         testProductionConstraint_Wave(test_wave_ptr);
         

@@ -33,6 +33,8 @@ print()
 
 
 if __name__ == "__main__":
+    time_list_hrs = [i for i in range(0, 8760)]
+    
     try:
         ## ================ test Interpolator ================ ##
         sys.stdout.write(
@@ -74,7 +76,12 @@ if __name__ == "__main__":
         
         test_production_inputs = PGMcpp.ProductionInputs()
         
-        test_production = PGMcpp.Production(8760, 1, test_production_inputs)
+        test_production = PGMcpp.Production(
+            8760,
+            1,
+            test_production_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -90,7 +97,12 @@ if __name__ == "__main__":
         
         test_combustion_inputs = PGMcpp.CombustionInputs()
         
-        test_combustion = PGMcpp.Combustion(8760, 1, test_combustion_inputs)
+        test_combustion = PGMcpp.Combustion(
+            8760,
+            1,
+            test_combustion_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -107,7 +119,12 @@ if __name__ == "__main__":
         test_diesel_inputs = PGMcpp.DieselInputs()
         test_diesel_inputs.combustion_inputs.production_inputs.is_sunk = True
         
-        test_diesel = PGMcpp.Diesel(8760, 1, test_diesel_inputs)
+        test_diesel = PGMcpp.Diesel(
+            8760,
+            1,
+            test_diesel_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -123,7 +140,12 @@ if __name__ == "__main__":
         
         test_noncombustion_inputs = PGMcpp.NoncombustionInputs()
         
-        test_noncombustion = PGMcpp.Noncombustion(8760, 1, test_noncombustion_inputs)
+        test_noncombustion = PGMcpp.Noncombustion(
+            8760,
+            1,
+            test_noncombustion_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -141,7 +163,12 @@ if __name__ == "__main__":
         test_hydro_inputs = PGMcpp.HydroInputs()
         test_hydro_inputs.noncombustion_inputs.production_inputs.is_sunk= True
         
-        test_hydro = PGMcpp.Hydro(8760, 1, test_hydro_inputs)
+        test_hydro = PGMcpp.Hydro(
+            8760,
+            1,
+            test_hydro_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -158,7 +185,12 @@ if __name__ == "__main__":
         
         test_renewable_inputs = PGMcpp.RenewableInputs()
         
-        test_renewable = PGMcpp.Renewable(8760, 1, test_renewable_inputs)
+        test_renewable = PGMcpp.Renewable(
+            8760,
+            1,
+            test_renewable_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -174,7 +206,12 @@ if __name__ == "__main__":
         
         test_solar_inputs = PGMcpp.SolarInputs()
         
-        test_solar = PGMcpp.Solar(8760, 1, test_solar_inputs)
+        test_solar = PGMcpp.Solar(
+            8760,
+            1,
+            test_solar_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -190,7 +227,12 @@ if __name__ == "__main__":
         
         test_tidal_inputs = PGMcpp.TidalInputs()
         
-        test_tidal = PGMcpp.Tidal(8760, 1, test_tidal_inputs)
+        test_tidal = PGMcpp.Tidal(
+            8760,
+            1,
+            test_tidal_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -206,7 +248,12 @@ if __name__ == "__main__":
         
         test_wave_inputs = PGMcpp.WaveInputs()
         
-        test_wave = PGMcpp.Wave(8760, 1, test_wave_inputs)
+        test_wave = PGMcpp.Wave(
+            8760,
+            1,
+            test_wave_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -222,7 +269,12 @@ if __name__ == "__main__":
         
         test_wind_inputs = PGMcpp.WindInputs()
         
-        test_wind = PGMcpp.Wind(8760, 1, test_wind_inputs)
+        test_wind = PGMcpp.Wind(
+            8760,
+            1,
+            test_wind_inputs,
+            time_list_hrs
+        )
         
         sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
         
@@ -437,6 +489,13 @@ if __name__ == "__main__":
         solar_inputs.renewable_inputs.production_inputs.capacity_kW = 250
         solar_inputs.resource_key = solar_resource_key
 
+        test_model.addSolar(solar_inputs)
+        
+        solar_inputs.renewable_inputs.production_inputs.capacity_kW = 100
+        solar_inputs.renewable_inputs.production_inputs.path_2_normalized_production_time_series = (
+            "../data/test/normalized_production/normalized_solar_production.csv"
+        )
+        
         test_model.addSolar(solar_inputs)
         
         tidal_inputs = PGMcpp.TidalInputs()

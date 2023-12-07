@@ -114,7 +114,8 @@ Noncombustion :: Noncombustion(void)
 /// \fn Noncombustion :: Noncombustion(
 ///         int n_points,
 ///         double n_years,
-///         NoncombustionInputs noncombustion_inputs
+///         NoncombustionInputs noncombustion_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
 ///     )
 ///
 /// \brief Constructor (intended) for the Noncombustion class.
@@ -125,16 +126,20 @@ Noncombustion :: Noncombustion(void)
 ///
 /// \param noncombustion_inputs A structure of Noncombustion constructor inputs.
 ///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
 
 Noncombustion :: Noncombustion(
     int n_points,
     double n_years,
-    NoncombustionInputs noncombustion_inputs
+    NoncombustionInputs noncombustion_inputs,
+    std::vector<double>* time_vec_hrs_ptr
 ) :
 Production(
     n_points,
     n_years,
-    noncombustion_inputs.production_inputs
+    noncombustion_inputs.production_inputs,
+    time_vec_hrs_ptr
 )
 {
     //  1. check inputs

@@ -29,7 +29,10 @@
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn Hydro* testConstruct_Hydro(void)
+/// \fn Hydro* Noncombustion* testConstruct_Hydro(
+///         HydroInputs hydro_inputs,
+///         std::vector<double>* time_vec_hrs_ptr
+///     )
 ///
 /// \brief A function to construct a Hydro object and spot check some
 ///     post-construction attributes.
@@ -37,9 +40,17 @@
 /// \return A Noncombustion pointer to a test Hydro object.
 ///
 
-Noncombustion* testConstruct_Hydro(HydroInputs hydro_inputs)
+Noncombustion* testConstruct_Hydro(
+    HydroInputs hydro_inputs,
+    std::vector<double>* time_vec_hrs_ptr
+)
 {
-    Noncombustion* test_hydro_ptr =  new Hydro(8760, 1, hydro_inputs);
+    Noncombustion* test_hydro_ptr =  new Hydro(
+        8760,
+        1,
+        hydro_inputs,
+        time_vec_hrs_ptr
+    );
     
     testTruth(
         not hydro_inputs.noncombustion_inputs.production_inputs.print_flag,
@@ -301,6 +312,11 @@ int main(int argc, char** argv)
     srand(time(NULL));
     
     
+    std::vector<double> time_vec_hrs (8760, 0);
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        time_vec_hrs[i] = i;
+    }
+    
     std::string path_2_electrical_load_time_series = 
         "data/test/electrical_load/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
 
@@ -315,7 +331,7 @@ int main(int argc, char** argv)
     hydro_inputs.reservoir_capacity_m3 = 10000;
     hydro_inputs.resource_key = hydro_resource_key;
     
-    Noncombustion* test_hydro_ptr = testConstruct_Hydro(hydro_inputs);
+    Noncombustion* test_hydro_ptr = testConstruct_Hydro(hydro_inputs, &time_vec_hrs);
     
     std::string path_2_hydro_resource_data =
         "data/test/resources/hydro_inflow_peak-20000m3hr_1yr_dt-1hr.csv";
