@@ -1,5 +1,6 @@
 *   improve testing and documentation (always ...)
 *   check the generality of the Hydro minimum power value
+*   implement binary search instead of linear probing within the Interpolator class
 *   add production lookup functionality to Tidal and Wind (lookup tables not quite the same thing as passing a production time series)
 *   implement model predictive control in Controller (means getting linear programming functionality in here ... need to find a good solution for that)
 *   implement Python Controller API (to allow users to define their own control algorithms); this will hurt runtime performance, but greatly increase modelling flexibility
