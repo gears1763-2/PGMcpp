@@ -1,5 +1,6 @@
 *   improve testing and documentation (always ...)
+*   check the generality of the Hydro minimum power value
 *   add pre-processed production lookup functionality to the Production hierarchy (to allow users to pass their own production time series)
-*   add production lookup functionality to Tidal and Wind
-*   implement model predictive control in Controller
-*   implement Python Controller API (to allow users to define their own control algorithms)
+*   add production lookup functionality to Tidal and Wind (probably still worth doing, even after implementing production lookup)
+*   implement model predictive control in Controller (means getting linear programming functionality in here ... need to find a good solution for that)
+*   implement Python Controller API (to allow users to define their own control algorithms); this will hurt runtime performance, but greatly increase modelling flexibility
