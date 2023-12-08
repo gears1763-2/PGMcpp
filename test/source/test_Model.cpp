@@ -1001,6 +1001,68 @@ void testAddSolar_Model(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void testAddSolar_productionOverride_Model(
+///         Model* test_model_ptr,
+///         std::string path_2_normalized_production_time_series
+///     )
+///
+/// \brief Function to test adding a solar PV array to the test Model object using the
+///     production override feature, and then spot check some post-add attributes.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+/// \param path_2_normalized_production_time_series A path (either relative or absolute)
+///     to the given normalized production time series data.
+///
+
+void testAddSolar_productionOverride_Model(
+    Model* test_model_ptr,
+    std::string path_2_normalized_production_time_series
+)
+{
+    SolarInputs solar_inputs;
+    solar_inputs.renewable_inputs.production_inputs.path_2_normalized_production_time_series = 
+        path_2_normalized_production_time_series;
+
+    test_model_ptr->addSolar(solar_inputs);
+    
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec.size(),
+        2,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model_ptr->renewable_ptr_vec[1]->type,
+        RenewableType :: SOLAR,
+        __FILE__,
+        __LINE__
+    );
+    
+    testTruth(
+        test_model_ptr->renewable_ptr_vec[1]->normalized_production_series_given,
+        __FILE__,
+        __LINE__
+    );
+    
+    testTruth(
+        test_model_ptr->renewable_ptr_vec[1]->path_2_normalized_production_time_series ==
+        path_2_normalized_production_time_series,
+        __FILE__,
+        __LINE__
+    );
+    
+    return;
+}   /* testAddSolar_productionOverride_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn void testAddTidal_Model(
 ///         Model* test_model_ptr,
 ///         int tidal_resource_key
@@ -1027,13 +1089,13 @@ void testAddTidal_Model(
 
     testFloatEquals(
         test_model_ptr->renewable_ptr_vec.size(),
-        2,
+        3,
         __FILE__,
         __LINE__
     );
 
     testFloatEquals(
-        test_model_ptr->renewable_ptr_vec[1]->type,
+        test_model_ptr->renewable_ptr_vec[2]->type,
         RenewableType :: TIDAL,
         __FILE__,
         __LINE__
@@ -1075,13 +1137,13 @@ void testAddWave_Model(
 
     testFloatEquals(
         test_model_ptr->renewable_ptr_vec.size(),
-        3,
+        4,
         __FILE__,
         __LINE__
     );
 
     testFloatEquals(
-        test_model_ptr->renewable_ptr_vec[2]->type,
+        test_model_ptr->renewable_ptr_vec[3]->type,
         RenewableType :: WAVE,
         __FILE__,
         __LINE__
@@ -1123,13 +1185,13 @@ void testAddWind_Model(
 
     testFloatEquals(
         test_model_ptr->renewable_ptr_vec.size(),
-        4,
+        5,
         __FILE__,
         __LINE__
     );
 
     testFloatEquals(
-        test_model_ptr->renewable_ptr_vec[3]->type,
+        test_model_ptr->renewable_ptr_vec[4]->type,
         RenewableType :: WIND,
         __FILE__,
         __LINE__
@@ -1406,6 +1468,7 @@ int main(int argc, char** argv)
     #endif  /* _WIN32 */
     
     printGold("\tTesting Model");
+    std::cout << std::flush;
     
     srand(time(NULL));
     
@@ -1481,21 +1544,38 @@ int main(int argc, char** argv)
         );
         
         
-        testAddHydro_Model(test_model_ptr, hydro_resource_key);
-        testAddDiesel_Model(test_model_ptr);
-        testAddSolar_Model(test_model_ptr, solar_resource_key);
-        testAddTidal_Model(test_model_ptr, tidal_resource_key);
-        testAddWave_Model(test_model_ptr, wave_resource_key);
-        testAddWind_Model(test_model_ptr, wind_resource_key);
+        std::string path_2_normalized_production_time_series =
+                "data/test/normalized_production/normalized_solar_production.csv";
         
-        
-        test_model_ptr->run();
-        test_model_ptr->writeResults("test/test_results/");
+        // looping solely for the sake of profiling (also tests reset(), which is
+        // needed for wrapping PGMcpp in an optimizer)
+        for (int i = 0; i < 1000; i++) {
+            test_model_ptr->reset();
+            
+            
+            testAddHydro_Model(test_model_ptr, hydro_resource_key);
+            testAddDiesel_Model(test_model_ptr);
+            testAddSolar_Model(test_model_ptr, solar_resource_key);
+            
+            testAddSolar_productionOverride_Model(
+                test_model_ptr,
+                path_2_normalized_production_time_series
+            );
+            
+            testAddTidal_Model(test_model_ptr, tidal_resource_key);
+            testAddWave_Model(test_model_ptr, wave_resource_key);
+            testAddWind_Model(test_model_ptr, wind_resource_key);
+            
+            
+            test_model_ptr->run();
+        }
         
         
         testLoadBalance_Model(test_model_ptr);
         testEconomics_Model(test_model_ptr);
         testFuelConsumptionEmissions_Model(test_model_ptr);
+        
+        test_model_ptr->writeResults("test/test_results/");
     }
 
 
