@@ -74,7 +74,7 @@ are some possible fixes
 
   * You may just need to update your MSYS2. This can be done by invoking `pacman -Syu` within an MSYS2 terminal. The terminal will close and need to be restarted.
   * You may need to install the mingw64 version of cmake. This can be done by invoking `pacman -S mingw-w64-x86_64-cmake`.
-  * The debugging (-g) and profiling (-p) compiler flags may be causing issues. A solution here is to modify the `CXXFLAGS` definition in the provided `makefile` to simply `-Wall -fPIC`.
+  * The debugging (`-g`) and profiling (`-p`) compiler flags may be causing issues. A solution here is to modify the `CXXFLAGS` definition in the provided `makefile` to simply `-Wall -fPIC`.
 
 ### Python 3 Setup
 
