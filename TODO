@@ -1,5 +1,5 @@
-*   improve testing and documentation (always ...)
-*   add production lookup functionality to Tidal and Wind (lookup tables not quite the same thing as passing a production time series)
-*   will probably need to de-couple normalized performance data from the assets themselves (or each reset will trigger a new disk read ...)
-*   implement model predictive control in Controller (means getting linear programming functionality in here ... need to find a good solution for that)
+*   improve testing and documentation (always ...), profile changes, identify optimization opportunities
+*   add production lookup functionality to Tidal and Wind (lookup tables not quite the same thing as passing a production time series ... certainly less data to read in!)
+*   will probably need to de-couple normalized performance data from the assets themselves (or each reset will trigger a new disk read ... which could get expensive fast)
+*   implement model predictive control in Controller (means getting linear programming functionality in here ... need to find a good solution for that!)
 *   implement Python Controller API (to allow users to define their own control algorithms); this will hurt runtime performance, but greatly increase modelling flexibility
