@@ -24,10 +24,10 @@ OUT_PROJECT = bin/$(PROJECT_NAME).out
 
 ## ======== COMPILER FLAGS ========================================================== ##
 
-CXX = g++
+CXX = g++ -O3 -std=c++17
 
-CXXFLAGS = -std=c++17 -Wall -g -fPIC
-#CXXFLAGS = -O3 -std=c++17 -Wall -fPIC
+CXXFLAGS =  -Wall -g -p -fPIC
+#CXXFLAGS = -Wall -fPIC
 
 LIBS = -lpthread
 
@@ -472,7 +472,9 @@ PGMcpp_project: $(SRC_PROJECT)
 .PHONY: clean
 clean:
 	rm -frv bin
+	rm -frv gmon.*
 	rm -frv object
+	rm -frv profiling_results
 	rm -frv projects/example_cpp
 	rm -frv projects/example_py
 	rm -frv pybindings/PGMcpp.*
@@ -533,6 +535,11 @@ PGMcpp:
 	@echo
 	$(OUT_TESTS)
 	@echo
+
+
+.PHONY: profile
+profile:
+	gprof test/bin/test_Model.out > profiling_results
 
 
 .PHONY: project
