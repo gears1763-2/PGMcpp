@@ -1,5 +1,4 @@
 *   improve testing and documentation (always ...)
-*   get a profiling workflow in place, start identifying some bottlenecks
 *   add production lookup functionality to Tidal and Wind (lookup tables not quite the same thing as passing a production time series)
 *   will probably need to de-couple normalized performance data from the assets themselves (or each reset will trigger a new disk read ...)
 *   implement model predictive control in Controller (means getting linear programming functionality in here ... need to find a good solution for that)
