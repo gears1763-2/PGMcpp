@@ -50,7 +50,7 @@ However, if you are all set up, then building the bindings is as simple as
 
 depending on your setup (either `python` or `python3`).
 
-### Linux (Debian/Ubuntu) Notes
+### --- Linux (Debian/Ubuntu) Notes ---
 
 You should already be set up with a Python 3 interpreter, so just doing the `pip install`
 steps should be sufficient. Additionally, you may also be set up with a compatible
@@ -61,7 +61,7 @@ C++ compiler already. However, if this is not the case, then you can simply
 The provided `setup.py` was successfully invoked on Linux Mint 21.2 using `g++ 11.4.0` 
 and `Python 3.10.12`.
 
-### Windows Notes
+### --- Windows Notes ---
 
 On Windows, there are a few things to set up first before building the Python 3 bindings;
 namely

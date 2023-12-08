@@ -50,16 +50,33 @@ makefile, a TODO list, and the following sub-directories:
 
 ## Setup
 
-### C++
+### C++ Setup
 
 To build PGMcpp, you can simply
 
     make PGMcpp
 
-On Windows, this was achieved using the environment provided by the MSYS2 project (see 
-<https://www.msys2.org/>).
+#### --- Linux (Debian/Ubuntu) Notes ---
 
-### Python 3
+On Linux (Debian/Ubuntu), this should be pretty turn-key. If not, you might need to
+install the build essential package; this can be done by invoking
+
+    sudo apt-get install build-essential
+
+#### --- Windows Notes ---
+
+On Windows, building is achieved using the environment provided by the MSYS2 project
+(see <https://www.msys2.org/>). You can follow the download and installation instructions
+provided there.
+
+For MSYS2, if you do run into any `undefined reference to` errors at compile time, here
+are some possible fixes
+
+  * You may just need to update your MSYS2. This can be done by invoking `pacman -Syu` within an MSYS2 terminal. The terminal will close and need to be restarted.
+  * You may need to install the mingw64 version of cmake. This can be done by invoking `pacman -S mingw-w64-x86_64-cmake`.
+  * The debugging (-g) and profiling (-p) compiler flags may be causing issues. A solution here is to modify the `CXXFLAGS` definition in the provided `makefile` to simply `-Wall -fPIC`.
+
+### Python 3 Setup
 
 The `pybindings/` sub-directory contains the infrastructure needed to build Python 3 
 bindings for PGMcpp (for more details, see `pybindings/README.md`). In summary, you can 
