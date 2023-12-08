@@ -85,6 +85,8 @@ of
 
     make docs
 
+assuming you are set up to do so (i.e., `doxygen` installed, etc.).
+
 --------
 
 
