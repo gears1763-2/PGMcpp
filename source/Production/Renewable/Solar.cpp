@@ -136,7 +136,7 @@ void Solar :: __writeSummary(std::string write_path)
     ofs << "## Production Attributes\n";
     ofs << "\n";
     
-    ofs << "Capacity: " << this->capacity_kW << "kW  \n";
+    ofs << "Capacity: " << this->capacity_kW << " kW  \n";
     ofs << "\n";
     
     ofs << "Production Override: (N = 0 / Y = 1): "

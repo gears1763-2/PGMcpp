@@ -493,8 +493,8 @@ void LiIon :: __writeSummary(std::string write_path)
     //  2.1. Storage attributes
     ofs << "## Storage Attributes\n";
     ofs << "\n";
-    ofs << "Power Capacity: " << this->power_capacity_kW << "kW  \n";
-    ofs << "Energy Capacity: " << this->energy_capacity_kWh << "kWh  \n";
+    ofs << "Power Capacity: " << this->power_capacity_kW << " kW  \n";
+    ofs << "Energy Capacity: " << this->energy_capacity_kWh << " kWh  \n";
     ofs << "\n";
     
     ofs << "Sunk Cost (N = 0 / Y = 1): " << this->is_sunk << "  \n";
@@ -541,7 +541,6 @@ void LiIon :: __writeSummary(std::string write_path)
     ofs << "Universal Gas Constant: " << this->gas_constant_JmolK
         << " J/mol.K  \n";
     ofs << "Absolute Environmental Temperature: " << this->temperature_K << " K  \n";
-    ofs << "\n";
     
     ofs << "\n--------\n\n";
     

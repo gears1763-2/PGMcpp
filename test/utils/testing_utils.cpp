@@ -13,7 +13,7 @@
 ///
 /// \file testing_utils.cpp
 ///
-/// \brief Header file for various PGMcpp testing utilities.
+/// \brief Implementation file for various PGMcpp testing utilities.
 ///
 /// This is a library of utility functions used throughout the various test suites.
 ///

@@ -149,8 +149,7 @@ double Tidal :: __computeCubicProductionkW(
         0.15 * this->design_speed_ms <= tidal_resource_ms and
         tidal_resource_ms <= this->design_speed_ms
     ) {
-        production = 
-            (1 / pow(this->design_speed_ms, 3)) * pow(tidal_resource_ms, 3);
+        production = (1 / pow(this->design_speed_ms, 3)) * pow(tidal_resource_ms, 3);
     }
     
     else {
@@ -281,7 +280,7 @@ void Tidal :: __writeSummary(std::string write_path)
     ofs << "## Production Attributes\n";
     ofs << "\n";
     
-    ofs << "Capacity: " << this->capacity_kW << "kW  \n";
+    ofs << "Capacity: " << this->capacity_kW << " kW  \n";
     ofs << "\n";
     
     ofs << "Production Override: (N = 0 / Y = 1): "

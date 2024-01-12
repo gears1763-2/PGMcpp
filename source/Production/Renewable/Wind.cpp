@@ -112,6 +112,59 @@ double Wind :: __getGenericOpMaintCost(void)
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn double Wind :: __computeCubicProductionkW(
+///         int timestep,
+///         double dt_hrs,
+///         double wind_resource_ms
+///     )
+///
+/// \brief Helper method to compute wind turbine production under a cubic
+///     production model.
+///
+/// Ref: \cite Milan_2010 \n
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param wind_resource_ms The available wind resource [m/s].
+///
+/// \return The production [kW] of the wind turbine, under an exponential model.
+///
+
+double Wind :: __computeCubicProductionkW(
+    int timestep,
+    double dt_hrs,
+    double wind_resource_ms
+)
+{
+    double production = 0;
+    
+    double turbine_speed = (wind_resource_ms - this->design_speed_ms) /
+        this->design_speed_ms;
+    
+    if (turbine_speed < -0.7857 or turbine_speed > 0.7857) {
+        production = 0;
+    }
+    
+    else if (turbine_speed >= -0.7857 and turbine_speed <= 0) {
+        production = (1 / pow(this->design_speed_ms, 3)) * pow(wind_resource_ms, 3);
+    }
+    
+    else {
+        production = 1;
+    }
+    
+    return production * this->capacity_kW;
+}   /* __computeCubicProductionkW() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn double Wind :: __computeExponentialProductionkW(
 ///         int timestep,
 ///         double dt_hrs,
@@ -142,7 +195,7 @@ double Wind :: __computeExponentialProductionkW(
     
     double turbine_speed = (wind_resource_ms - this->design_speed_ms) /
         this->design_speed_ms;
-        
+
     if (turbine_speed < -0.76 or turbine_speed > 0.68) {
         production = 0;
     }
@@ -227,7 +280,7 @@ void Wind :: __writeSummary(std::string write_path)
     ofs << "## Production Attributes\n";
     ofs << "\n";
     
-    ofs << "Capacity: " << this->capacity_kW << "kW  \n";
+    ofs << "Capacity: " << this->capacity_kW << " kW  \n";
     ofs << "\n";
     
     ofs << "Production Override: (N = 0 / Y = 1): "
@@ -266,6 +319,12 @@ void Wind :: __writeSummary(std::string write_path)
     
     ofs << "Power Production Model: " << this->power_model_string << "  \n";
     switch (this->power_model) {
+        case (WindPowerProductionModel :: WIND_POWER_CUBIC): {
+            ofs << "Design Speed: " << this->design_speed_ms << " m/s  \n";
+            
+            break;
+        }
+        
         case (WindPowerProductionModel :: WIND_POWER_EXPONENTIAL): {
             ofs << "Design Speed: " << this->design_speed_ms << " m/s  \n";
             
@@ -451,6 +510,12 @@ Renewable(
     this->power_model = wind_inputs.power_model;
     
     switch (this->power_model) {
+        case (WindPowerProductionModel :: WIND_POWER_CUBIC): {
+            this->power_model_string = "CUBIC";
+            
+            break;
+        }
+        
         case (WindPowerProductionModel :: WIND_POWER_EXPONENTIAL): {
             this->power_model_string = "EXPONENTIAL";
             
@@ -579,6 +644,16 @@ double Wind :: computeProductionkW(
     double production_kW = 0;
     
     switch (this->power_model) {
+        case (WindPowerProductionModel :: WIND_POWER_CUBIC): {
+            production_kW = this->__computeCubicProductionkW(
+                timestep,
+                dt_hrs,
+                wind_resource_ms
+            );
+            
+            break;
+        }
+        
         case (WindPowerProductionModel :: WIND_POWER_EXPONENTIAL): {
             production_kW = this->__computeExponentialProductionkW(
                 timestep,

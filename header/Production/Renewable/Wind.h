@@ -32,6 +32,7 @@
 ///
 
 enum WindPowerProductionModel {
+    WIND_POWER_CUBIC, ///< A cubic power production model
     WIND_POWER_EXPONENTIAL, ///< An exponential power production model
     WIND_POWER_LOOKUP, ///< Lookup from a given set of power curve data
     N_WIND_POWER_PRODUCTION_MODELS ///< A simple hack to get the number of elements in WindPowerProductionModel
@@ -54,9 +55,9 @@ struct WindInputs {
     double capital_cost = -1; ///< The capital cost of the asset (undefined currency). -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD].
     double operation_maintenance_cost_kWh = -1; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced. -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD/kWh].
     
-    double design_speed_ms = 8; ///< The wind speed [m/s] at which the wind turbine achieves its rated capacity.
+    double design_speed_ms = 14; ///< The wind speed [m/s] at which the wind turbine achieves its rated capacity.
     
-    WindPowerProductionModel power_model = WindPowerProductionModel :: WIND_POWER_EXPONENTIAL; ///< The wind power production model to be applied.
+    WindPowerProductionModel power_model = WindPowerProductionModel :: WIND_POWER_CUBIC; ///< The wind power production model to be applied.
 };
 
 
@@ -79,6 +80,7 @@ class Wind : public Renewable {
         double __getGenericCapitalCost(void);
         double __getGenericOpMaintCost(void);
         
+        double __computeCubicProductionkW(int, double, double);
         double __computeExponentialProductionkW(int, double, double);
         double __computeLookupProductionkW(int, double, double);
         
