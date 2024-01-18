@@ -881,41 +881,73 @@ double Controller :: __getRenewableProduction(
     
     switch (renewable_ptr->type) {
         case (RenewableType :: SOLAR): {
+            double resource_value = 0;
+            
+            if (not renewable_ptr->normalized_production_series_given) {
+                resource_value =
+                    resources_ptr->resource_map_1D[renewable_ptr->resource_key][timestep];
+            }
+            
             production_kW = renewable_ptr->computeProductionkW(
                 timestep,
                 dt_hrs,
-                resources_ptr->resource_map_1D[renewable_ptr->resource_key][timestep]
+                resource_value
             );
             
             break;
         }
         
         case (RenewableType :: TIDAL): {
+            double resource_value = 0;
+            
+            if (not renewable_ptr->normalized_production_series_given) {
+                resource_value =
+                    resources_ptr->resource_map_1D[renewable_ptr->resource_key][timestep];
+            }
+            
             production_kW = renewable_ptr->computeProductionkW(
                 timestep,
                 dt_hrs,
-                resources_ptr->resource_map_1D[renewable_ptr->resource_key][timestep]
+                resource_value
             );
             
             break;
         }
         
         case (RenewableType :: WAVE): {
+            double significant_wave_height_m = 0;
+            double energy_period_s = 0;
+            
+            if (not renewable_ptr->normalized_production_series_given) {
+                significant_wave_height_m =
+                    resources_ptr->resource_map_2D[renewable_ptr->resource_key][timestep][0];
+                
+                energy_period_s =
+                    resources_ptr->resource_map_2D[renewable_ptr->resource_key][timestep][1];
+            }
+            
             production_kW = renewable_ptr->computeProductionkW(
                 timestep,
                 dt_hrs,
-                resources_ptr->resource_map_2D[renewable_ptr->resource_key][timestep][0],
-                resources_ptr->resource_map_2D[renewable_ptr->resource_key][timestep][1]
+                significant_wave_height_m,
+                energy_period_s
             );
             
             break;
         }
         
         case (RenewableType :: WIND): {
+            double resource_value = 0;
+            
+            if (not renewable_ptr->normalized_production_series_given) {
+                resource_value =
+                    resources_ptr->resource_map_1D[renewable_ptr->resource_key][timestep];
+            }
+            
             production_kW = renewable_ptr->computeProductionkW(
                 timestep,
                 dt_hrs,
-                resources_ptr->resource_map_1D[renewable_ptr->resource_key][timestep]
+                resource_value
             );
             
             break;
@@ -1087,11 +1119,18 @@ double Controller :: __handleNoncombustionDispatch(
         
         switch (noncombustion_ptr->type) {
             case (NoncombustionType :: HYDRO): {
+                double resource_value = 0;
+                
+                if (not noncombustion_ptr->normalized_production_series_given) {
+                    resource_value =
+                        resources_ptr->resource_map_1D[noncombustion_ptr->resource_key][timestep];
+                }
+                
                 production_kW = noncombustion_ptr->requestProductionkW(
                     timestep,
                     dt_hrs,
                     net_load_kW,
-                    resources_ptr->resource_map_1D[noncombustion_ptr->resource_key][timestep]
+                    resource_value
                 );
                 
                 net_load_kW = noncombustion_ptr->commit(
@@ -1099,7 +1138,7 @@ double Controller :: __handleNoncombustionDispatch(
                     dt_hrs,
                     production_kW,
                     net_load_kW,
-                    resources_ptr->resource_map_1D[noncombustion_ptr->resource_key][timestep]
+                    resource_value
                 );
                 
                 break;
