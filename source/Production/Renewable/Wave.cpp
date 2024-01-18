@@ -476,8 +476,17 @@ void Wave :: __writeTimeSeries(
     
     for (int i = 0; i < max_lines; i++) {
         ofs << time_vec_hrs_ptr->at(i) << ",";
-        ofs << resource_map_2D_ptr->at(this->resource_key)[i][0] << ",";
-        ofs << resource_map_2D_ptr->at(this->resource_key)[i][1] << ",";
+        
+        if (not this->normalized_production_series_given) {
+            ofs << resource_map_2D_ptr->at(this->resource_key)[i][0] << ",";
+            ofs << resource_map_2D_ptr->at(this->resource_key)[i][1] << ",";
+        }
+        
+        else {
+            ofs << "OVERRIDE" << ",";
+            ofs << "OVERRIDE" << ",";
+        }
+        
         ofs << this->production_vec_kW[i] << ",";
         ofs << this->dispatch_vec_kW[i] << ",";
         ofs << this->storage_vec_kW[i] << ",";

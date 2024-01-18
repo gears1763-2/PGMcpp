@@ -255,7 +255,15 @@ void Solar :: __writeTimeSeries(
     
     for (int i = 0; i < max_lines; i++) {
         ofs << time_vec_hrs_ptr->at(i) << ",";
-        ofs << resource_map_1D_ptr->at(this->resource_key)[i] << ",";
+        
+        if (not this->normalized_production_series_given) {
+            ofs << resource_map_1D_ptr->at(this->resource_key)[i] << ",";
+        }
+        
+        else {
+            ofs << "OVERRIDE" << ",";
+        }
+        
         ofs << this->production_vec_kW[i] << ",";
         ofs << this->dispatch_vec_kW[i] << ",";
         ofs << this->storage_vec_kW[i] << ",";
