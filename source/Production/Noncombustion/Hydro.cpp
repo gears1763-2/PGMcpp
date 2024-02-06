@@ -130,7 +130,7 @@ void Hydro :: __initInterpolator(void)
         )
     );
     
-    //  2. set up efficiency interpolation
+    //  2. set up turbine efficiency interpolation
     InterpolatorStruct1D turbine_interp_struct_1D;
     
     turbine_interp_struct_1D.n_points = 11;
@@ -316,7 +316,10 @@ double Hydro :: __getGenericOpMaintCost(void)
 ///
 /// Ref: \cite Hydro_2023\n
 ///
-/// \param power_kW The 
+/// \param power_kW The power requested of the hydro plant.
+///
+/// \return The product of the turbine and generator efficiencies.
+///
 
 double Hydro :: __getEfficiencyFactor(double power_kW)
 {
@@ -327,6 +330,15 @@ double Hydro :: __getEfficiencyFactor(double power_kW)
     
     //  2. compute power ratio (clip to [0, 1])
     double power_ratio = power_kW / this->capacity_kW;
+    
+    if (power_ratio < 0) {
+        power_ratio = 0;
+    }
+    
+    else if (power_ratio > 1) {
+        power_ratio = 1;
+    }
+    
     
     //  3. init efficiency factor to the turbine efficiency
     double efficiency_factor = this->interpolator.interp1D(
@@ -585,7 +597,7 @@ void Hydro :: __updateState(
     this->spill_rate_vec_m3hr[timestep] = spill_m3hr;
     
     //  6. update reservoir state, log
-    this->stored_volume_m3 += net_flow_m3hr;
+    this->stored_volume_m3 += net_flow_m3hr * dt_hrs;
     this->stored_volume_vec_m3[timestep] = this->stored_volume_m3;
     
     return;
