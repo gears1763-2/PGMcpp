@@ -578,6 +578,12 @@ void Hydro :: __updateState(
         flow_m3hr = this->__powerToFlow(production_kW);
     }
     
+    double available_flow_m3hr = this->__getAvailableFlow(dt_hrs, hydro_resource_m3hr);
+    
+    if (flow_m3hr > available_flow_m3hr) {
+        flow_m3hr = available_flow_m3hr;
+    }
+    
     this->turbine_flow_vec_m3hr[timestep] = flow_m3hr;
     
     //  3. compute net reservoir flow
