@@ -109,6 +109,26 @@ Storage* testConstruct_LiIon(void)
         __LINE__
     );
     
+    testTruth(
+        not ((LiIon*)test_liion_ptr)->power_degradation_flag,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_liion_ptr->energy_capacity_kWh,
+        ((LiIon*)test_liion_ptr)->dynamic_energy_capacity_kWh,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_liion_ptr->power_capacity_kW,
+        ((LiIon*)test_liion_ptr)->dynamic_power_capacity_kW,
+        __FILE__,
+        __LINE__
+    );
+    
     return test_liion_ptr;
 }   /* testConstruct_LiIon() */
 

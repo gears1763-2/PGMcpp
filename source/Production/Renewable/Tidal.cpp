@@ -32,6 +32,9 @@
 ///
 /// \brief Helper method to check inputs to the Tidal constructor.
 ///
+/// Ref: \cite Bir_2011 \n
+/// Ref: \cite Lewis_2021 \n
+///
 
 void Tidal :: __checkInputs(TidalInputs tidal_inputs)
 {
@@ -45,6 +48,14 @@ void Tidal :: __checkInputs(TidalInputs tidal_inputs)
         #endif
 
         throw std::invalid_argument(error_str);
+    }
+    
+    else if (tidal_inputs.design_speed_ms < 2) {
+        std::string warning_str = "WARNING:  Tidal():  ";
+        warning_str += "Setting TidalInputs::design_speed_ms to less than 2 m/s may be ";
+        warning_str += "technically unrealistic";
+        
+        std::cout << warning_str << std::endl;
     }
     
     return;
@@ -119,7 +130,10 @@ double Tidal :: __getGenericOpMaintCost(void)
 /// \brief Helper method to compute tidal turbine production under a cubic
 ///     production model.
 ///
-/// Ref: \cite WeiWaiKum_2023\n
+/// Ref: \cite WeiWaiKum_2023 \n
+/// Ref: \cite Bir_2011 \n
+/// Ref: \cite Lewis_2021 \n
+/// Ref: \cite Whitby_2013 \n
 ///
 /// \param timestep The current time step of the Model run.
 ///

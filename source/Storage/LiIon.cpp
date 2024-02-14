@@ -353,6 +353,10 @@ void LiIon :: __handleDegradation(
     this->SOH_vec[timestep] = this->SOH;
     this->dynamic_energy_capacity_kWh = this->SOH * this->energy_capacity_kWh;
     
+    if (this->power_degradation_flag) {
+        this->dynamic_power_capacity_kW = this->SOH * this->power_capacity_kW;
+    }
+    
     return;
 }   /* __handleDegradation() */
 
@@ -687,7 +691,10 @@ Storage(
     this->type_str = "LIION";
     
     this->dynamic_energy_capacity_kWh = this->energy_capacity_kWh;
+    this->dynamic_power_capacity_kW = this->power_capacity_kW;
+    
     this->SOH = 1;
+    this->power_degradation_flag = liion_inputs.power_degradation_flag;
     this->replace_SOH = liion_inputs.replace_SOH;
     
     this->degradation_alpha = liion_inputs.degradation_alpha;
@@ -758,6 +765,7 @@ void LiIon :: handleReplacement(int timestep)
 {
     //  1. reset attributes
     this->dynamic_energy_capacity_kWh = this->energy_capacity_kWh;
+    this->dynamic_power_capacity_kW = this->power_capacity_kW;
     this->SOH = 1;
     
     // 2. invoke base class method
@@ -804,8 +812,8 @@ double LiIon :: getAvailablekW(double dt_hrs)
     }
     
     //  3. apply power constraint
-    if (available_kW > this->power_capacity_kW) {
-        available_kW = this->power_capacity_kW;
+    if (available_kW > this->dynamic_power_capacity_kW) {
+        available_kW = this->dynamic_power_capacity_kW;
     }
     
     return available_kW;
@@ -849,8 +857,8 @@ double LiIon :: getAcceptablekW(double dt_hrs)
     }
     
     //  3. apply power constraint
-    if (acceptable_kW > this->power_capacity_kW) {
-        acceptable_kW = this->power_capacity_kW;
+    if (acceptable_kW > this->dynamic_power_capacity_kW) {
+        acceptable_kW = this->dynamic_power_capacity_kW;
     }
     
     return acceptable_kW;

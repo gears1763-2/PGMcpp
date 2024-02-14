@@ -525,6 +525,7 @@ if __name__ == "__main__":
 
         liion_inputs.storage_inputs.power_capacity_kW = 500
         liion_inputs.storage_inputs.energy_capacity_kWh = 1050
+        liion_inputs.power_degradation_flag = True
 
         test_model.addLiIon(liion_inputs)
         

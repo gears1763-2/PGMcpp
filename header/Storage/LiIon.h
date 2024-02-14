@@ -50,6 +50,7 @@ struct LiIonInputs {
     double discharging_efficiency = 0.9; ///< The discharging efficiency of the asset.
     
     double replace_SOH = 0.8; ///< The state of health at which the asset is considered "dead" and must be replaced.
+    bool power_degradation_flag = false; ///< A flag which indicates whether or not power degradation should be modelled.
     
     double degradation_alpha = 8.935; ///< A dimensionless acceleration coefficient used in modelling energy capacity degradation.
     double degradation_beta = 1; ///< A dimensionless acceleration exponent used in modelling energy capacity degradation.
@@ -96,7 +97,11 @@ class LiIon : public Storage {
         
     public:
         //  1. attributes
+        bool power_degradation_flag; ///< A flag which indicates whether or not power degradation should be modelled.
+        
         double dynamic_energy_capacity_kWh; ///< The dynamic (i.e. degrading) energy capacity [kWh] of the asset.
+        double dynamic_power_capacity_kW; ///< The dynamic (i.e. degrading) power capacity [kW] of the asset.
+        
         double SOH; ///< The state of health of the asset.
         double replace_SOH; ///< The state of health at which the asset is considered "dead" and must be replaced.
         

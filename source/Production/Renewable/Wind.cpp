@@ -32,6 +32,8 @@
 ///
 /// \brief  Helper method to check inputs to the Wind constructor.
 ///
+/// Ref: \cite Zafar_2018 \n
+///
 /// \param wind_inputs A structure of Wind constructor inputs.
 ///
 
@@ -47,6 +49,14 @@ void Wind :: __checkInputs(WindInputs wind_inputs)
         #endif
 
         throw std::invalid_argument(error_str);
+    }
+    
+    else if (wind_inputs.design_speed_ms < 12) {
+        std::string warning_str = "WARNING:  Wind():  ";
+        warning_str += "Setting WindInputs::design_speed_ms to less than 12 m/s may be ";
+        warning_str += "technically unrealistic";
+        
+        std::cout << warning_str << std::endl;
     }
     
     return;
@@ -122,6 +132,7 @@ double Wind :: __getGenericOpMaintCost(void)
 ///     production model.
 ///
 /// Ref: \cite Milan_2010 \n
+/// Ref: \cite Zafar_2018 \n
 ///
 /// \param timestep The current time step of the Model run.
 ///
