@@ -12,8 +12,11 @@ environmental impacts of integrating renewable energy production and storage ass
 into an otherwise isolated microgrid (presumably reliant on diesel, or other
 fuel-based, generation to begin with).
 
-The Pacific Regional Institute for Marine Energy Discovery (PRIMED): <https://onlineacademiccommunity.uvic.ca/primed/><br>
-The Institute for Integrated Energy Systems (IESVic): <https://www.uvic.ca/research/centres/iesvic/index.php>
+The Pacific Regional Institute for Marine Energy Discovery (PRIMED):  
+<https://onlineacademiccommunity.uvic.ca/primed/><br>  
+
+The Institute for Integrated Energy Systems (IESVic):  
+<https://www.uvic.ca/research/centres/iesvic/index.php>
 
 --------
 
