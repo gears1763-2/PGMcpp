@@ -89,6 +89,7 @@ struct CombustionInputs {
     FuelMode fuel_mode = FuelMode :: FUEL_MODE_LINEAR; ///< The fuel mode to use in modelling fuel consumption.
     
     double nominal_fuel_escalation_annual = 0.05; ///< The nominal, annual fuel escalation rate to use in computing model economics.
+    double cycle_charging_setpoint = 0.85; ///< The cycle charging set point (the load ratio at which to produce when running in cycle charging mode).
     
     std::string path_2_fuel_interp_data = ""; ///< A path (either relative or absolute) to a set of fuel consumption data.
 };
@@ -147,6 +148,8 @@ class Combustion : public Production {
         
         double linear_fuel_slope_LkWh; ///< The slope [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.
         double linear_fuel_intercept_LkWh; ///< The intercept [L/kWh] to use in computing linearized fuel consumption. This is fuel consumption per unit energy produced.
+        
+        double cycle_charging_setpoint; ///< The cycle charging set point (the load ratio at which to produce when running in cycle charging mode).
         
         double CO2_emissions_intensity_kgL; ///< Carbon dioxide (CO2) emissions intensity [kg/L].
         double CO_emissions_intensity_kgL; ///< Carbon monoxide (CO) emissions intensity [kg/L].

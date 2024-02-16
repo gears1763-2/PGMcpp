@@ -68,6 +68,10 @@ pybind11::class_<CombustionInputs>(m, "CombustionInputs")
         &CombustionInputs::nominal_fuel_escalation_annual
     )
     .def_readwrite(
+        "cycle_charging_setpoint",
+        &CombustionInputs::cycle_charging_setpoint
+    )
+    .def_readwrite(
         "path_2_fuel_interp_data",
         &CombustionInputs::path_2_fuel_interp_data
     )
@@ -103,6 +107,10 @@ pybind11::class_<Combustion>(m, "Combustion")
     .def_readwrite(
         "linear_fuel_intercept_LkWh",
         &Combustion::linear_fuel_intercept_LkWh
+    )
+    .def_readwrite(
+        "cycle_charging_setpoint",
+        &Combustion::cycle_charging_setpoint
     )
     .def_readwrite(
         "CO2_emissions_intensity_kgL",

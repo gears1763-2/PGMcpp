@@ -1074,8 +1074,8 @@ double Controller :: __handleCombustionDispatch(
         }
         
         if (is_cycle_charging and request_kW > 0) {
-            if (request_kW < 0.85 * combustion_ptr->capacity_kW) {
-                request_kW = 0.85 * combustion_ptr->capacity_kW;
+            if (request_kW < combustion_ptr->cycle_charging_setpoint * combustion_ptr->capacity_kW) {
+                request_kW = combustion_ptr->cycle_charging_setpoint * combustion_ptr->capacity_kW;
             }
         }
         

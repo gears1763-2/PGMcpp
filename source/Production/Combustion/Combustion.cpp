@@ -79,6 +79,21 @@ void Combustion :: __checkInputs(CombustionInputs combustion_inputs)
         throw std::invalid_argument(error_str);
     }
     
+    // 2. cycle charging setpoint
+    if (
+        combustion_inputs.cycle_charging_setpoint < 0 or
+        combustion_inputs.cycle_charging_setpoint > 1
+    ) {
+        std::string error_str = "ERROR:  Combustion()  cycle charging set point ";
+        error_str += "must be in the closed interval [0, 1].";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
     return;
 }   /* __checkInputs() */
 
@@ -192,6 +207,8 @@ Production(
     
     this->linear_fuel_slope_LkWh = 0;
     this->linear_fuel_intercept_LkWh = 0;
+    
+    this->cycle_charging_setpoint = combustion_inputs.cycle_charging_setpoint;
     
     this->CO2_emissions_intensity_kgL = 0;
     this->CO_emissions_intensity_kgL = 0;

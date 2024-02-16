@@ -140,6 +140,13 @@ Combustion* testConstruct_Diesel(std::vector<double>* time_vec_hrs_ptr)
         __LINE__
     );
     
+    testFloatEquals(
+        test_diesel_ptr->cycle_charging_setpoint,
+        0.85,
+        __FILE__,
+        __LINE__
+    );
+    
     return test_diesel_ptr;
 }   /* testConstruct_Diesel() */
 

@@ -443,6 +443,11 @@ if __name__ == "__main__":
         test_diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 200
         
         for i in range(0, 3):
+            if i == 1:
+                test_diesel_inputs.combustion_inputs.cycle_charging_setpoint = 1
+            else:
+                test_diesel_inputs.combustion_inputs.cycle_charging_setpoint = 0.85
+            
             test_model.addDiesel(test_diesel_inputs)
         
         #   add renewable resources
