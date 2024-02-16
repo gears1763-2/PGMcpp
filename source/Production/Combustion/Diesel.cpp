@@ -412,6 +412,9 @@ void Diesel :: __writeSummary(std::string write_path)
     ofs << "## Combustion Attributes\n";
     ofs << "\n";
     
+    ofs << "Cycle Charging Setpoint: " << this->cycle_charging_setpoint << "\n";
+    ofs << "\n";
+    
     ofs << "Fuel Cost: " << this->fuel_cost_L << " per L  \n";
     ofs << "Nominal Fuel Escalation Rate (annual): "
         << this->nominal_fuel_escalation_annual << "  \n";
