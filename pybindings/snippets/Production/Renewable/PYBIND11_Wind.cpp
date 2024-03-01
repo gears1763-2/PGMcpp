@@ -49,6 +49,7 @@
 
 
 pybind11::enum_<WindPowerProductionModel>(m, "WindPowerProductionModel")
+    .value("WIND_POWER_CUBIC", WindPowerProductionModel::WIND_POWER_CUBIC)
     .value("WIND_POWER_EXPONENTIAL", WindPowerProductionModel::WIND_POWER_EXPONENTIAL)
     .value("WIND_POWER_LOOKUP", WindPowerProductionModel::WIND_POWER_LOOKUP)
     .value(

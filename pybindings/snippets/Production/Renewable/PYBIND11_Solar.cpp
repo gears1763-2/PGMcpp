@@ -48,6 +48,15 @@
 ///
 
 
+pybind11::enum_<SolarPowerProductionModel>(m, "SolarPowerProductionModel")
+    .value("SOLAR_POWER_SIMPLE", SolarPowerProductionModel::SOLAR_POWER_SIMPLE)
+    .value("SOLAR_POWER_DETAILED", SolarPowerProductionModel::SOLAR_POWER_DETAILED)
+    .value(
+        "N_SOLAR_POWER_PRODUCTION_MODELS",
+        SolarPowerProductionModel::N_SOLAR_POWER_PRODUCTION_MODELS
+    );
+
+
 pybind11::class_<SolarInputs>(m, "SolarInputs")
     .def_readwrite("renewable_inputs", &SolarInputs::renewable_inputs)
     .def_readwrite("resource_key", &SolarInputs::resource_key)
@@ -57,12 +66,21 @@ pybind11::class_<SolarInputs>(m, "SolarInputs")
         &SolarInputs::operation_maintenance_cost_kWh
     )
     .def_readwrite("derating", &SolarInputs::derating)
+    .def_readwrite("julian_day", &SolarInputs::julian_day)
+    .def_readwrite("latitude_deg", &SolarInputs::latitude_deg)
+    .def_readwrite("longitude_deg", &SolarInputs::longitude_deg)
+    .def_readwrite("panel_azimuth_deg", &SolarInputs::panel_azimuth_deg)
+    .def_readwrite("panel_tilt_deg", &SolarInputs::panel_tilt_deg)
+    .def_readwrite("albedo_ground_reflectance", &SolarInputs::albedo_ground_reflectance)
+    .def_readwrite("power_model", &SolarInputs::power_model)
     
     .def(pybind11::init());
 
 
 pybind11::class_<Solar>(m, "Solar")
     .def_readwrite("derating", &Solar::derating)
+    .def_readwrite("power_model", &Solar::power_model)
+    .def_readwrite("power_model_string", &Solar::power_model_string)
       
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, SolarInputs, std::vector<double>*>())
