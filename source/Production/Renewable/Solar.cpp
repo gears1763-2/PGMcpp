@@ -637,7 +637,7 @@ double Solar :: __getSolarAltitudeRad(
     }
     
     else {
-        (M_PI / 180.0) * (altitude_deg + refraction);
+        altitude_corrected_rad = (M_PI / 180.0) * (altitude_deg + refraction);
     }
     
     return altitude_corrected_rad;

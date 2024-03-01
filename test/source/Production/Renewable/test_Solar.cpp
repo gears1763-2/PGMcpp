@@ -267,6 +267,207 @@ void testProductionOverride_Solar(
 // ---------------------------------------------------------------------------------- //
 
 ///
+/// \fn void testDetailed_Solar(
+///         std::string path_2_normalized_production_time_series,
+///         std::vector<double>* time_vec_hrs_ptr
+///     ) 
+///
+/// \brief Function to test that the detailed production model is not acting erratically.
+///     The underlying theory is very complicated, and there's plenty of opportunity for
+///     floating point and divide-by-zero errors. =)
+///
+/// \param path_2_normalized_production_time_series A path (either relative or absolute)
+///     to the given normalized production time series data.
+///
+/// \param time_vec_hrs_ptr A pointer to the vector containing the modelling time series.
+///
+
+void testDetailed_Solar(void) 
+{
+    // init time and solar resource vectors
+    std::vector<double> time_vec_hrs = {
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+    };
+    
+    std::vector<double> solar_resource_vec_kWm2 = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        8.51702662684015E-05,
+        0.000348341567045,
+        0.00213793728593,
+        0.004099863613322,
+        0.000997135230553,
+        0.009534527624657,
+        0.022927996790616,
+        0.0136071715294,
+        0.002535134127751,
+        0.005206897515821,
+        0.005627658648597,
+        0.000701186722215,
+        0.00017119827089,
+        0,
+        0,
+        0,
+        0,
+        0
+    };
+    
+    // init expected results (simple and detailed)
+    std::vector<double> expected_simple_production_vec_kW = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.00681362130147212,
+        0.0278673253636,
+        0.1710349828744,
+        0.32798908906576,
+        0.07977081844424,
+        0.7627622099725601,
+        1.83423974324928,
+        1.088573722352,
+        0.20281073022008,
+        0.41655180126568,
+        0.45021269188776,
+        0.0560949377772,
+        0.0136958616712,
+        0,
+        0,
+        0,
+        0,
+        0
+    };
+    
+    std::vector<double> expected_detailed_production_vec_kW = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.007338124437333107,
+        0.03001323298400045,
+        0.1842098680357352,
+        0.3532627387497894,
+        0.085919752082476,
+        0.8215778242841695,
+        1.975723895381408,
+        1.17256966118828,
+        0.2184652818009985,
+        0.4487156859620408,
+        0.4849877212456633,
+        0.06042929047364313,
+        0.01475448450756636,
+        0,
+        0,
+        0,
+        0,
+        0
+    };
+    
+    // init Solar (simple)
+    SolarInputs solar_inputs;
+    
+    Solar test_solar_simple(
+        time_vec_hrs.size(),
+        1,
+        solar_inputs,
+        &time_vec_hrs
+    );
+    
+    // init Solar (detailed)
+    solar_inputs.power_model = SolarPowerProductionModel :: SOLAR_POWER_DETAILED;
+    
+    solar_inputs.julian_day = 8766;
+    solar_inputs.latitude_deg = 50;
+    solar_inputs.longitude_deg = -125;
+    solar_inputs.panel_azimuth_deg = 180;
+    solar_inputs.panel_tilt_deg = 30;
+    solar_inputs.albedo_ground_reflectance = 0.5;
+
+    Solar test_solar_detailed(
+        time_vec_hrs.size(),
+        1,
+        solar_inputs,
+        &time_vec_hrs
+    );
+    
+    // test simple production
+    double production_kW = 0;
+    
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        production_kW = test_solar_simple.computeProductionkW(
+            i, 1, solar_resource_vec_kWm2[i]
+        );
+        
+        test_solar_simple.commit(
+            i, 1, production_kW, 100
+        );
+        
+        testFloatEquals(
+            production_kW,
+            expected_simple_production_vec_kW[i],
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    // test detailed production
+    for (size_t i = 0; i < time_vec_hrs.size(); i++) {
+        production_kW = test_solar_detailed.computeProductionkW(
+            i, 1, solar_resource_vec_kWm2[i]
+        );
+        
+        test_solar_detailed.commit(
+            i, 1, production_kW, 100
+        );
+        
+        testFloatEquals(
+            production_kW,
+            expected_detailed_production_vec_kW[i],
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+}   /* testDetailed_Solar() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
 /// \fn void testProductionConstraint_Solar(Renewable* test_solar_ptr)
 ///
 /// \brief Function to test that the production constraint is active and behaving as
@@ -490,6 +691,8 @@ int main(int argc, char** argv)
             path_2_normalized_production_time_series,
             &time_vec_hrs
         );
+        
+        testDetailed_Solar();
         
         testProductionConstraint_Solar(test_solar_ptr);
         
