@@ -45,6 +45,7 @@
 #ifndef STD_INCLUDES_H
 #define STD_INCLUDES_H
 
+#define _USE_MATH_DEFINES
 
 #include <cmath>
 #include <cstdlib>
