@@ -15,6 +15,8 @@ building the bindings. However, if none of the pre-compiled bindings work for yo
 you make changes to the code and need to build new bindings), then this README is for
 you.
 
+*** ONLY THE LINUX BINDINGS ARE BEING ACTIVELY MAINTAINED ***
+
 --------
 
 
