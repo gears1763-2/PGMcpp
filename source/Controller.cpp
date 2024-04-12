@@ -192,9 +192,14 @@ void Controller :: __constructCombustionMap(
             }
         }
         
-        std::cout << print_str << row + 1 << " / " << n_rows << "\r";
+        if (n_cols >= 10) {
+            std::cout << print_str << row + 1 << " / " << n_rows << "\r";
+        }
     }
-    std::cout << print_str << n_rows << " / " << n_rows << "  DONE" << std::endl;
+    
+    if (n_cols >= 10) {
+        std::cout << print_str << n_rows << " / " << n_rows << "  DONE" << std::endl;
+    }
     
     //  3. sort combustion map by key value (ascending order)
     /*
