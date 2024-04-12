@@ -144,68 +144,69 @@ void Controller :: __constructCombustionMap(
     std::vector<Combustion*>* combustion_ptr_vec_ptr
 )
 {
+    std::string print_str = "Controller :: __constructCombustionMap()  ";
+    print_str += "constructing combustion map (dispatch)  ";
+    
     //  1. get state table dimensions
-    int n_cols = combustion_ptr_vec_ptr->size();
-    int n_rows = pow(2, n_cols);
+    uint n_cols = combustion_ptr_vec_ptr->size();
+    unsigned long int n_rows = pow(2, n_cols);
     
-    //  2. init state table (all possible on/off combinations)
-    std::vector<std::vector<bool>> state_table;
-    state_table.resize(n_rows, {});
-    
-    int x = 0;
-    for (int i = 0; i < n_rows; i++) {
-        state_table[i].resize(n_cols, false);
+    //  2. walk through all possible operating states (on/off) and populate combustion
+    //     map, keeping only states with minimum number of assets running.
+    for (unsigned long int row = 0; row < n_rows; row++) {
+        std::vector<bool> state_vec(n_cols, false);
         
-        x = i;
-        for (int j = 0; j < n_cols; j++) {
-            if (x % 2 == 0) {
-                state_table[i][j] = true;
+        uint asset_count = 0;
+        unsigned long int x = row;
+        double total_capacity_kW = 0;
+        
+        for (uint i = 0; i < n_cols; i++) {
+            if (x <= 0) {
+                break;
             }
+            
+            if (x % 2 != 0) {
+                state_vec[i] = true;
+                total_capacity_kW += combustion_ptr_vec_ptr->at(i)->capacity_kW;
+                asset_count++;
+            }
+            
             x /= 2;
         }
-    }
-    
-    //  3. construct combustion map (handle duplicates by keeping rows with minimum
-    //     trues)
-    double total_capacity_kW = 0;
-    int truth_count = 0;
-    int current_truth_count = 0;
-    
-    for (int i = 0; i < n_rows; i++) {
-        total_capacity_kW = 0;
-        truth_count = 0;
-        current_truth_count = 0;
         
-        for (int j = 0; j < n_cols; j++) {
-            if (state_table[i][j]) {
-                total_capacity_kW += combustion_ptr_vec_ptr->at(j)->capacity_kW;
-                truth_count++;
-            }
+        if (this->combustion_map.count(total_capacity_kW) == 0) {
+            this->combustion_map[total_capacity_kW] = state_vec;
         }
         
-        if (this->combustion_map.count(total_capacity_kW) > 0) {
-            for (int j = 0; j < n_cols; j++) {
-                if (this->combustion_map[total_capacity_kW][j]) {
-                    current_truth_count++;
+        else {
+            uint incumbent_asset_count = 0;
+            
+            for (uint i = 0; i < n_cols; i++) {
+                if (this->combustion_map[total_capacity_kW][i]) {
+                    incumbent_asset_count++;
                 }
             }
             
-            if (truth_count < current_truth_count) {
-                this->combustion_map.erase(total_capacity_kW);
+            if (asset_count < incumbent_asset_count) {
+                this->combustion_map[total_capacity_kW] = state_vec;
             }
         }
         
-        this->combustion_map.insert(
-            std::pair<double, std::vector<bool>> (
-                total_capacity_kW,
-                state_table[i]
-            )
-        );
+        std::cout << print_str << row + 1 << " / " << n_rows << "\r";
     }
+    std::cout << print_str << n_rows << " / " << n_rows << "  DONE" << std::endl;
+    
+    //  3. sort combustion map by key value (ascending order)
+    /*
+     *  Not necessary, since std::map is automatically sorted by key value on insertion.
+     *  See https://en.cppreference.com/w/cpp/container/map, namely "std::map is a
+     *  sorted associative container that contains key-value pairs with unique keys.
+     *  Keys are sorted by using the comparison function Compare."
+     */
     
     /*
     // ==== TEST PRINT ==== //
-    std::cout << std::endl;
+    std::cout << std::endl << std::endl;
     
     std::cout << "\t\t";
     for (size_t i = 0; i < combustion_ptr_vec_ptr->size(); i++) {
@@ -226,8 +227,10 @@ void Controller :: __constructCombustionMap(
         }
         std::cout << "}" << std::endl;
     }
+    
+    
     // ==== END TEST PRINT ==== //
-    //*/
+    */
     
     return;
 }   /* __constructCombustionTable() */
@@ -1044,6 +1047,7 @@ double Controller :: __handleCombustionDispatch(
     double total_capacity_kW = 0;
     
     std::map<double, std::vector<bool>>::iterator iter = this->combustion_map.begin();
+    
     while (iter != std::prev(this->combustion_map.end(), 1)) {
         if (target_production_kW <= total_capacity_kW) {
             break;
