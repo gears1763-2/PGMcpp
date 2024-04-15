@@ -148,7 +148,7 @@ void Controller :: __constructCombustionMap(
     print_str += "constructing combustion map (dispatch)  ";
     
     //  1. get state table dimensions
-    uint n_cols = combustion_ptr_vec_ptr->size();
+    unsigned int n_cols = combustion_ptr_vec_ptr->size();
     unsigned long int n_rows = pow(2, n_cols);
     
     //  2. walk through all possible operating states (on/off) and populate combustion
@@ -156,11 +156,11 @@ void Controller :: __constructCombustionMap(
     for (unsigned long int row = 0; row < n_rows; row++) {
         std::vector<bool> state_vec(n_cols, false);
         
-        uint asset_count = 0;
+        unsigned int asset_count = 0;
         unsigned long int x = row;
         double total_capacity_kW = 0;
         
-        for (uint i = 0; i < n_cols; i++) {
+        for (unsigned int i = 0; i < n_cols; i++) {
             if (x <= 0) {
                 break;
             }
@@ -179,9 +179,9 @@ void Controller :: __constructCombustionMap(
         }
         
         else {
-            uint incumbent_asset_count = 0;
+            unsigned int incumbent_asset_count = 0;
             
-            for (uint i = 0; i < n_cols; i++) {
+            for (unsigned int i = 0; i < n_cols; i++) {
                 if (this->combustion_map[total_capacity_kW][i]) {
                     incumbent_asset_count++;
                 }
