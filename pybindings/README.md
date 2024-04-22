@@ -105,3 +105,17 @@ For now, the most portable solution is to build the bindings yourself using the
 instructions above. However, a better solution would be to make PGMcpp available on PyPI
 (so that one can simply `pip install` it). I've never attemped this before, however, so
 I have some learning to do before I can offer that. More to follow.
+
+--------
+
+
+## Notes on Python Learning Resources
+
+If you are new to Python and need to level up your programming skills to make use of 
+PGMcpp, a good place to start is the Essentials 1 and 2 courses as offered by the
+Python Institute. These courses are free, online, and self-directed. You can access them 
+any time from  
+
+<https://www.pythoninstitute.org/python-essentials-1>  
+
+<https://www.pythoninstitute.org/python-essentials-2>  
