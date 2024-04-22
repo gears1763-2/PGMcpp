@@ -41,12 +41,33 @@ makefile, a TODO list, and the following sub-directories:
 ## Key Features
 
   * A time-domain microgrid modelling code that will work with any time series data (can be non-uniform series of arbitrary length).
+  
   * Support for modelling diesel generators. This includes modelling fuel consumption and emissions. Up to 30 diesel generators can be modelled simultaneously.
+  
   * Support for modelling hydro, solar, wind, tidal, and wave renewable production assets. Any number of assets can be modelled (up to memory limitations).
+  
   * Any number of renewable resource time series can be modelled (up to memory limitations), with resources being associated with chosen production assets.
+  
   * Support for modelling lithium ion battery energy storage. This includes modelling use-based battery degradation dynamics.
+  
   * Support for modelling both load following and cycle charging dispatch control.
+  
   * Can be either accessed natively in C++, or accessed in Python 3 by way of the provided bindings.
+
+--------
+
+
+##  Quick Start (Windows Tutorial Videos)
+
+For a quick start with PGMcpp (on Windows), consider viewing the tutorial videos  
+
+  * 1 - Getting PGMcpp Source Code from GitHub: <https://youtu.be/Z2-56tzYG0E>  
+
+  * 2 - Compiling PGMcpp from Source (C++): <https://youtu.be/d9ozOhWM3H0>  
+
+  * 3 - Building Python Bindings for PGMcpp: <https://youtu.be/nNRSS3f5UDE>  
+
+  * 4 - An Example Python Project in PGMcpp: <https://youtu.be/hw8BC_ztJLo>  
 
 --------
 

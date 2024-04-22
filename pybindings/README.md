@@ -36,6 +36,15 @@ definitions corresponding to `source/../<>.cpp`.
 --------
 
 
+##  Tutorial Video (Windows)
+
+For a tutorial video on this topic, refer to  
+
+3 - Building Python Bindings for PGMcpp: <https://youtu.be/nNRSS3f5UDE>
+
+--------
+
+
 ## Setup
 
 Note that the provided `setup.py` has the following dependencies (listed in 
