@@ -1493,6 +1493,11 @@ int main(int argc, char** argv)
     #endif  /* _WIN32 */
     
     printGold("\tTesting Model");
+    
+    #ifdef _WIN32
+        std::cout << std::endl;
+    #endif
+    
     std::cout << std::flush;
     
     srand(time(NULL));

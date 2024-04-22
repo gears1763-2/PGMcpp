@@ -670,6 +670,10 @@ int main(int argc, char** argv)
     
     printGold("\tTesting Production <-- Renewable <-- Solar");
     
+    #ifdef _WIN32
+        std::cout << std::endl;
+    #endif
+    
     srand(time(NULL));
     
     

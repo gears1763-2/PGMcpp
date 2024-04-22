@@ -103,6 +103,10 @@ int main(int argc, char** argv)
     
     printGold("\tTesting Production <-- Noncombustion");
     
+    #ifdef _WIN32
+        std::cout << std::endl;
+    #endif
+    
     srand(time(NULL));
     
     

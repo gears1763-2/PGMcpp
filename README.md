@@ -55,29 +55,49 @@ makefile, a TODO list, and the following sub-directories:
 
 ### C++ Setup
 
-To build PGMcpp, you can simply
+To build (and test) PGMcpp, you can simply
 
     make PGMcpp
 
-#### --- Linux (Debian/Ubuntu) Notes ---
+once appropriately set up to do so. See below for some OS-specific notes.
+
+#### --- Linux (Debian/Ubuntu) Setup Notes ---
 
 On Linux (Debian/Ubuntu), this should be pretty turn-key. If not, you might need to
 install the build essential package; this can be done by invoking
 
     sudo apt-get install build-essential
 
-#### --- Windows Notes ---
+#### --- Windows Setup Notes ---
 
-On Windows, building is achieved using the environment provided by the MSYS2 project
+On Windows, building is achieved using the environment provided by the `MSYS2` project
 (see <https://www.msys2.org/>). You can follow the download and installation instructions
-provided there.
+provided there. Specifically, be sure to
 
-For MSYS2, if you do run into any `undefined reference to` errors at compile time, here
-are some possible fixes
+    pacman -S mingw-w64-x86_64-gcc make
+
+and
+
+    pacman -Syu
+
+from within `MSYS2` after installing. Then, close `MSYS2` and run `MSYS2 MINGW64`, and
+ensure everything needed has been installed by issuing
+
+    g++ --version
+
+and then
+
+    make --version
+
+If you get version info each time rather than a `command not found` error, then
+everything you need is set up and ready to go.
+
+For `MSYS2`, if you do run into any `undefined reference to` errors at compile time,
+here are some possible fixes
 
   * You may just need to update your MSYS2. This can be done by invoking `pacman -Syu` within an MSYS2 terminal. The terminal will close and need to be restarted.
-  * You may need to install the mingw64 version of cmake. This can be done by invoking `pacman -S mingw-w64-x86_64-cmake`.
   * The debugging (`-g`) and profiling (`-p`) compiler flags may be causing issues. A solution here is to modify the `CXXFLAGS` definition in the provided `makefile` to simply `-Wall -fPIC`.
+  * For missing dependencies, you likely just need to install them (`pacman`); just search for the missing dependency and you should find install instructions.
 
 ### Python 3 Setup
 
