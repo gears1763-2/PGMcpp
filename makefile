@@ -26,8 +26,8 @@ OUT_PROJECT = bin/$(PROJECT_NAME).out
 
 CXX = g++ -O3 -std=c++17
 
-CXXFLAGS =  -Wall -g -p -fPIC
-#CXXFLAGS = -Wall -fPIC
+#CXXFLAGS =  -Wall -g -p -fPIC
+CXXFLAGS = -Wall -fPIC
 
 LIBS = -lpthread
 
