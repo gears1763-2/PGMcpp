@@ -65,8 +65,38 @@ void Model :: __checkInputs(ModelInputs model_inputs)
 {
     //  1. check path_2_electrical_load_time_series
     if (model_inputs.path_2_electrical_load_time_series.empty()) {
-        std::string error_str = "ERROR:  Model()  path_2_electrical_load_time_series ";
-        error_str += "cannot be empty";
+        std::string error_str = "ERROR:  Model():  ";
+        error_str += "ModelInputs::path_2_electrical_load_time_series cannot be empty";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  2. check load_operating_reserve_factor
+    if (
+        model_inputs.load_operating_reserve_factor < 0 or
+        model_inputs.load_operating_reserve_factor > 1
+    ) {
+        std::string error_str = "ERROR:  Model():  ";
+        error_str += "ModelInputs::load_operating_reserve_factor must be in the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  3. check max_operating_reserve_factor
+    if (
+        model_inputs.max_operating_reserve_factor < 0 or
+        model_inputs.max_operating_reserve_factor > 1
+    ) {
+        std::string error_str = "ERROR:  Model():  ";
+        error_str += "ModelInputs::max_operating_reserve_factor must be in the closed interval [0, 1]";
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;
@@ -315,6 +345,10 @@ void Model :: __writeSummary(std::string write_path)
     ofs << "## Controller\n";
     ofs << "\n";
     ofs << "Control Mode: " << this->controller.control_string << "  \n";
+    ofs << "Load Operating Reserve Factor: " <<
+        this->controller.load_operating_reserve_factor << "  \n";
+    ofs << "Max Overall Operating Reserve Factor: " << 
+        this->controller.max_operating_reserve_factor << "  \n";
     ofs << "\n--------\n\n";
     
     //  3.3. Resources (1D)
@@ -621,8 +655,10 @@ Model :: Model(ModelInputs model_inputs)
     //  2. read in electrical load data
     this->electrical_load.readLoadData(model_inputs.path_2_electrical_load_time_series);
     
-    //  3. set control mode
+    //  3. set controller attributes
     this->controller.setControlMode(model_inputs.control_mode);
+    this->controller.setLoadOperatingReserveFactor(model_inputs.load_operating_reserve_factor);
+    this->controller.setMaxOperatingReserveFactor(model_inputs.max_operating_reserve_factor);
     
     //  4. set public attributes
     this->total_fuel_consumed_L = 0;

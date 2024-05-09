@@ -84,6 +84,9 @@ model_inputs = PGMcpp.ModelInputs()
 model_inputs.path_2_electrical_load_time_series = path_2_electrical_load_time_series
 model_inputs.control_mode = PGMcpp.ControlMode.CYCLE_CHARGING
 
+model_inputs.load_operating_reserve_factor = 0.25
+model_inputs.max_operating_reserve_factor = 0.50
+
 model = PGMcpp.Model(model_inputs)
 
 

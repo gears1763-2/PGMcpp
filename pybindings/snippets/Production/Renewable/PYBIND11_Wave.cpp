@@ -61,6 +61,7 @@ pybind11::enum_<WavePowerProductionModel>(m, "WavePowerProductionModel")
 pybind11::class_<WaveInputs>(m, "WaveInputs")
     .def_readwrite("renewable_inputs", &WaveInputs::renewable_inputs)
     .def_readwrite("resource_key", &WaveInputs::resource_key)
+    .def_readwrite("firmness_factor", &WaveInputs::firmness_factor)
     .def_readwrite("capital_cost", &WaveInputs::capital_cost)
     .def_readwrite(
         "operation_maintenance_cost_kWh",

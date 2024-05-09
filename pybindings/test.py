@@ -234,6 +234,8 @@ if __name__ == "__main__":
         
         test_solar_inputs = PGMcpp.SolarInputs()
         
+        test_solar_inputs.firmness_factor = 1
+        
         test_solar = PGMcpp.Solar(
             8760,
             1,
@@ -425,6 +427,9 @@ if __name__ == "__main__":
         )
 
         test_model_inputs = PGMcpp.ModelInputs()
+        
+        test_model_inputs.load_operating_reserve_factor = 0.3
+        test_model_inputs.max_operating_reserve_factor = 0.8
 
         test_model_inputs.path_2_electrical_load_time_series = (
             path_2_electrical_load_time_series
@@ -438,6 +443,10 @@ if __name__ == "__main__":
         )
         
         assert (test_model.controller.control_string == "LOAD_FOLLOWING")
+        
+        assert (test_model.controller.load_operating_reserve_factor == 0.3)
+        
+        assert (test_model.controller.max_operating_reserve_factor == 0.8)
         
         #   add Diesel assets
         test_diesel_inputs.combustion_inputs.production_inputs.capacity_kW = 200

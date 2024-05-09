@@ -64,6 +64,7 @@ pybind11::enum_<TidalPowerProductionModel>(m, "TidalPowerProductionModel")
 pybind11::class_<TidalInputs>(m, "TidalInputs")
     .def_readwrite("renewable_inputs", &TidalInputs::renewable_inputs)
     .def_readwrite("resource_key", &TidalInputs::resource_key)
+    .def_readwrite("firmness_factor", &TidalInputs::firmness_factor)
     .def_readwrite("capital_cost", &TidalInputs::capital_cost)
     .def_readwrite(
         "operation_maintenance_cost_kWh",

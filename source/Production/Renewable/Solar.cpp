@@ -151,6 +151,21 @@ void Solar :: __checkInputs(SolarInputs solar_inputs)
         throw std::invalid_argument(error_str);
     }
     
+    //  7. check firmness_factor
+    if (
+        solar_inputs.firmness_factor < 0 or
+        solar_inputs.firmness_factor > 1
+    ) {
+        std::string error_str = "ERROR:  Solar():  ";
+        error_str += "SolarInputs::firmness_factor must be in the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
     return;
 }   /* __checkInputs() */
 
@@ -1257,6 +1272,7 @@ void Solar :: __writeSummary(std::string write_path)
     ofs << "\n";
     
     ofs << "Resource Key (1D): " << this->resource_key << "  \n";
+    ofs << "Firmness Factor: " << this->firmness_factor << "  \n";
     
     ofs << "\n--------\n\n";
     
@@ -1437,6 +1453,8 @@ Renewable(
     this->type_str = "SOLAR";
     
     this->resource_key = solar_inputs.resource_key;
+    
+    this->firmness_factor = solar_inputs.firmness_factor;
     
     this->derating = solar_inputs.derating;
     

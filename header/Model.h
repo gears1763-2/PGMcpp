@@ -75,6 +75,9 @@ struct ModelInputs {
     std::string path_2_electrical_load_time_series = ""; ///< A string defining the path (either relative or absolute) to the given electrical load time series.
     
     ControlMode control_mode = ControlMode :: LOAD_FOLLOWING; ///< The control mode to be applied by the Controller object.
+    
+    double load_operating_reserve_factor = 0.2; ///< An operating reserve factor [0, 1] to cover random fluctuations in load.
+    double max_operating_reserve_factor = 1; ///< A maximum reserve factor [0, 1] that limits the required overall operating reserve to, at most, factor * load_kW.
 };
 
 

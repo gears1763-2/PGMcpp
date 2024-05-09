@@ -112,6 +112,13 @@ Renewable* testConstruct_Solar(std::vector<double>* time_vec_hrs_ptr)
         __LINE__
     );
     
+    testFloatEquals(
+        test_solar_ptr->firmness_factor,
+        0.2,
+        __FILE__,
+        __LINE__
+    );
+    
     return test_solar_ptr;
 }   /* testConstruct_Solar() */
 

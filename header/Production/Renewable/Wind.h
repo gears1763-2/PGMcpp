@@ -77,6 +77,8 @@ struct WindInputs {
     
     int resource_key = 0; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
     
+    double firmness_factor = 0.5; ///< A factor [0, 1] which defines how firm the production from this asset is.
+    
     double capital_cost = -1; ///< The capital cost of the asset (undefined currency). -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD].
     double operation_maintenance_cost_kWh = -1; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced. -1 is a sentinel value, which triggers a generic cost model on construction (in fact, any negative value here will trigger). Note that the generic cost model is in terms of Canadian dollars [CAD/kWh].
     

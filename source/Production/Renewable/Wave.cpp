@@ -102,6 +102,21 @@ void Wave :: __checkInputs(WaveInputs wave_inputs)
         throw std::invalid_argument(error_str);
     }
     
+    //  4. check firmness_factor
+    if (
+        wave_inputs.firmness_factor < 0 or
+        wave_inputs.firmness_factor > 1
+    ) {
+        std::string error_str = "ERROR:  Wave():  ";
+        error_str += "WaveInputs::firmness_factor must be in the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
     return;
 }   /* __checkInputs() */
 
@@ -387,6 +402,7 @@ void Wave :: __writeSummary(std::string write_path)
     ofs << "\n";
     
     ofs << "Resource Key (2D): " << this->resource_key << "  \n";
+    ofs << "Firmness Factor: " << this->firmness_factor << "  \n";
     
     ofs << "\n--------\n\n";
     
@@ -590,6 +606,8 @@ Renewable(
     this->type_str = "WAVE";
     
     this->resource_key = wave_inputs.resource_key;
+    
+    this->firmness_factor = wave_inputs.firmness_factor;
     
     this->design_significant_wave_height_m =
         wave_inputs.design_significant_wave_height_m;

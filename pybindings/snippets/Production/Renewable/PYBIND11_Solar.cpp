@@ -60,6 +60,7 @@ pybind11::enum_<SolarPowerProductionModel>(m, "SolarPowerProductionModel")
 pybind11::class_<SolarInputs>(m, "SolarInputs")
     .def_readwrite("renewable_inputs", &SolarInputs::renewable_inputs)
     .def_readwrite("resource_key", &SolarInputs::resource_key)
+    .def_readwrite("firmness_factor", &SolarInputs::firmness_factor)
     .def_readwrite("capital_cost", &SolarInputs::capital_cost)
     .def_readwrite(
         "operation_maintenance_cost_kWh",

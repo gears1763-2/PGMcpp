@@ -106,6 +106,13 @@ Renewable* testConstruct_Wind(std::vector<double>* time_vec_hrs_ptr)
         __FILE__,
         __LINE__
     );
+    
+    testFloatEquals(
+        test_wind_ptr->firmness_factor,
+        0.5,
+        __FILE__,
+        __LINE__
+    );
 
     return test_wind_ptr;
 }   /* testConstruct_Wind() */

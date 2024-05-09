@@ -106,6 +106,13 @@ Renewable* testConstruct_Tidal(std::vector<double>* time_vec_hrs_ptr)
         __FILE__,
         __LINE__
     );
+    
+    testFloatEquals(
+        test_tidal_ptr->firmness_factor,
+        0.8,
+        __FILE__,
+        __LINE__
+    );
 
     return test_tidal_ptr;
 }   /* testConstruct_Tidal() */

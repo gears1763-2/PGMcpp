@@ -87,57 +87,38 @@ class Controller {
         
         
         //  2. methods
-        void __computeNetLoad(ElectricalLoad*, std::vector<Renewable*>*, Resources*);
+        void __computeRenewableProduction(
+            ElectricalLoad*,
+            std::vector<Renewable*>*,
+            Resources*
+        );
+        
         void __constructCombustionMap(std::vector<Combustion*>*);
         
-        void __applyLoadFollowingControl_CHARGING(
-            int,
-            ElectricalLoad*,
-            Resources*,
-            std::vector<Combustion*>*,
-            std::vector<Noncombustion*>*,
-            std::vector<Renewable*>*,
-            std::vector<Storage*>*
-        );
+        double __getRenewableProduction(int, double, Renewable*, Resources*);
         
-        void __applyLoadFollowingControl_DISCHARGING(
-            int,
-            ElectricalLoad*,
-            Resources*,
-            std::vector<Combustion*>*,
-            std::vector<Noncombustion*>*,
-            std::vector<Renewable*>*,
-            std::vector<Storage*>*
-        );
+        double __handleStorageDischarging(int, double, double, std::vector<Storage*>*);
         
-        void __applyCycleChargingControl_CHARGING(
-            int,
-            ElectricalLoad*,
-            Resources*,
-            std::vector<Combustion*>*,
-            std::vector<Noncombustion*>*,
-            std::vector<Renewable*>*,
-            std::vector<Storage*>*
-        );
-        
-        void __applyCycleChargingControl_DISCHARGING(
-            int,
-            ElectricalLoad*,
-            Resources*,
-            std::vector<Combustion*>*,
-            std::vector<Noncombustion*>*,
-            std::vector<Renewable*>*,
-            std::vector<Storage*>*
-        );
-        
-        void __handleStorageCharging(
+        double __handleNoncombustionDispatch(
             int,
             double,
-            std::list<Storage*>,
-            std::vector<Combustion*>*,
+            double,
             std::vector<Noncombustion*>*,
-            std::vector<Renewable*>*
+            Resources*
         );
+        
+        double __handleCombustionDispatch(
+            int,
+            double,
+            double,
+            double,
+            double,
+            double,
+            std::vector<Combustion*>*,
+            bool
+        );
+        
+        double __handleRenewableDispatch(int, double, double, std::vector<Renewable*>*);
         
         void __handleStorageCharging(
             int,
@@ -148,31 +129,18 @@ class Controller {
             std::vector<Renewable*>*
         );
         
-        double __getRenewableProduction(int, double, Renewable*, Resources*);
-        
-        double __handleCombustionDispatch(
-            int,
-            double,
-            double,
-            std::vector<Combustion*>*,
-            bool
-        );
-        
-        double __handleNoncombustionDispatch(
-            int,
-            double,
-            double,
-            std::vector<Noncombustion*>*,
-            Resources*
-        );
-        
-        double __handleStorageDischarging(int, double, double, std::list<Storage*>);
-        
         
     public:
         //  1. attributes
         ControlMode control_mode; ///< The ControlMode that is active in the Model.
         std::string control_string; ///< A string describing the active ControlMode.
+        
+        double load_operating_reserve_factor; ///< An operating reserve factor [0, 1] to cover random fluctuations in load.
+        double max_operating_reserve_factor; ///< A maximum reserve factor [0, 1] that limits the required overall operating reserve to, at most, factor * load_kW.
+        
+        double required_operating_reserve_kW; ///< A required operating reserve [kW], to absorb load and Renewable production fluctuations.
+        
+        std::vector<bool> storage_discharge_bool_vec; ///< A boolean vector attribute to track which Storage assets have been discharged in each time step.
         
         std::vector<double> net_load_vec_kW; ///< A vector of net load values [kW] at each point in the modelling time series. Net load is defined as load minus all available Renewable production.
         std::vector<double> missed_load_vec_kW; ///< A vector of missed load values [kW] at each point in the modelling time series.
@@ -184,6 +152,9 @@ class Controller {
         Controller(void);
         
         void setControlMode(ControlMode);
+        
+        void setLoadOperatingReserveFactor(double);
+        void setMaxOperatingReserveFactor(double);
         
         void init(
             ElectricalLoad*,

@@ -70,6 +70,20 @@ Model* testConstruct_Model(ModelInputs test_model_inputs)
         __FILE__,
         __LINE__
     );
+    
+    testFloatEquals(
+        test_model_ptr->controller.load_operating_reserve_factor,
+        0.2,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model_ptr->controller.max_operating_reserve_factor,
+        1,
+        __FILE__,
+        __LINE__
+    );
 
     return test_model_ptr;
 }   /* testConstruct_Model() */
@@ -1281,7 +1295,7 @@ void testAddLiIon_Model(Model* test_model_ptr)
 
 void testLoadBalance_Model(Model* test_model_ptr)
 {
-    double net_load_kW = 0;
+    double load_kW = 0;
 
     Combustion* combustion_ptr;
     Noncombustion* noncombustion_ptr;
@@ -1289,8 +1303,6 @@ void testLoadBalance_Model(Model* test_model_ptr)
     Storage* storage_ptr;
 
     for (int i = 0; i < test_model_ptr->electrical_load.n_points; i++) {
-        net_load_kW = test_model_ptr->controller.net_load_vec_kW[i];
-        
         testLessThanOrEqualTo(
             test_model_ptr->controller.net_load_vec_kW[i],
             test_model_ptr->electrical_load.max_load_kW,
@@ -1298,8 +1310,38 @@ void testLoadBalance_Model(Model* test_model_ptr)
             __LINE__
         );
         
+        load_kW = test_model_ptr->electrical_load.load_vec_kW[i];
+        
         for (size_t j = 0; j < test_model_ptr->combustion_ptr_vec.size(); j++) {
             combustion_ptr = test_model_ptr->combustion_ptr_vec[j];
+            
+            testGreaterThanOrEqualTo(
+                combustion_ptr->production_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                combustion_ptr->dispatch_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                combustion_ptr->curtailment_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                combustion_ptr->storage_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
             
             testFloatEquals(
                 combustion_ptr->production_vec_kW[i] -
@@ -1311,11 +1353,39 @@ void testLoadBalance_Model(Model* test_model_ptr)
                 __LINE__
             );
             
-            net_load_kW -= combustion_ptr->production_vec_kW[i];
+            load_kW -= combustion_ptr->dispatch_vec_kW[i];
         }
         
         for (size_t j = 0; j < test_model_ptr->noncombustion_ptr_vec.size(); j++) {
             noncombustion_ptr = test_model_ptr->noncombustion_ptr_vec[j];
+            
+            testGreaterThanOrEqualTo(
+                noncombustion_ptr->production_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                noncombustion_ptr->dispatch_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                noncombustion_ptr->curtailment_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                noncombustion_ptr->storage_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
             
             testFloatEquals(
                 noncombustion_ptr->production_vec_kW[i] -
@@ -1327,11 +1397,39 @@ void testLoadBalance_Model(Model* test_model_ptr)
                 __LINE__
             );
             
-            net_load_kW -= noncombustion_ptr->production_vec_kW[i];
+            load_kW -= noncombustion_ptr->dispatch_vec_kW[i];
         }
         
         for (size_t j = 0; j < test_model_ptr->renewable_ptr_vec.size(); j++) {
             renewable_ptr = test_model_ptr->renewable_ptr_vec[j];
+            
+            testGreaterThanOrEqualTo(
+                renewable_ptr->production_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                renewable_ptr->dispatch_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                renewable_ptr->curtailment_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                renewable_ptr->storage_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
             
             testFloatEquals(
                 renewable_ptr->production_vec_kW[i] -
@@ -1343,11 +1441,25 @@ void testLoadBalance_Model(Model* test_model_ptr)
                 __LINE__
             );
             
-            net_load_kW -= renewable_ptr->production_vec_kW[i];
+            load_kW -= renewable_ptr->dispatch_vec_kW[i];
         }
         
         for (size_t j = 0; j < test_model_ptr->storage_ptr_vec.size(); j++) {
             storage_ptr = test_model_ptr->storage_ptr_vec[j];
+            
+            testGreaterThanOrEqualTo(
+                storage_ptr->charging_power_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+            
+            testGreaterThanOrEqualTo(
+                storage_ptr->discharging_power_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
             
             testTruth(
                 not (
@@ -1358,11 +1470,18 @@ void testLoadBalance_Model(Model* test_model_ptr)
                 __LINE__
             );
             
-            net_load_kW -= storage_ptr->discharging_power_vec_kW[i];
+            load_kW -= storage_ptr->discharging_power_vec_kW[i];
         }
         
         testLessThanOrEqualTo(
-            net_load_kW,
+            load_kW,
+            1e-6,
+            __FILE__,
+            __LINE__
+        );
+        
+        testLessThanOrEqualTo(
+            test_model_ptr->controller.missed_load_vec_kW[i],
             0,
             __FILE__,
             __LINE__
@@ -1378,6 +1497,100 @@ void testLoadBalance_Model(Model* test_model_ptr)
     
     return;
 }   /* testLoadBalance_Model() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void testOperatingReserve_Model(Model* test_model_ptr)
+///
+/// \brief Function to check that the post-run state is consistent with the intended 
+///     operating reserve (or "spinning reserve") logic.
+///
+/// \param test_model_ptr A pointer to the test Model object.
+///
+
+void testOperatingReserve_Model(Model* test_model_ptr)
+{
+    double load_kW = 0;
+    double operating_reserve_kW = 0;
+
+    Combustion* combustion_ptr;
+    Noncombustion* noncombustion_ptr;
+    Renewable* renewable_ptr;
+    Storage* storage_ptr;
+
+    for (int i = 0; i < test_model_ptr->electrical_load.n_points; i++) {
+        //  1. compute operating reserve
+        load_kW = test_model_ptr->electrical_load.load_vec_kW[i];
+        
+        operating_reserve_kW =
+            test_model_ptr->controller.load_operating_reserve_factor * load_kW;
+        
+        for (size_t j = 0; j < test_model_ptr->renewable_ptr_vec.size(); j++) {
+            renewable_ptr = test_model_ptr->renewable_ptr_vec[j];
+            
+            operating_reserve_kW += (1 - renewable_ptr->firmness_factor) *
+                renewable_ptr->production_vec_kW[i];
+            
+            testGreaterThanOrEqualTo(
+                renewable_ptr->production_vec_kW[i],
+                0,
+                __FILE__,
+                __LINE__
+            );
+        }
+        
+        if (
+            operating_reserve_kW >
+                test_model_ptr->controller.max_operating_reserve_factor * load_kW
+        ) {
+            operating_reserve_kW =
+                test_model_ptr->controller.max_operating_reserve_factor * load_kW;
+        }
+        
+        testGreaterThanOrEqualTo(
+            operating_reserve_kW,
+            0,
+            __FILE__,
+            __LINE__
+        );
+        
+        //  2. deduct Storage discharge from operating reserve
+        for (size_t j = 0; j < test_model_ptr->storage_ptr_vec.size(); j++) {
+            storage_ptr = test_model_ptr->storage_ptr_vec[j];
+            
+            operating_reserve_kW -= storage_ptr->discharging_power_vec_kW[i];
+        }
+        
+        //  3. deduct Noncombustion dispatch from operating reserve
+        for (size_t j = 0; j < test_model_ptr->noncombustion_ptr_vec.size(); j++) {
+            noncombustion_ptr = test_model_ptr->noncombustion_ptr_vec[j];
+            
+            operating_reserve_kW -= noncombustion_ptr->dispatch_vec_kW[i];
+        }
+        
+        //  4. deduct Combustion dispatch from operating reserve
+        for (size_t j = 0; j < test_model_ptr->combustion_ptr_vec.size(); j++) {
+            combustion_ptr = test_model_ptr->combustion_ptr_vec[j];
+            
+            operating_reserve_kW -= combustion_ptr->dispatch_vec_kW[i];
+        }
+        
+        //  5. assert remaining operating reserve is zero (+/- tolerance)
+        testLessThanOrEqualTo(
+            operating_reserve_kW,
+            1e-6,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    return;
+}   /* testOperatingReserve_Model() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -1579,9 +1792,9 @@ int main(int argc, char** argv)
         
         // looping solely for the sake of profiling (also tests reset(), which is
         // needed for wrapping PGMcpp in an optimizer)
-        for (int i = 0; i < 1000; i++) {
+        int n_times = 1000;
+        for (int i = 0; i < n_times; i++) {
             test_model_ptr->reset();
-            
             
             testAddHydro_Model(test_model_ptr, hydro_resource_key);
             testAddDiesel_Model(test_model_ptr);
@@ -1596,12 +1809,14 @@ int main(int argc, char** argv)
             testAddWave_Model(test_model_ptr, wave_resource_key);
             testAddWind_Model(test_model_ptr, wind_resource_key);
             
+            testAddLiIon_Model(test_model_ptr);
             
             test_model_ptr->run();
         }
         
         
         testLoadBalance_Model(test_model_ptr);
+        testOperatingReserve_Model(test_model_ptr);
         testEconomics_Model(test_model_ptr);
         testFuelConsumptionEmissions_Model(test_model_ptr);
         

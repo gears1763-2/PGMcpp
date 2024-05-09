@@ -106,6 +106,13 @@ Renewable* testConstruct_Wave(std::vector<double>* time_vec_hrs_ptr)
         __FILE__,
         __LINE__
     );
+    
+    testFloatEquals(
+        test_wave_ptr->firmness_factor,
+        0.8,
+        __FILE__,
+        __LINE__
+    );
 
     return test_wave_ptr;
 }   /* testConstruct_Wave() */

@@ -110,6 +110,8 @@ class Renewable : public Production {
         
         int resource_key; ///< A key used to index into the Resources object, to associate this asset with the appropriate resource time series.
         
+        double firmness_factor; ///< A factor [0, 1] which defines how firm the production from this asset is.
+        
         
         //  2. methods
         Renewable(void);

@@ -61,6 +61,7 @@ pybind11::enum_<WindPowerProductionModel>(m, "WindPowerProductionModel")
 pybind11::class_<WindInputs>(m, "WindInputs")
     .def_readwrite("renewable_inputs", &WindInputs::renewable_inputs)
     .def_readwrite("resource_key", &WindInputs::resource_key)
+    .def_readwrite("firmness_factor", &WindInputs::firmness_factor)
     .def_readwrite("capital_cost", &WindInputs::capital_cost)
     .def_readwrite(
         "operation_maintenance_cost_kWh",

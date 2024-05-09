@@ -54,6 +54,8 @@ pybind11::class_<ModelInputs>(m, "ModelInputs")
         &ModelInputs::path_2_electrical_load_time_series
     )
     .def_readwrite("control_mode", &ModelInputs::control_mode)
+    .def_readwrite("load_operating_reserve_factor", &ModelInputs::load_operating_reserve_factor)
+    .def_readwrite("max_operating_reserve_factor", &ModelInputs::max_operating_reserve_factor)
     
     .def(pybind11::init());
 

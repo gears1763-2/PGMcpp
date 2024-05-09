@@ -84,6 +84,21 @@ void Wind :: __checkInputs(WindInputs wind_inputs)
         std::cout << warning_str << std::endl;
     }
     
+    //  2. check firmness_factor
+    if (
+        wind_inputs.firmness_factor < 0 or
+        wind_inputs.firmness_factor > 1
+    ) {
+        std::string error_str = "ERROR:  Wind():  ";
+        error_str += "WindInputs::firmness_factor must be in the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
     return;
 }   /* __checkInputs() */
 
@@ -346,6 +361,7 @@ void Wind :: __writeSummary(std::string write_path)
     ofs << "\n";
     
     ofs << "Resource Key (1D): " << this->resource_key << "  \n";
+    ofs << "Firmness Factor: " << this->firmness_factor << "  \n";
     
     ofs << "\n--------\n\n";
     
@@ -548,6 +564,8 @@ Renewable(
     this->type_str = "WIND";
     
     this->resource_key = wind_inputs.resource_key;
+    
+    this->firmness_factor = wind_inputs.firmness_factor;
     
     this->design_speed_ms = wind_inputs.design_speed_ms;
     

@@ -65,6 +65,7 @@ pybind11::class_<RenewableInputs>(m, "RenewableInputs")
 pybind11::class_<Renewable>(m, "Renewable")
     .def_readwrite("type", &Renewable::type)
     .def_readwrite("resource_key", &Renewable::resource_key)
+    .def_readwrite("firmness_factor", &Renewable::firmness_factor)
       
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, RenewableInputs, std::vector<double>*>())
