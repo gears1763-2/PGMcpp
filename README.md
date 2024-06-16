@@ -74,7 +74,7 @@ For a quick start with PGMcpp (on Windows), consider viewing the tutorial videos
 
 ## Slack
 
-Have a question? Want to get involved? Join the PGMcpp Slack!<br><br>
+Have a question? Want to get involved? Join the PGMcpp Slack!<br>
 
 <https://join.slack.com/t/slack-krd2059/shared_invite/zt-2l3wocs01-GrN3HIDCyibNhhjW7GDunw>
 
