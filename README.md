@@ -57,7 +57,7 @@ makefile, a TODO list, and the following sub-directories:
 --------
 
 
-##  Quick Start (Windows Tutorial Videos)
+## Quick Start (Windows Tutorial Videos)
 
 For a quick start with PGMcpp (on Windows), consider viewing the tutorial videos  
 
@@ -68,6 +68,15 @@ For a quick start with PGMcpp (on Windows), consider viewing the tutorial videos
   * 3 - Building Python Bindings for PGMcpp: <https://youtu.be/nNRSS3f5UDE>  
 
   * 4 - An Example Python Project in PGMcpp: <https://youtu.be/hw8BC_ztJLo>  
+
+--------
+
+
+## Slack
+
+Have a question? Want to get involved? Join the PGMcpp Slack!<br><br>
+
+<https://join.slack.com/t/slack-krd2059/shared_invite/zt-2l3wocs01-GrN3HIDCyibNhhjW7GDunw>
 
 --------
 
@@ -202,3 +211,10 @@ issued is simply
 
 Of course, `test/bin/test_Model.out` must exist for this to work, so be sure to 
 `make PGMcpp` beforehand.
+
+--------
+
+
+## Other Projects
+
+  * Have a focus on solar specifically? Check out Griddler Solar: <https://griddlersolar.com/>.
