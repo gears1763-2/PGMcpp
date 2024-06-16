@@ -18,6 +18,9 @@ The Pacific Regional Institute for Marine Energy Discovery (PRIMED):
 The Institute for Integrated Energy Systems (IESVic):  
 <https://www.uvic.ca/research/centres/iesvic/index.php>
 
+Accelerating Community Energy Transformation (ACET):  
+<https://www.uvic.ca/research-innovation/research-at-uvic/climate-environmental-change-and-sustainability/community-energy-transition/index.php>
+
 --------
 
 
@@ -218,3 +221,5 @@ Of course, `test/bin/test_Model.out` must exist for this to work, so be sure to
 ## Other Projects
 
   * Have a focus on solar specifically? Check out Griddler Solar: <https://griddlersolar.com/>.
+  
+  * Interested in other open source data, assumptions, and tools for energy modelling? Check out the M3 Modelling Platform: <https://cme-emh.ca/en/m3-platform/>.
