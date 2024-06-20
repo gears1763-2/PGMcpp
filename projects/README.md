@@ -16,7 +16,8 @@ Example projects README for PGMcpp.
 
 In this `projects/` sub-directory, you should find this README, an example C++ project
 (`example.cpp`), an example Python 3 project (`example.py`), and an example dashboard 
-script (`dashboard.py`).
+script (`dashboard.py`). In addition, a minimal(ish) working example of using PGMcpp to 
+facilitate microgrid design optimization is provided in `optimization_MWE.py`.
 
 --------
 

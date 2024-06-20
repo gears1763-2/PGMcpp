@@ -477,6 +477,7 @@ clean:
 	rm -frv profiling_results
 	rm -frv projects/example_cpp
 	rm -frv projects/example_py
+	rm -frv projects/optimization_results
 	rm -frv pybindings/PGMcpp.*
 	rm -frv pybindings/test_results/
 	rm -frv test/bin

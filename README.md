@@ -56,6 +56,8 @@ makefile, a TODO list, and the following sub-directories:
   * Support for modelling both load following and cycle charging dispatch control.
   
   * Can be either accessed natively in C++, or accessed in Python 3 by way of the provided bindings.
+  
+  * Can be wrapped in `scipy.optimize` to facilitate microgrid design optimization. See `projects/optimization_MWE.py` for a minimal(ish) working example.
 
 --------
 
