@@ -74,6 +74,21 @@ enum ControlMode {
 
 
 ///
+/// \struct LoadStruct
+///
+/// \brief A structure for holding various inputs/outputs for the Controller
+//      __handle*() methods.
+///
+
+struct LoadStruct {
+    double load_kW = 0;    ///< The load [kW] remaining for the time step.
+    double total_renewable_production_kW = 0;   ///< The total production [kW] from all Renewable assets for the time step.
+    double required_firm_dispatch_kW = 0; ///< The firm dispatch requirement [kW] remaining for the time step.
+    double required_spinning_reserve_kW = 0; ///< The spinning reserve requirement [kW] remaining for the time step.
+};
+
+
+///
 /// \class Controller
 ///
 /// \brief A class which contains a various dispatch control logic. Intended to serve
@@ -97,6 +112,8 @@ class Controller {
         
         double __getRenewableProduction(int, double, Renewable*, Resources*);
         
+        // **** DEPRECATED ****
+        /*
         double __handleStorageDischarging(int, double, double, std::vector<Storage*>*);
         
         double __handleNoncombustionDispatch(
@@ -117,8 +134,37 @@ class Controller {
             std::vector<Combustion*>*,
             bool
         );
+        */
         
-        double __handleRenewableDispatch(int, double, double, std::vector<Renewable*>*);
+        LoadStruct __handleStorageDischarging(
+            int,
+            double,
+            LoadStruct,
+            std::vector<Storage*>*
+        );
+        
+        LoadStruct __handleNoncombustionDispatch(
+            int,
+            double,
+            LoadStruct,
+            std::vector<Noncombustion*>*,
+            Resources*
+        );
+        
+        LoadStruct __handleCombustionDispatch(
+            int,
+            double,
+            LoadStruct,
+            std::vector<Combustion*>*,
+            bool
+        );
+        
+        double __handleRenewableDispatch(
+            int,
+            double,
+            double,
+            std::vector<Renewable*>*
+        );
         
         void __handleStorageCharging(
             int,
@@ -135,10 +181,15 @@ class Controller {
         ControlMode control_mode; ///< The ControlMode that is active in the Model.
         std::string control_string; ///< A string describing the active ControlMode.
         
-        double load_operating_reserve_factor; ///< An operating reserve factor [0, 1] to cover random fluctuations in load.
-        double max_operating_reserve_factor; ///< A maximum reserve factor [0, 1] that limits the required overall operating reserve to, at most, factor * load_kW.
+        // **** DEPRECATED ****
+        /*
+        double load_operating_reserve_factor; //< An operating reserve factor [0, 1] to cover random fluctuations in load.
+        double max_operating_reserve_factor; //< A maximum reserve factor [0, 1] that limits the required overall operating reserve to, at most, factor * load_kW.
+        double required_operating_reserve_kW; //< A required operating reserve [kW], to absorb load and Renewable production fluctuations.
+        */
         
-        double required_operating_reserve_kW; ///< A required operating reserve [kW], to absorb load and Renewable production fluctuations.
+        double firm_dispatch_ratio; ///< The ratio [0, 1] of the load in each time step that must be dispatched from firm assets.
+        double load_reserve_ratio; ///< The ratio [0, 1] of the load in each time step that must be included in the required spinning reserve.
         
         std::vector<bool> storage_discharge_bool_vec; ///< A boolean vector attribute to track which Storage assets have been discharged in each time step.
         
@@ -153,8 +204,13 @@ class Controller {
         
         void setControlMode(ControlMode);
         
+        // **** DEPRECATED ****
+        /*
         void setLoadOperatingReserveFactor(double);
         void setMaxOperatingReserveFactor(double);
+        */
+        void setFirmDispatchRatio(double);
+        void setLoadReserveRatio(double);
         
         void init(
             ElectricalLoad*,

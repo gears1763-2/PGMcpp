@@ -76,8 +76,14 @@ struct ModelInputs {
     
     ControlMode control_mode = ControlMode :: LOAD_FOLLOWING; ///< The control mode to be applied by the Controller object.
     
-    double load_operating_reserve_factor = 0.2; ///< An operating reserve factor [0, 1] to cover random fluctuations in load.
-    double max_operating_reserve_factor = 1; ///< A maximum reserve factor [0, 1] that limits the required overall operating reserve to, at most, factor * load_kW.
+    // **** DEPRECATED ****
+    /*
+    double load_operating_reserve_factor = 0.2; //< An operating reserve factor [0, 1] to cover random fluctuations in load.
+    double max_operating_reserve_factor = 1; //< A maximum reserve factor [0, 1] that limits the required overall operating reserve to, at most, factor * load_kW.
+    */
+    
+    double firm_dispatch_ratio = 0.1; ///< The ratio [0, 1] of the load in each time step that must be dispatched from firm assets.
+    double load_reserve_ratio = 0.1; ///< The ratio [0, 1] of the load in each time step that must be included in the required spinning reserve.
 };
 
 

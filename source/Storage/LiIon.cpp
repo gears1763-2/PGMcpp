@@ -825,20 +825,20 @@ double LiIon :: getAvailablekW(double dt_hrs)
     double min_charge_kWh = this->min_SOC * this->energy_capacity_kWh;
     
     //  2. compute available power
-    //     (accounting for the power currently being charged/discharged by the asset)
     double available_kW =
         ((this->charge_kWh - min_charge_kWh) * this->discharging_efficiency) /
         dt_hrs;
     
+    //  3. apply power constraint
+    if (available_kW > this->dynamic_power_capacity_kW) {
+        available_kW = this->dynamic_power_capacity_kW;
+    }
+    
+    //  4. account for power already being discharged
     available_kW -= this->power_kW;
     
     if (available_kW <= 0) {
         return 0;
-    }
-    
-    //  3. apply power constraint
-    if (available_kW > this->dynamic_power_capacity_kW) {
-        available_kW = this->dynamic_power_capacity_kW;
     }
     
     return available_kW;
@@ -870,20 +870,20 @@ double LiIon :: getAcceptablekW(double dt_hrs)
     }
     
     //  2. compute acceptable power
-    //     (accounting for the power currently being charged/discharged by the asset)
     double acceptable_kW = 
         (max_charge_kWh - this->charge_kWh) /
         (this->charging_efficiency * dt_hrs);
     
+    //  3. apply power constraint
+    if (acceptable_kW > this->dynamic_power_capacity_kW) {
+        acceptable_kW = this->dynamic_power_capacity_kW;
+    }
+    
+    //  4. account for power already being charged
     acceptable_kW -= this->power_kW;
     
     if (acceptable_kW <= 0) {
         return 0;
-    }
-    
-    //  3. apply power constraint
-    if (acceptable_kW > this->dynamic_power_capacity_kW) {
-        acceptable_kW = this->dynamic_power_capacity_kW;
     }
     
     return acceptable_kW;

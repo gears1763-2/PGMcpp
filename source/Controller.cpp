@@ -365,27 +365,28 @@ double Controller :: __getRenewableProduction(
 
 
 // ---------------------------------------------------------------------------------- //
-
-///
-/// \fn double Controller :: __handleStorageDischarging(
-///         int timestep,
-///         double dt_hrs,
-///         double net_load_kW,
-///         std::vector<Storage*>* storage_ptr_vec_ptr
-///     )
-///
-/// \brief Helper method to handle the discharging of available Storage assets.
-///
-/// \param timestep The current time step of the Model run.
-///
-/// \param dt_hrs The interval of time [hrs] associated with the action.
-///
-/// \param remaining_load_kW The load remaining [kW] before discharging.
-///
-/// \param storage_ptr_vec_ptr A pointer to a vector of pointers to the Storage assets.
-///
-/// \return The load [kW] remaining after the discharge is deducted from it.
-///
+/*
+// **** DEPRECATED ****
+//
+// \fn double Controller :: __handleStorageDischarging(
+//         int timestep,
+//         double dt_hrs,
+//         double net_load_kW,
+//         std::vector<Storage*>* storage_ptr_vec_ptr
+//     )
+//
+// \brief Helper method to handle the discharging of available Storage assets.
+//
+// \param timestep The current time step of the Model run.
+//
+// \param dt_hrs The interval of time [hrs] associated with the action.
+//
+// \param remaining_load_kW The load remaining [kW] before discharging.
+//
+// \param storage_ptr_vec_ptr A pointer to a vector of pointers to the Storage assets.
+//
+// \return The load [kW] remaining after the discharge is deducted from it.
+//
 
 double Controller :: __handleStorageDischarging(
     int timestep,
@@ -457,6 +458,128 @@ double Controller :: __handleStorageDischarging(
     }
     
     return remaining_load_kW;
+}   // __handleStorageDischarging()
+*/
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn LoadStruct Controller :: __handleStorageDischarging(
+///         int timestep,
+///         double dt_hrs,
+///         LoadStruct load_struct,
+///         std::vector<Storage*>* storage_ptr_vec_ptr
+///     )
+///
+/// \brief Helper method to handle the discharging of available Storage assets.
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param load_struct A structure of the load remaining [kW], total renewable 
+///     production [kW], required firm dispatch remaining [kW], and required
+///     spinning reserve remaining [kW] after discharge.
+///
+/// \param storage_ptr_vec_ptr A pointer to a vector of pointers to the Storage assets.
+///
+/// \return A structure of the load remaining [kW], total renewable 
+///     production [kW], required firm dispatch remaining [kW], and required
+///     spinning reserve remaining [kW] after discharge.
+///
+
+LoadStruct Controller :: __handleStorageDischarging(
+    int timestep,
+    double dt_hrs,
+    LoadStruct load_struct,
+    std::vector<Storage*>* storage_ptr_vec_ptr
+)
+{
+    //  1. get total available power
+    double total_available_power_kW = 0;
+    std::vector<double> available_power_vec_kW(storage_ptr_vec_ptr->size(), 0);
+    Storage* storage_ptr;
+    
+    for (size_t asset = 0; asset < storage_ptr_vec_ptr->size(); asset++) {
+        //  1.1. get pointer
+        storage_ptr = storage_ptr_vec_ptr->at(asset);
+        
+        //  1.2. check if depleted
+        if (storage_ptr->is_depleted) {
+            continue;
+        }
+        
+        //  1.3. log available, increment total available
+        available_power_vec_kW[asset] = storage_ptr->getAvailablekW(dt_hrs);
+        total_available_power_kW += available_power_vec_kW[asset];
+    }
+    
+    //  2. update spinning reserve requirement
+    load_struct.required_spinning_reserve_kW -= total_available_power_kW;
+    
+    if (load_struct.required_spinning_reserve_kW < 0) {
+        load_struct.required_spinning_reserve_kW = 0;
+    }
+    
+    //  3. set total discharge power
+    double total_discharge_power_kW = 
+        load_struct.load_kW - load_struct.total_renewable_production_kW;
+    
+    if (total_discharge_power_kW < load_struct.required_firm_dispatch_kW) {
+        total_discharge_power_kW = load_struct.required_firm_dispatch_kW;
+    }
+    
+    if (total_discharge_power_kW > total_available_power_kW) {
+        total_discharge_power_kW = total_available_power_kW;
+    }
+    
+    //  4. update firm dispatch requirement
+    load_struct.required_firm_dispatch_kW -= total_discharge_power_kW;
+    
+    if (load_struct.required_firm_dispatch_kW < 0) {
+        load_struct.required_firm_dispatch_kW = 0;
+    }
+    
+    //  5. commit total discharge power
+    double asset_discharge_power_kW = 0;
+    
+    for (size_t asset = 0; asset < storage_ptr_vec_ptr->size(); asset++) {
+        //  5.1. get pointer
+        storage_ptr = storage_ptr_vec_ptr->at(asset);
+        
+        //  5.2. check if depleted
+        if (storage_ptr->is_depleted) {
+            continue;
+        }
+        
+        //  5.3. get asset discharge power (proportional to available)
+        if (total_available_power_kW <= 0) {
+            asset_discharge_power_kW = 0;
+        }
+        
+        else {
+            asset_discharge_power_kW =
+                (total_discharge_power_kW / total_available_power_kW) *
+                available_power_vec_kW[asset];
+        }
+        
+        //  5.4. commit discharging, log
+        load_struct.load_kW = storage_ptr->commitDischarge(
+            timestep,
+            dt_hrs,
+            asset_discharge_power_kW,
+            load_struct.load_kW
+        );
+        
+        if (asset_discharge_power_kW > 0) {
+            this->storage_discharge_bool_vec[asset] = true;
+        }
+    }
+    
+    return load_struct;
 }   /* __handleStorageDischarging() */
 
 // ---------------------------------------------------------------------------------- //
@@ -464,31 +587,32 @@ double Controller :: __handleStorageDischarging(
 
 
 // ---------------------------------------------------------------------------------- //
-
-///
-/// \fn double __handleNoncombustionDispatch(
-///         int timestep,
-///         double dt_hrs,
-///         double remaining_load_kW,
-///         std::vector<Noncombustion*>* noncombustion_ptr_vec_ptr,
-///         Resources* resources_ptr
-///     )
-///
-/// \brief Helper method to handle the dispatch of Noncombustion assets.
-///
-/// \param timestep The current time step of the Model run.
-///
-/// \param dt_hrs The interval of time [hrs] associated with the action.
-///
-/// \param remaining_load_kW The load remaining [kW] before dispatch.
-///
-/// \param noncombustion_ptr_vec_ptr A pointer to the Noncombustion pointer vector of
-///     the Model.
-///
-/// \param resources_ptr A pointer to the Resources component of the Model.
-///
-/// \return The load [kW] remaining after the dispatch is deducted from it.
-///
+/*
+// **** DEPRECATED ****
+//
+// \fn double Controller :: __handleNoncombustionDispatch(
+//         int timestep,
+//         double dt_hrs,
+//         double remaining_load_kW,
+//         std::vector<Noncombustion*>* noncombustion_ptr_vec_ptr,
+//         Resources* resources_ptr
+//     )
+//
+// \brief Helper method to handle the dispatch of Noncombustion assets.
+//
+// \param timestep The current time step of the Model run.
+//
+// \param dt_hrs The interval of time [hrs] associated with the action.
+//
+// \param remaining_load_kW The load remaining [kW] before dispatch.
+//
+// \param noncombustion_ptr_vec_ptr A pointer to the Noncombustion pointer vector of
+//     the Model.
+//
+// \param resources_ptr A pointer to the Resources component of the Model.
+//
+// \return The load [kW] remaining after the dispatch is deducted from it.
+//
 
 double Controller :: __handleNoncombustionDispatch(
     int timestep,
@@ -576,6 +700,193 @@ double Controller :: __handleNoncombustionDispatch(
     }
     
     return remaining_load_kW;
+}   // __handleNoncombustionDispatch()
+*/
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn LoadStruct Controller :: __handleNoncombustionDispatch(
+///         int timestep,
+///         double dt_hrs,
+///         LoadStruct load_struct,
+///         std::vector<Noncombustion*>* noncombustion_ptr_vec_ptr,
+///         Resources* resources_ptr
+///     )
+///
+/// \brief Helper method to handle the dispatch of Noncombustion assets.
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param load_struct A structure of the load remaining [kW], total renewable 
+///     production [kW], required firm dispatch remaining [kW], and required
+///     spinning reserve remaining [kW] after discharge.
+///
+/// \param noncombustion_ptr_vec_ptr A pointer to the Noncombustion pointer
+///     vector of the Model.
+///
+/// \param resources_ptr A pointer to the Resources component of the Model.
+///
+/// \return A structure of the load remaining [kW], total renewable 
+///     production [kW], required firm dispatch remaining [kW], and required
+///     spinning reserve remaining [kW] after discharge.
+///
+
+LoadStruct Controller :: __handleNoncombustionDispatch(
+    int timestep,
+    double dt_hrs,
+    LoadStruct load_struct,
+    std::vector<Noncombustion*>* noncombustion_ptr_vec_ptr,
+    Resources* resources_ptr
+)
+{
+    //  1. get total available production
+    double total_available_production_kW = 0;
+    std::vector<double> available_production_vec_kW(
+        noncombustion_ptr_vec_ptr->size(), 0
+    );
+    Noncombustion* noncombustion_ptr;
+    
+    for (
+        size_t asset = 0; asset < noncombustion_ptr_vec_ptr->size(); asset++
+    ) {
+        //  1.1. get pointer
+        noncombustion_ptr = noncombustion_ptr_vec_ptr->at(asset);
+        
+        //  1.2. log available, increment total available
+        switch (noncombustion_ptr->type) {
+            case (NoncombustionType :: HYDRO): {
+                double resource_value = 0;
+                
+                if (
+                    not noncombustion_ptr->normalized_production_series_given
+                ) {
+                    resource_value =
+                        resources_ptr->resource_map_1D[
+                            noncombustion_ptr->resource_key
+                        ][timestep];
+                }
+                
+                available_production_vec_kW[asset] =
+                    noncombustion_ptr->requestProductionkW(
+                        timestep,
+                        dt_hrs,
+                        noncombustion_ptr->capacity_kW,
+                        resource_value
+                    );
+                
+                total_available_production_kW +=
+                    available_production_vec_kW[asset];
+                
+                break;
+            }
+            
+            default: {
+                available_production_vec_kW[asset] =
+                    noncombustion_ptr->requestProductionkW(
+                        timestep,
+                        dt_hrs,
+                        noncombustion_ptr->capacity_kW
+                    );
+                
+                total_available_production_kW +=
+                    available_production_vec_kW[asset];
+                
+                break;
+            }
+        }
+    }
+    
+    //  2. update spinning reserve requirement
+    load_struct.required_spinning_reserve_kW -= total_available_production_kW;
+    
+    if (load_struct.required_spinning_reserve_kW < 0) {
+        load_struct.required_spinning_reserve_kW = 0;
+    }
+    
+    //  3. set total production
+    double total_production_kW = 
+        load_struct.load_kW - load_struct.total_renewable_production_kW;
+    
+    if (total_production_kW < load_struct.required_firm_dispatch_kW) {
+        total_production_kW = load_struct.required_firm_dispatch_kW;
+    }
+    
+    if (total_production_kW > total_available_production_kW) {
+        total_production_kW = total_available_production_kW;
+    }
+    
+    //  4. update firm dispatch requirement
+    load_struct.required_firm_dispatch_kW -= total_production_kW;
+    
+    if (load_struct.required_firm_dispatch_kW < 0) {
+        load_struct.required_firm_dispatch_kW = 0;
+    }
+    
+    //  5. commit total production
+    double asset_production_kW = 0;
+    
+    for (
+        size_t asset = 0; asset < noncombustion_ptr_vec_ptr->size(); asset++
+    ) {
+        //  5.1. get pointer
+        noncombustion_ptr = noncombustion_ptr_vec_ptr->at(asset);
+        
+        //  5.2. get asset production (proportional to available)
+        if (total_available_production_kW <= 0) {
+            asset_production_kW = 0;
+        }
+        
+        else {
+            asset_production_kW =
+                (total_production_kW / total_available_production_kW) *
+                available_production_vec_kW[asset];
+        }
+        
+        //  5.3. commit production, log
+        switch (noncombustion_ptr->type) {
+            case (NoncombustionType :: HYDRO): {
+                double resource_value = 0;
+                
+                if (
+                    not noncombustion_ptr->normalized_production_series_given
+                ) {
+                    resource_value =
+                        resources_ptr->resource_map_1D[
+                            noncombustion_ptr->resource_key
+                        ][timestep];
+                }
+                
+                load_struct.load_kW = noncombustion_ptr->commit(
+                    timestep,
+                    dt_hrs,
+                    asset_production_kW,
+                    load_struct.load_kW,
+                    resource_value
+                );
+                
+                break;
+            }
+            
+            default: {
+                load_struct.load_kW = noncombustion_ptr->commit(
+                    timestep,
+                    dt_hrs,
+                    asset_production_kW,
+                    load_struct.load_kW
+                );
+                
+                break;
+            }
+        }
+    }
+    
+    return load_struct;
 }   /* __handleNoncombustionDispatch() */
 
 // ---------------------------------------------------------------------------------- //
@@ -583,45 +894,44 @@ double Controller :: __handleNoncombustionDispatch(
 
 
 // ---------------------------------------------------------------------------------- //
-
-///
-/// \fn double Controller :: __handleCombustionDispatch(
-///         int timestep,
-///         double dt_hrs,
-///         double load_kW,
-///         double remaining_load_kW,
-///         double total_renewable_production_kW,
-///         double firm_renewable_production_kW,
-///         std::vector<Combustion*>* combustion_ptr_vec_ptr,
-///         bool is_cycle_charging
-///     )
-///
-/// \brief Helper method to handle the dispatch of Combustion assets. Accounts for load
-///     operating reserve and Renewable production reserve (firmness), as per conversation
-///     with BC Hydro (April 2024).
-///
-/// \param timestep The current time step of the Model run.
-///
-/// \param dt_hrs The interval of time [hrs] associated with the action.
-///
-/// \param load_kW The load [kW] for this timestep.
-///
-/// \param remaining_load_kW The load remaining [kW] before dispatch.
-///
-/// \param total_renewable_production_kW The total production [kW] from all Renewable
-///     assets.
-///
-/// \param firm_renewable_production_kW The firm production [kW] from all Renewable 
-///     assets.
-///
-/// \param combustion_ptr_vec_ptr A pointer to the Combustion pointer vector of
-///     the Model.
-///
-/// \param is_cycle_charging A flag which indicates whether the Combustion assets are 
-///     running in cycle charging mode (true) or load following mode (false).
-///
-/// \return The load [kW] remaining after the dispatch is deducted from it.
-///
+/*
+// **** DEPRECATED ****
+//
+// \fn double Controller :: __handleCombustionDispatch(
+//         int timestep,
+//         double dt_hrs,
+//         double load_kW,
+//         double remaining_load_kW,
+//         double total_renewable_production_kW,
+//         double firm_renewable_production_kW,
+//         std::vector<Combustion*>* combustion_ptr_vec_ptr,
+//         bool is_cycle_charging
+//     )
+//
+// \brief Helper method to handle the dispatch of Combustion assets.
+//
+// \param timestep The current time step of the Model run.
+//
+// \param dt_hrs The interval of time [hrs] associated with the action.
+//
+// \param load_kW The load [kW] for this timestep.
+//
+// \param remaining_load_kW The load remaining [kW] before dispatch.
+//
+// \param total_renewable_production_kW The total production [kW] from all Renewable
+//     assets.
+//
+// \param firm_renewable_production_kW The firm production [kW] from all Renewable 
+//     assets.
+//
+// \param combustion_ptr_vec_ptr A pointer to the Combustion pointer vector of
+//     the Model.
+//
+// \param is_cycle_charging A flag which indicates whether the Combustion assets are 
+//     running in cycle charging mode (true) or load following mode (false).
+//
+// \return The load [kW] remaining after the dispatch is deducted from it.
+//
 
 double Controller :: __handleCombustionDispatch(
     int timestep,
@@ -719,6 +1029,151 @@ double Controller :: __handleCombustionDispatch(
     }
     
     return remaining_load_kW;
+}   // __handleCombustionDispatch()
+*/
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn LoadStruct Controller :: __handleCombustionDispatch(
+///         int timestep,
+///         double dt_hrs,
+///         LoadStruct load_struct,
+///         std::vector<Combustion*>* combustion_ptr_vec_ptr,
+///         bool is_cycle_charging
+///     )
+///
+/// \brief Helper method to handle the dispatch of Combustion assets.
+///
+/// \param timestep The current time step of the Model run.
+///
+/// \param dt_hrs The interval of time [hrs] associated with the action.
+///
+/// \param load_struct A structure of the load remaining [kW], total renewable 
+///     production [kW], required firm dispatch remaining [kW], and required
+///     spinning reserve remaining [kW] after discharge.
+///
+/// \param combustion_ptr_vec_ptr A pointer to the Combustion pointer vector of
+///     the Model.
+///
+/// \param is_cycle_charging A flag which indicates whether the Combustion assets are 
+///     running in cycle charging mode (true) or load following mode (false).
+///
+/// \return A structure of the load remaining [kW], total renewable 
+///     production [kW], required firm dispatch remaining [kW], and required
+///     spinning reserve remaining [kW] after discharge.
+///
+
+LoadStruct Controller :: __handleCombustionDispatch(
+    int timestep,
+    double dt_hrs,
+    LoadStruct load_struct,
+    std::vector<Combustion*>* combustion_ptr_vec_ptr,
+    bool is_cycle_charging
+)
+{
+    //  1. determine allocation
+    double allocation_kW = 
+        load_struct.load_kW - load_struct.total_renewable_production_kW;
+    
+    if (allocation_kW < load_struct.required_spinning_reserve_kW) {
+        allocation_kW = load_struct.required_spinning_reserve_kW;
+    }
+    
+    if (allocation_kW < load_struct.required_firm_dispatch_kW) {
+        allocation_kW = load_struct.required_firm_dispatch_kW;
+    }
+    
+    //  2. allocate Combustion assets
+    double allocated_capacity_kW = 0;
+    std::map<double, std::vector<bool>>::iterator iter =
+        this->combustion_map.begin();
+    
+    while (iter != std::prev(this->combustion_map.end(), 1)) {
+        if (allocation_kW <= allocated_capacity_kW) {
+            break;
+        }
+        
+        iter++;
+        allocated_capacity_kW = iter->first;
+    }
+    
+    //  3. update spinning reserve requirement
+    load_struct.required_spinning_reserve_kW -= allocated_capacity_kW;
+    
+    if (load_struct.required_spinning_reserve_kW < 0) {
+        load_struct.required_spinning_reserve_kW = 0;
+    }
+    
+    //  4. set total production
+    double total_production_kW = 
+        load_struct.load_kW - load_struct.total_renewable_production_kW;
+    
+    if (total_production_kW < load_struct.required_firm_dispatch_kW) {
+        total_production_kW = load_struct.required_firm_dispatch_kW;
+    }
+    
+    if (total_production_kW > allocated_capacity_kW) {
+        total_production_kW = allocated_capacity_kW;
+    }
+    
+    //  5. update firm dispatch requirement
+    load_struct.required_firm_dispatch_kW -= total_production_kW;
+    
+    if (load_struct.required_firm_dispatch_kW < 0) {
+        load_struct.required_firm_dispatch_kW = 0;
+    }
+    
+    //  6. commit Combustion assets
+    //     sharing load proportionally to individual rated capacities
+    double asset_production_kW = 0;
+    Combustion* combustion_ptr;
+    
+    for (
+        size_t asset = 0;
+        asset < this->combustion_map[allocated_capacity_kW].size();
+        asset++
+    ) {
+        //  6.1. get pointer
+        combustion_ptr = combustion_ptr_vec_ptr->at(asset);
+        
+        //  6.2. get asset production
+        if (allocated_capacity_kW <= 0) {
+            asset_production_kW = 0;
+        }
+        
+        else {
+            asset_production_kW =
+                int(this->combustion_map[allocated_capacity_kW][asset]) * 
+                (combustion_ptr->capacity_kW / allocated_capacity_kW) *
+                total_production_kW;
+        }
+        
+        if (is_cycle_charging and asset_production_kW > 0) {
+            if (
+                asset_production_kW <
+                    combustion_ptr->cycle_charging_setpoint *
+                    combustion_ptr->capacity_kW
+            ) {
+                asset_production_kW =
+                    combustion_ptr->cycle_charging_setpoint *
+                    combustion_ptr->capacity_kW;
+            }
+        }
+        
+        //  6.3. commit production, log
+        load_struct.load_kW = combustion_ptr->commit(
+            timestep,
+            dt_hrs,
+            asset_production_kW,
+            load_struct.load_kW
+        );
+    }
+    
+    return load_struct;
 }   /* __handleCombustionDispatch() */
 
 // ---------------------------------------------------------------------------------- //
@@ -728,7 +1183,7 @@ double Controller :: __handleCombustionDispatch(
 // ---------------------------------------------------------------------------------- //
 
 ///
-/// \fn double __handleRenewableDispatch(
+/// \fn double Controller :: __handleRenewableDispatch(
 ///         int timestep,
 ///         double dt_hrs,
 ///         double remaining_load_kW,
@@ -996,44 +1451,90 @@ void Controller :: setControlMode(ControlMode control_mode)
 
 
 // ---------------------------------------------------------------------------------- //
-
-///
-/// \fn void Controller :: setLoadOperatingReserveFactor(double load_operating_reserve_factor)
-///
-/// \brief Method to set Controller load_operating_reserve_factor attribute.
-///
-/// \param load_operating_reserve_factor An operating reserve factor [0, 1] to cover
-///     random fluctuations in load.
-///
+/*
+// **** DEPRECATED ****
+//
+// \fn void Controller :: setLoadOperatingReserveFactor(double load_operating_reserve_factor)
+//
+// \brief Method to set Controller load_operating_reserve_factor attribute.
+//
+// \param load_operating_reserve_factor An operating reserve factor [0, 1] to cover
+//     random fluctuations in load.
+//
 
 void Controller :: setLoadOperatingReserveFactor(double load_operating_reserve_factor)
 {
     this->load_operating_reserve_factor = load_operating_reserve_factor;
     
     return;
-}   /* setLoadOperatingReserveFactor() */
-
+}   // setLoadOperatingReserveFactor()
+*/
 // ---------------------------------------------------------------------------------- //
 
 
 
 // ---------------------------------------------------------------------------------- //
-
-///
-/// \fn void Controller :: setMaxOperatingReserveFactor(double max_operating_reserve_factor)
-///
-/// \brief Method to set Controller max_operating_reserve_factor attribute.
-///
-/// \param max_operating_reserve_factor An operating reserve factor [0, 1] that limits
-///     the required overall operating reserve to, at most, factor * load_kW.
-///
+/*
+// **** DEPRECATED ****
+//
+// \fn void Controller :: setMaxOperatingReserveFactor(double max_operating_reserve_factor)
+//
+// \brief Method to set Controller max_operating_reserve_factor attribute.
+//
+// \param max_operating_reserve_factor An operating reserve factor [0, 1] that limits
+//     the required overall operating reserve to, at most, factor * load_kW.
+//
 
 void Controller :: setMaxOperatingReserveFactor(double max_operating_reserve_factor)
 {
     this->max_operating_reserve_factor = max_operating_reserve_factor;
     
     return;
-}   /* setMaxOperatingReserveFactor() */
+}   // setMaxOperatingReserveFactor()
+*/
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Controller :: setFirmDispatchRatio(double max_operating_reserve_factor)
+///
+/// \brief Method to set Controller firm_dispatch_ratio attribute.
+///
+/// \param firm_dispatch_ratio The ratio [0, 1] of the load in each time step
+///     that must be dispatched from firm assets.
+///
+
+void Controller :: setFirmDispatchRatio(double firm_dispatch_ratio)
+{
+    this->firm_dispatch_ratio = firm_dispatch_ratio;
+    
+    return;
+}   /* setFirmDispatchRatio() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+
+// ---------------------------------------------------------------------------------- //
+
+///
+/// \fn void Controller :: setLoadReserveRatio(double max_operating_reserve_factor)
+///
+/// \brief Method to set Controller firm_dispatch_ratio attribute.
+///
+/// \param load_reserve_ratio The ratio [0, 1] of the load in each time step
+///     that must be included in the required spinning reserve.
+///
+
+void Controller :: setLoadReserveRatio(double load_reserve_ratio)
+{
+    this->load_reserve_ratio = load_reserve_ratio;
+    
+    return;
+}   /* setLoadReserveRatio() */
 
 // ---------------------------------------------------------------------------------- //
 
@@ -1127,17 +1628,173 @@ void Controller :: applyDispatchControl(
 {
     double dt_hrs = 0;
     double load_kW = 0;
+    double required_firm_dispatch_kW = 0;
+    double total_renewable_production_kW = 0;
+    double required_spinning_reserve_kW = 0;
+    
+    Renewable* renewable_ptr;
+    
+    LoadStruct load_struct;
+    
+    this->storage_discharge_bool_vec.clear();
+    this->storage_discharge_bool_vec.resize(storage_ptr_vec_ptr->size(), false);
+    
+    for (
+        int timestep = 0; timestep < electrical_load_ptr->n_points; timestep++
+    ) {
+        //  1. get load and dt_hrs
+        load_kW = electrical_load_ptr->load_vec_kW[timestep];
+        dt_hrs = electrical_load_ptr->dt_vec_hrs[timestep];
+        
+        //  2. compute required firm dispatch
+        required_firm_dispatch_kW = this->firm_dispatch_ratio * load_kW;
+        
+        //  3. compute total renewable production and required spinning reserve
+        total_renewable_production_kW = 0;
+        required_spinning_reserve_kW = this->load_reserve_ratio * load_kW;
+        
+        for (
+            size_t asset = 0; asset < renewable_ptr_vec_ptr->size(); asset++
+        ) {
+            renewable_ptr = renewable_ptr_vec_ptr->at(asset);
+            
+            total_renewable_production_kW +=
+                renewable_ptr->production_vec_kW[timestep];
+            
+            required_spinning_reserve_kW += 
+                (1 - renewable_ptr->firmness_factor) *
+                renewable_ptr->production_vec_kW[timestep];
+        }
+        
+        if (required_spinning_reserve_kW > load_kW) {
+            required_spinning_reserve_kW = load_kW;
+        }
+        
+        //  4. init load structure
+        load_struct.load_kW = load_kW;
+        load_struct.total_renewable_production_kW =
+            total_renewable_production_kW;
+        load_struct.required_firm_dispatch_kW = required_firm_dispatch_kW;
+        load_struct.required_spinning_reserve_kW =
+            required_spinning_reserve_kW;
+        
+        //  5. handle Noncombustion dispatch
+        load_struct = this->__handleNoncombustionDispatch(
+            timestep,
+            dt_hrs,
+            load_struct,
+            noncombustion_ptr_vec_ptr,
+            resources_ptr
+        );
+        
+        //  6. handle Storage discharge
+        load_struct = this->__handleStorageDischarging(
+            timestep,
+            dt_hrs,
+            load_struct,
+            storage_ptr_vec_ptr
+        );
+        
+        //  7. handle Combustion dispatch
+        switch(this->control_mode) {
+            case (ControlMode :: LOAD_FOLLOWING): {
+                load_struct = this->__handleCombustionDispatch(
+                    timestep,
+                    dt_hrs,
+                    load_struct,
+                    combustion_ptr_vec_ptr,
+                    false
+                );
+                
+                break;
+            }
+            
+            case (ControlMode :: CYCLE_CHARGING): {
+                bool is_cycle_charging = false;
+                
+                for (
+                    size_t asset = 0;
+                    asset < storage_ptr_vec_ptr->size();
+                    asset++
+                ) {
+                    if (not this->storage_discharge_bool_vec[asset]) {
+                        is_cycle_charging = true;
+                        break;
+                    }
+                }
+                
+                load_struct = this->__handleCombustionDispatch(
+                    timestep,
+                    dt_hrs,
+                    load_struct,
+                    combustion_ptr_vec_ptr,
+                    is_cycle_charging
+                );
+                
+                break;
+            }
+            
+            default: {
+                std::string error_str = "ERROR:  Controller :: setControlMode():  ";
+                    error_str += "control mode ";
+                    error_str += std::to_string(control_mode);
+                    error_str += " not recognized";
+                    
+                    #ifdef _WIN32
+                        std::cout << error_str << std::endl;
+                    #endif
+
+                    throw std::runtime_error(error_str);
+                
+                break;
+            }
+        }
+        
+        //  8. handle Renewable dispatch
+        load_struct.load_kW = this->__handleRenewableDispatch(
+            timestep,
+            dt_hrs,
+            load_struct.load_kW,
+            renewable_ptr_vec_ptr
+        );
+        
+        //  9. handle Storage charging
+        this->__handleStorageCharging(
+            timestep,
+            dt_hrs,
+            storage_ptr_vec_ptr,
+            combustion_ptr_vec_ptr,
+            noncombustion_ptr_vec_ptr,
+            renewable_ptr_vec_ptr
+        );
+        
+        //  10. log missed load, if any
+        if (load_struct.load_kW > 1e-6) {
+            this->missed_load_vec_kW[timestep] = load_struct.load_kW;
+        }
+        
+        //  11. reset storage_discharge_bool_vec
+        for (size_t asset = 0; asset < storage_ptr_vec_ptr->size(); asset++) {
+            this->storage_discharge_bool_vec[asset] = false;
+        }
+    }
+    
+    
+    // **** DEPRECATED ****
+    /*
+    double dt_hrs = 0;
+    double load_kW = 0;
     double total_renewable_production_kW = 0;
     double firm_renewable_production_kW = 0;
     double remaining_load_kW = 0;
-    /*
+    
     double required_operating_reserve_before_kW = 0;
     double rem_load_test_0 = 0;
     double rem_load_test_1 = 0;
     double rem_load_test_2 = 0;
     double rem_load_test_3 = 0;
     double rem_load_test_4 = 0;
-    */
+    
     this->required_operating_reserve_kW = 0;
     this->storage_discharge_bool_vec.clear();
     this->storage_discharge_bool_vec.resize(storage_ptr_vec_ptr->size(), false);
@@ -1295,7 +1952,6 @@ void Controller :: applyDispatchControl(
         }
         
         //  12. test print
-        /*
         if (required_operating_reserve_before_kW < load_kW) {
             std::cout << "Timestep: " << timestep << std::endl;
             std::cout << "Load: " << load_kW << std::endl;
@@ -1308,8 +1964,7 @@ void Controller :: applyDispatchControl(
             std::cout << "Rem Load: " << remaining_load_kW << std::endl;
             std::cout << std::endl;
         }
-        */
-    }
+    */
     
     return;
 }   /* applyDispatchControl() */

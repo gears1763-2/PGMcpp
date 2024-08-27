@@ -1,6 +1,6 @@
 /*
  * PGMcpp : PRIMED Grid Modelling (in C++)
- * Copyright 2023 (C)
+ * Copyright 2024 (C)
  * 
  * Anthony Truelove MASc, P.Eng.
  * email:  gears1763@tutanota.com

@@ -137,6 +137,37 @@ void printRed(std::string input_str)
 
 // ---------------------------------------------------------------------------------- //
 
+//...
+
+void testFloatIsNaN(
+    double x,
+    std::string file,
+    int line
+) {
+    if (not std::isnan(x)) {
+        return;
+    }
+    
+    std::string error_str = "ERROR: testFloatIsNaN():\t in ";
+    error_str += file;
+    error_str += "\tline ";
+    error_str += std::to_string(line);
+    error_str += ":\t\n";
+    error_str += "input is not a number (NaN).\n";
+
+    #ifdef _WIN32
+        std::cout << error_str << std::endl;
+    #endif
+
+    throw std::runtime_error(error_str);
+    return;
+}   /* testFloatIsNaN() */
+
+// ---------------------------------------------------------------------------------- //
+
+
+// ---------------------------------------------------------------------------------- //
+
 ///
 /// \fn void testFloatEquals(double x, double y, std::string file, int line)
 ///
@@ -161,6 +192,18 @@ void testFloatEquals(
     int line
 )
 {
+    testFloatIsNaN(
+        x,
+        file,
+        line
+    );
+    
+    testFloatIsNaN(
+        y,
+        file,
+        line
+    );
+    
     if (fabs(x - y) <= FLOAT_TOLERANCE) {
         return;
     }
@@ -214,6 +257,18 @@ void testGreaterThan(
     int line
 )
 {
+    testFloatIsNaN(
+        x,
+        file,
+        line
+    );
+    
+    testFloatIsNaN(
+        y,
+        file,
+        line
+    );
+    
     if (x > y) {
         return;
     }
@@ -265,6 +320,18 @@ void testGreaterThanOrEqualTo(
     int line
 )
 {
+    testFloatIsNaN(
+        x,
+        file,
+        line
+    );
+    
+    testFloatIsNaN(
+        y,
+        file,
+        line
+    );
+    
     if (x >= y) {
         return;
     }
@@ -316,6 +383,18 @@ void testLessThan(
     int line
 )
 {
+    testFloatIsNaN(
+        x,
+        file,
+        line
+    );
+    
+    testFloatIsNaN(
+        y,
+        file,
+        line
+    );
+    
     if (x < y) {
         return;
     }
@@ -367,6 +446,18 @@ void testLessThanOrEqualTo(
     int line
 )
 {
+    testFloatIsNaN(
+        x,
+        file,
+        line
+    );
+    
+    testFloatIsNaN(
+        y,
+        file,
+        line
+    );
+    
     if (x <= y) {
         return;
     }

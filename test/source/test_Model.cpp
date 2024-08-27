@@ -72,6 +72,15 @@ Model* testConstruct_Model(ModelInputs test_model_inputs)
     );
     
     testFloatEquals(
+        test_model_ptr->controller.firm_dispatch_ratio,
+        0.1,
+        __FILE__,
+        __LINE__
+    );
+    
+    // DEPRECATED
+    /*
+    testFloatEquals(
         test_model_ptr->controller.load_operating_reserve_factor,
         0.2,
         __FILE__,
@@ -84,6 +93,7 @@ Model* testConstruct_Model(ModelInputs test_model_inputs)
         __FILE__,
         __LINE__
     );
+    */
 
     return test_model_ptr;
 }   /* testConstruct_Model() */
@@ -1515,6 +1525,8 @@ void testLoadBalance_Model(Model* test_model_ptr)
 
 void testOperatingReserve_Model(Model* test_model_ptr)
 {
+    // DEPRECATED
+    /*
     double load_kW = 0;
     double operating_reserve_kW = 0;
 
@@ -1588,7 +1600,7 @@ void testOperatingReserve_Model(Model* test_model_ptr)
             __LINE__
         );
     }
-    
+    */
     return;
 }   /* testOperatingReserve_Model() */
 

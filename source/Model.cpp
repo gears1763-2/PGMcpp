@@ -75,6 +75,8 @@ void Model :: __checkInputs(ModelInputs model_inputs)
         throw std::invalid_argument(error_str);
     }
     
+    // DEPRECATED
+    /*
     //  2. check load_operating_reserve_factor
     if (
         model_inputs.load_operating_reserve_factor < 0 or
@@ -97,6 +99,37 @@ void Model :: __checkInputs(ModelInputs model_inputs)
     ) {
         std::string error_str = "ERROR:  Model():  ";
         error_str += "ModelInputs::max_operating_reserve_factor must be in the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    */
+    
+    //  2. check firm_dispatch_ratio
+    if (
+        model_inputs.firm_dispatch_ratio < 0 or
+        model_inputs.firm_dispatch_ratio > 1
+    ) {
+        std::string error_str = "ERROR:  Model():  ";
+        error_str += "ModelInputs::firm_dispatch_ratio must be in the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+
+        throw std::invalid_argument(error_str);
+    }
+    
+    //  3. check load_reserve_ratio
+    if (
+        model_inputs.load_reserve_ratio < 0 or
+        model_inputs.load_reserve_ratio > 1
+    ) {
+        std::string error_str = "ERROR:  Model():  ";
+        error_str += "ModelInputs::load_reserve_ratio must be in the closed interval [0, 1]";
         
         #ifdef _WIN32
             std::cout << error_str << std::endl;
@@ -345,10 +378,15 @@ void Model :: __writeSummary(std::string write_path)
     ofs << "## Controller\n";
     ofs << "\n";
     ofs << "Control Mode: " << this->controller.control_string << "  \n";
+    // DEPRECATED
+    /*
     ofs << "Load Operating Reserve Factor: " <<
         this->controller.load_operating_reserve_factor << "  \n";
     ofs << "Max Overall Operating Reserve Factor: " << 
         this->controller.max_operating_reserve_factor << "  \n";
+    */
+    ofs << "Firm Dispatch Ratio: " <<
+        this->controller.firm_dispatch_ratio << "  \n";
     ofs << "\n--------\n\n";
     
     //  3.3. Resources (1D)
@@ -657,8 +695,14 @@ Model :: Model(ModelInputs model_inputs)
     
     //  3. set controller attributes
     this->controller.setControlMode(model_inputs.control_mode);
+    // DEPRECATED
+    /*
     this->controller.setLoadOperatingReserveFactor(model_inputs.load_operating_reserve_factor);
     this->controller.setMaxOperatingReserveFactor(model_inputs.max_operating_reserve_factor);
+    */
+    this->controller.setFirmDispatchRatio(model_inputs.firm_dispatch_ratio);
+    this->controller.setLoadReserveRatio(model_inputs.load_reserve_ratio);
+    
     
     //  4. set public attributes
     this->total_fuel_consumed_L = 0;
