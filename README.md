@@ -43,17 +43,17 @@ makefile, a TODO list, and the following sub-directories:
 
 ## Key Features
 
-  * A time-domain microgrid modelling code that will work with any time series data (can be non-uniform series of arbitrary length).
+  * A time-domain microgrid modelling code that will work with any time series data (can be non-uniform series of arbitrary length, up to memory limitations).
   
-  * Support for modelling diesel generators. This includes modelling fuel consumption and emissions. Up to 30 diesel generators can be modelled simultaneously (up to memory limitations).
+  * Support for modelling diesel generators. This includes modelling fuel consumption and emissions. Up to 30 diesel generators can be modelled simultaneously (subject to memory limitations).
   
-  * Support for modelling hydro, solar, wind, tidal, and wave renewable production assets. Any number of assets can be modelled (up to memory limitations).
+  * Support for modelling hydro, solar, wind, tidal, and wave renewable production assets. Any number of assets can be modelled simultaneously (up to memory limitations).
   
-  * Any number of renewable resource time series can be modelled (up to memory limitations), with resources being associated with chosen production assets.
+  * Any number of renewable resource time series can be modelled simultaneously (up to memory limitations), with resources being associated with chosen renewable production assets.
   
-  * Support for modelling lithium ion battery energy storage. This includes modelling use-based battery degradation dynamics.
+  * Support for modelling lithium ion battery energy storage. This includes modelling use-based battery degradation dynamics. Any number of storage assets can be modelled simultaneously (up to memory limitations).
   
-  * Support for modelling both load following and cycle charging dispatch control.
+  * Support for modelling both load following and cycle charging dispatch control. This includes the handling of any firm dispatch and/or spinning reserve requirements.
   
   * Can be either accessed natively in C++, or accessed in Python 3 by way of the provided bindings.
   
