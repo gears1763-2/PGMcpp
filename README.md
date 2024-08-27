@@ -45,7 +45,7 @@ makefile, a TODO list, and the following sub-directories:
 
   * A time-domain microgrid modelling code that will work with any time series data (can be non-uniform series of arbitrary length).
   
-  * Support for modelling diesel generators. This includes modelling fuel consumption and emissions. Up to 30 diesel generators can be modelled simultaneously.
+  * Support for modelling diesel generators. This includes modelling fuel consumption and emissions. Up to 30 diesel generators can be modelled simultaneously (up to memory limitations).
   
   * Support for modelling hydro, solar, wind, tidal, and wave renewable production assets. Any number of assets can be modelled (up to memory limitations).
   
