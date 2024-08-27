@@ -208,8 +208,8 @@ if __name__ == "__main__":
     model_inputs.path_2_electrical_load_time_series = path_2_electrical_load_time_series
     model_inputs.control_mode = PGMcpp.ControlMode.LOAD_FOLLOWING
 
-    model_inputs.load_operating_reserve_factor = 0.20
-    model_inputs.max_operating_reserve_factor = 0.50
+    model_inputs.firm_dispatch_ratio = 0.1
+    model_inputs.load_reserve_ratio = 0.1
 
     model = PGMcpp.Model(model_inputs)
     
