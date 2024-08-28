@@ -55,6 +55,7 @@
 
 // production and storage
 #include "Production/Combustion/Combustion.h"
+#include "Production/Combustion/Diesel.h"
 #include "Production/Noncombustion/Noncombustion.h"
 #include "Production/Renewable/Renewable.h"
 #include "Storage/Storage.h"
@@ -195,6 +196,8 @@ class Controller {
         
         std::vector<double> net_load_vec_kW; ///< A vector of net load values [kW] at each point in the modelling time series. Net load is defined as load minus all available Renewable production.
         std::vector<double> missed_load_vec_kW; ///< A vector of missed load values [kW] at each point in the modelling time series.
+        std::vector<double> missed_firm_dispatch_vec_kW; ///< A vector of missed firm dispatch values [kW] at each point in the modelling time series.
+        std::vector<double> missed_spinning_reserve_vec_kW; ///< A vector of missed spinning reserve values [kw] at each point in the modelling time series.
         
         std::map<double, std::vector<bool>> combustion_map; ///< A map of all possible combustion states, for use in determining optimal dispatch.
         

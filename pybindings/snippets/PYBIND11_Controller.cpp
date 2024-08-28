@@ -61,6 +61,14 @@ pybind11::class_<Controller>(m, "Controller")
     .def_readwrite("load_reserve_ratio", &Controller::load_reserve_ratio)
     .def_readwrite("net_load_vec_kW", &Controller::net_load_vec_kW)
     .def_readwrite("missed_load_vec_kW", &Controller::missed_load_vec_kW)
+    .def_readwrite(
+        "missed_firm_dispatch_vec_kW",
+        &Controller::missed_firm_dispatch_vec_kW
+    )
+    .def_readwrite(
+        "missed_spinning_reserve_vec_kW",
+        &Controller::missed_spinning_reserve_vec_kW
+    )
     .def_readwrite("combustion_map", &Controller::combustion_map)
     
     .def(pybind11::init<>())

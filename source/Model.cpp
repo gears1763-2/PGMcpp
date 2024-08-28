@@ -623,6 +623,8 @@ void Model :: __writeTimeSeries(std::string write_path, int max_lines)
     ofs << "Electrical Load [kW],";
     ofs << "Net Load [kW],";
     ofs << "Missed Load [kW],";
+    ofs << "Missed Firm Dispatch Requirement [kW],";
+    ofs << "Missed Spinning Reserve Requirement [kW],";
     
     for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
         ofs << this->renewable_ptr_vec[i]->capacity_kW << " kW "
@@ -654,6 +656,8 @@ void Model :: __writeTimeSeries(std::string write_path, int max_lines)
         ofs << this->electrical_load.load_vec_kW[i] << ",";
         ofs << this->controller.net_load_vec_kW[i] << ",";
         ofs << this->controller.missed_load_vec_kW[i] << ",";
+        ofs << this->controller.missed_firm_dispatch_vec_kW[i] << ",";
+        ofs << this->controller.missed_spinning_reserve_vec_kW[i] << ",";
         
         //  3.2. asset-wise dispatch/discharge
         for (size_t j = 0; j < this->renewable_ptr_vec.size(); j++) {

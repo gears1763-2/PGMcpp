@@ -517,14 +517,7 @@ LoadStruct Controller :: __handleStorageDischarging(
         total_available_power_kW += available_power_vec_kW[asset];
     }
     
-    //  2. update spinning reserve requirement
-    load_struct.required_spinning_reserve_kW -= total_available_power_kW;
-    
-    if (load_struct.required_spinning_reserve_kW < 0) {
-        load_struct.required_spinning_reserve_kW = 0;
-    }
-    
-    //  3. set total discharge power
+    //  2. set total discharge power
     double total_discharge_power_kW = 
         load_struct.load_kW - load_struct.total_renewable_production_kW;
     
@@ -536,11 +529,19 @@ LoadStruct Controller :: __handleStorageDischarging(
         total_discharge_power_kW = total_available_power_kW;
     }
     
-    //  4. update firm dispatch requirement
+    //  3. update firm dispatch requirement
     load_struct.required_firm_dispatch_kW -= total_discharge_power_kW;
     
     if (load_struct.required_firm_dispatch_kW < 0) {
         load_struct.required_firm_dispatch_kW = 0;
+    }
+    
+    //  4. update spinning reserve requirement
+    load_struct.required_spinning_reserve_kW -=
+        (total_available_power_kW - total_discharge_power_kW);
+    
+    if (load_struct.required_spinning_reserve_kW < 0) {
+        load_struct.required_spinning_reserve_kW = 0;
     }
     
     //  5. commit total discharge power
@@ -802,14 +803,7 @@ LoadStruct Controller :: __handleNoncombustionDispatch(
         }
     }
     
-    //  2. update spinning reserve requirement
-    load_struct.required_spinning_reserve_kW -= total_available_production_kW;
-    
-    if (load_struct.required_spinning_reserve_kW < 0) {
-        load_struct.required_spinning_reserve_kW = 0;
-    }
-    
-    //  3. set total production
+    //  2. set total production
     double total_production_kW = 
         load_struct.load_kW - load_struct.total_renewable_production_kW;
     
@@ -821,11 +815,19 @@ LoadStruct Controller :: __handleNoncombustionDispatch(
         total_production_kW = total_available_production_kW;
     }
     
-    //  4. update firm dispatch requirement
+    //  3. update firm dispatch requirement
     load_struct.required_firm_dispatch_kW -= total_production_kW;
     
     if (load_struct.required_firm_dispatch_kW < 0) {
         load_struct.required_firm_dispatch_kW = 0;
+    }
+    
+    //  4. update spinning reserve requirement
+    load_struct.required_spinning_reserve_kW -= 
+        (total_available_production_kW - total_production_kW);
+    
+    if (load_struct.required_spinning_reserve_kW < 0) {
+        load_struct.required_spinning_reserve_kW = 0;
     }
     
     //  5. commit total production
@@ -1079,12 +1081,12 @@ LoadStruct Controller :: __handleCombustionDispatch(
     double allocation_kW = 
         load_struct.load_kW - load_struct.total_renewable_production_kW;
     
-    if (allocation_kW < load_struct.required_spinning_reserve_kW) {
-        allocation_kW = load_struct.required_spinning_reserve_kW;
-    }
-    
     if (allocation_kW < load_struct.required_firm_dispatch_kW) {
         allocation_kW = load_struct.required_firm_dispatch_kW;
+    }
+    
+    if (load_struct.required_spinning_reserve_kW > 0) {
+        allocation_kW += load_struct.required_spinning_reserve_kW;
     }
     
     //  2. allocate Combustion assets
@@ -1101,14 +1103,7 @@ LoadStruct Controller :: __handleCombustionDispatch(
         allocated_capacity_kW = iter->first;
     }
     
-    //  3. update spinning reserve requirement
-    load_struct.required_spinning_reserve_kW -= allocated_capacity_kW;
-    
-    if (load_struct.required_spinning_reserve_kW < 0) {
-        load_struct.required_spinning_reserve_kW = 0;
-    }
-    
-    //  4. set total production
+    //  3. set total production
     double total_production_kW = 
         load_struct.load_kW - load_struct.total_renewable_production_kW;
     
@@ -1120,15 +1115,25 @@ LoadStruct Controller :: __handleCombustionDispatch(
         total_production_kW = allocated_capacity_kW;
     }
     
-    //  5. update firm dispatch requirement
+    //  4. update firm dispatch requirement
     load_struct.required_firm_dispatch_kW -= total_production_kW;
     
     if (load_struct.required_firm_dispatch_kW < 0) {
         load_struct.required_firm_dispatch_kW = 0;
     }
     
+    //  5. update spinning reserve requirement
+    load_struct.required_spinning_reserve_kW -=
+        (allocated_capacity_kW - total_production_kW);
+    
+    if (load_struct.required_spinning_reserve_kW < 0) {
+        load_struct.required_spinning_reserve_kW = 0;
+    }
+    
     //  6. commit Combustion assets
     //     sharing load proportionally to individual rated capacities
+    //     force starts of allocated assets even if production is zero
+    //     (to satisfy spinning reserve requirement)
     double asset_production_kW = 0;
     Combustion* combustion_ptr;
     
@@ -1147,7 +1152,7 @@ LoadStruct Controller :: __handleCombustionDispatch(
         
         else {
             asset_production_kW =
-                int(this->combustion_map[allocated_capacity_kW][asset]) * 
+                int(this->combustion_map[allocated_capacity_kW][asset]) *
                 (combustion_ptr->capacity_kW / allocated_capacity_kW) *
                 total_production_kW;
         }
@@ -1164,7 +1169,32 @@ LoadStruct Controller :: __handleCombustionDispatch(
             }
         }
         
-        //  6.3. commit production, log
+        //  6.3. force start (if applicable), commit production, log
+        if (
+            allocated_capacity_kW > 0 and
+            this->combustion_map[allocated_capacity_kW][asset] and
+            not combustion_ptr->is_running and
+            asset_production_kW == 0
+        ) {
+            switch (combustion_ptr->type) {
+                case (CombustionType :: DIESEL): {
+                    Diesel* diesel_ptr = (Diesel*)combustion_ptr;
+                    
+                    diesel_ptr->is_running = true;
+                    diesel_ptr->n_starts++;
+                    diesel_ptr->time_since_last_start_hrs = 0;
+                    
+                    break;
+                }
+                
+                default: {
+                    // do nothing!
+                    
+                    break;
+                }
+            }
+        }
+        
         load_struct.load_kW = combustion_ptr->commit(
             timestep,
             dt_hrs,
@@ -1574,6 +1604,8 @@ void Controller :: init(
     //  1. init vector attributes
     this->net_load_vec_kW.resize(electrical_load_ptr->n_points, 0);
     this->missed_load_vec_kW.resize(electrical_load_ptr->n_points, 0);
+    this->missed_firm_dispatch_vec_kW.resize(electrical_load_ptr->n_points, 0);
+    this->missed_spinning_reserve_vec_kW.resize(electrical_load_ptr->n_points, 0);
     
     //  2. compute Renewable production
     this->__computeRenewableProduction(
@@ -1771,9 +1803,19 @@ void Controller :: applyDispatchControl(
             renewable_ptr_vec_ptr
         );
         
-        //  10. log missed load, if any
+        //  10. log missed load, firm dispatch, and/or spinning reserve, if any
         if (load_struct.load_kW > 1e-6) {
             this->missed_load_vec_kW[timestep] = load_struct.load_kW;
+        }
+        
+        if (load_struct.required_firm_dispatch_kW > 1e-6) {
+            this->missed_firm_dispatch_vec_kW[timestep] =
+                load_struct.required_firm_dispatch_kW;
+        }
+        
+        if (load_struct.required_spinning_reserve_kW > 1e-6) {
+            this->missed_spinning_reserve_vec_kW[timestep] =
+                load_struct.required_spinning_reserve_kW;
         }
         
         //  11. reset storage_discharge_bool_vec
@@ -1988,6 +2030,8 @@ void Controller :: clear(void)
 {
     this->net_load_vec_kW.clear();
     this->missed_load_vec_kW.clear();
+    this->missed_firm_dispatch_vec_kW.clear();
+    this->missed_spinning_reserve_vec_kW.clear();
     this->combustion_map.clear();
     
     return;

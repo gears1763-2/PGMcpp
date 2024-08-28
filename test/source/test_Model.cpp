@@ -78,6 +78,13 @@ Model* testConstruct_Model(ModelInputs test_model_inputs)
         __LINE__
     );
     
+    testFloatEquals(
+        test_model_ptr->controller.load_reserve_ratio,
+        0.1,
+        __FILE__,
+        __LINE__
+    );
+    
     // DEPRECATED
     /*
     testFloatEquals(
@@ -1492,10 +1499,25 @@ void testLoadBalance_Model(Model* test_model_ptr)
         
         testLessThanOrEqualTo(
             test_model_ptr->controller.missed_load_vec_kW[i],
-            0,
+            1e-6,
             __FILE__,
             __LINE__
         );
+        
+        testLessThanOrEqualTo(
+            test_model_ptr->controller.missed_firm_dispatch_vec_kW[i],
+            1e-6,
+            __FILE__,
+            __LINE__
+        );
+        
+        testLessThanOrEqualTo(
+            test_model_ptr->controller.missed_spinning_reserve_vec_kW[i],
+            1e-6,
+            __FILE__,
+            __LINE__
+        );
+        
     }
     
     testFloatEquals(
@@ -1548,20 +1570,18 @@ void testLoadBalance_Model(Model* test_model_ptr)
 
 
 // ---------------------------------------------------------------------------------- //
-
-///
-/// \fn void testOperatingReserve_Model(Model* test_model_ptr)
-///
-/// \brief Function to check that the post-run state is consistent with the intended 
-///     operating reserve (or "spinning reserve") logic.
-///
-/// \param test_model_ptr A pointer to the test Model object.
-///
+/* DEPRECATED
+//
+// \fn void testOperatingReserve_Model(Model* test_model_ptr)
+//
+// \brief Function to check that the post-run state is consistent with the intended 
+//     operating reserve (or "spinning reserve") logic.
+//
+// \param test_model_ptr A pointer to the test Model object.
+//
 
 void testOperatingReserve_Model(Model* test_model_ptr)
 {
-    // DEPRECATED
-    /*
     double load_kW = 0;
     double operating_reserve_kW = 0;
 
@@ -1635,10 +1655,10 @@ void testOperatingReserve_Model(Model* test_model_ptr)
             __LINE__
         );
     }
-    */
+    
     return;
-}   /* testOperatingReserve_Model() */
-
+}   // testOperatingReserve_Model()
+*/
 // ---------------------------------------------------------------------------------- //
 
 
@@ -1863,7 +1883,7 @@ int main(int argc, char** argv)
         
         
         testLoadBalance_Model(test_model_ptr);
-        testOperatingReserve_Model(test_model_ptr);
+        //testOperatingReserve_Model(test_model_ptr);
         testEconomics_Model(test_model_ptr);
         testFuelConsumptionEmissions_Model(test_model_ptr);
         
