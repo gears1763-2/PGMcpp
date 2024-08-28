@@ -119,8 +119,14 @@ class Model {
         Emissions total_emissions; ///< An Emissions structure for holding total emissions [kg].
         
         double net_present_cost; ///< The net present cost of the Model (undefined currency).
-        double total_renewable_dispatch_kWh; ///< The total energy dispatched [kWh] by all renewable assets over the Model run.
-        double total_dispatch_discharge_kWh; ///< The total energy dispatched/discharged [kWh] over the Model run.
+        
+        double total_renewable_noncombustion_dispatch_kWh; ///< The total energy dispatched [kWh] by all renewable and non-combustion assets over the Model run.
+        double total_renewable_noncombustion_charge_kWh; ///< The total energy stored [kWh] from all renewable and non-combustion assets over the Model run.
+        double total_combustion_charge_kWh; ///< The total energy stored [kWh] from all combustion assets over the Model run.
+        double total_discharge_kWh; ///< The total energy discharged [kWh] from all storage assets over the Model run.
+        double total_dispatch_kWh; ///< The total energy dispatched [kWh] from all production assets over the Model run.
+        double renewable_penetration; ///< The total renewable (i.e. non-combustion) penetration over the Model run.
+        
         double levellized_cost_of_energy_kWh; ///< The levellized cost of energy, per unit energy dispatched/discharged, of the Model [1/kWh] (undefined currency).
         
         Controller controller; ///< Controller component of Model

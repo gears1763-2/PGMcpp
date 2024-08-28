@@ -89,6 +89,7 @@ pybind11::class_<Production>(m, "Production")
     )
     .def_readwrite("net_present_cost", &Production::net_present_cost)
     .def_readwrite("total_dispatch_kWh", &Production::total_dispatch_kWh)
+    .def_readwrite("total_stored_kWh", &Production::total_stored_kWh)
     .def_readwrite(
         "levellized_cost_of_energy_kWh",
         &Production::levellized_cost_of_energy_kWh

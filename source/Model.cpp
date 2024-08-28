@@ -194,8 +194,8 @@ void Model :: __computeFuelAndEmissions(void)
 /// \fn void Model :: __computeNetPresentCost(void)
 ///
 /// \brief Helper method to compute the overall net present cost, for the Model
-///     run, from the asset-wise net present costs. Also tallies up total dispatch
-///     and discharge.
+///     run, from the asset-wise net present costs. Also tallies up total
+///     dispatch, charge, and discharge metrics.
 ///
 
 void Model :: __computeNetPresentCost(void)
@@ -209,7 +209,10 @@ void Model :: __computeNetPresentCost(void)
         
         this->net_present_cost += this->combustion_ptr_vec[i]->net_present_cost;
         
-        this->total_dispatch_discharge_kWh +=
+        this->total_combustion_charge_kWh +=
+            this->combustion_ptr_vec[i]->total_stored_kWh;
+        
+        this->total_dispatch_kWh +=
             this->combustion_ptr_vec[i]->total_dispatch_kWh;
     }
     
@@ -222,7 +225,13 @@ void Model :: __computeNetPresentCost(void)
         
         this->net_present_cost += this->noncombustion_ptr_vec[i]->net_present_cost;
         
-        this->total_dispatch_discharge_kWh +=
+        this->total_renewable_noncombustion_dispatch_kWh +=
+            this->noncombustion_ptr_vec[i]->total_dispatch_kWh;
+        
+        this->total_renewable_noncombustion_charge_kWh +=
+            this->noncombustion_ptr_vec[i]->total_stored_kWh;
+        
+        this->total_dispatch_kWh +=
             this->noncombustion_ptr_vec[i]->total_dispatch_kWh;
     }
     
@@ -235,10 +244,13 @@ void Model :: __computeNetPresentCost(void)
         
         this->net_present_cost += this->renewable_ptr_vec[i]->net_present_cost;
         
-        this->total_dispatch_discharge_kWh +=
+        this->total_renewable_noncombustion_dispatch_kWh +=
             this->renewable_ptr_vec[i]->total_dispatch_kWh;
         
-        this->total_renewable_dispatch_kWh +=
+        this->total_renewable_noncombustion_charge_kWh +=
+            this->renewable_ptr_vec[i]->total_stored_kWh;
+        
+        this->total_dispatch_kWh +=
             this->renewable_ptr_vec[i]->total_dispatch_kWh;
     }
     
@@ -251,7 +263,7 @@ void Model :: __computeNetPresentCost(void)
         
         this->net_present_cost += this->storage_ptr_vec[i]->net_present_cost;
         
-        this->total_dispatch_discharge_kWh +=
+        this->total_discharge_kWh +=
             this->storage_ptr_vec[i]->total_discharge_kWh;
     }
     
@@ -279,7 +291,7 @@ void Model :: __computeLevellizedCostOfEnergy(void)
             (
                 this->combustion_ptr_vec[i]->levellized_cost_of_energy_kWh *
                 this->combustion_ptr_vec[i]->total_dispatch_kWh
-            ) / this->total_dispatch_discharge_kWh;
+            ) / (this->total_dispatch_kWh + this->total_discharge_kWh);
     }
     
     //  2. account for Noncombustion economics in levellized cost of energy
@@ -288,7 +300,7 @@ void Model :: __computeLevellizedCostOfEnergy(void)
             (
                 this->noncombustion_ptr_vec[i]->levellized_cost_of_energy_kWh *
                 this->noncombustion_ptr_vec[i]->total_dispatch_kWh
-            ) / this->total_dispatch_discharge_kWh;
+            ) / (this->total_dispatch_kWh + this->total_discharge_kWh);
     }
     
     //  3. account for Renewable economics in levellized cost of energy
@@ -297,7 +309,7 @@ void Model :: __computeLevellizedCostOfEnergy(void)
             (
                 this->renewable_ptr_vec[i]->levellized_cost_of_energy_kWh *
                 this->renewable_ptr_vec[i]->total_dispatch_kWh
-            ) / this->total_dispatch_discharge_kWh;
+            ) / (this->total_dispatch_kWh + this->total_discharge_kWh);
     }
     
     //  4. account for Storage economics in levellized cost of energy
@@ -306,7 +318,7 @@ void Model :: __computeLevellizedCostOfEnergy(void)
             (
                 this->storage_ptr_vec[i]->levellized_cost_of_energy_kWh *
                 this->storage_ptr_vec[i]->total_discharge_kWh
-            ) / this->total_dispatch_discharge_kWh;
+            ) / (this->total_dispatch_kWh + this->total_discharge_kWh);
     }
     
     return;
@@ -387,6 +399,8 @@ void Model :: __writeSummary(std::string write_path)
     */
     ofs << "Firm Dispatch Ratio: " <<
         this->controller.firm_dispatch_ratio << "  \n";
+    ofs << "Load Reserve Ratio: " <<
+        this->controller.load_reserve_ratio << "  \n";
     ofs << "\n--------\n\n";
     
     //  3.3. Resources (1D)
@@ -477,7 +491,10 @@ void Model :: __writeSummary(std::string write_path)
     for (size_t i = 0; i < this->renewable_ptr_vec.size(); i++) {
         ofs << "Asset Index: " << i << "  \n";
         ofs << "Type: " << this->renewable_ptr_vec[i]->type_str << "  \n";
-        ofs << "Capacity: " << this->renewable_ptr_vec[i]->capacity_kW << " kW  \n";
+        ofs << "Capacity: " << this->renewable_ptr_vec[i]->capacity_kW
+            << " kW  \n";
+        ofs << "Firmness Factor: " <<
+            this->renewable_ptr_vec[i]->firmness_factor << "  \n";
         ofs << "\n";
     }
     
@@ -506,12 +523,24 @@ void Model :: __writeSummary(std::string write_path)
     ofs << "Net Present Cost: " << this->net_present_cost << "  \n";
     ofs << "\n";
     
-    ofs << "Total Dispatch + Discharge: " << this->total_dispatch_discharge_kWh
+    ofs << "Total Noncombustion and Renewable Dispatch: "
+        << this->total_renewable_noncombustion_dispatch_kWh << " kWh  \n";
+    ofs << "Total Combustion Dispatch: " << 
+        this->total_dispatch_kWh -
+        this->total_renewable_noncombustion_dispatch_kWh << " kWh  \n";
+    ofs << "Total Dispatch: " << this->total_dispatch_kWh
         << " kWh  \n";
+    ofs << "\n";
     
-    ofs << "Renewable Penetration: "
-        << this->total_renewable_dispatch_kWh / this->total_dispatch_discharge_kWh
-        << "  \n";
+    ofs << "Total Noncombustion and Renewable Charge: " <<
+        this->total_renewable_noncombustion_charge_kWh << " kWh  \n";
+    ofs << "Total Combustion Charge: " <<
+        this->total_combustion_charge_kWh << " kWh  \n";
+    ofs << "Total Discharge: " << this->total_discharge_kWh
+        << " kWh  \n";
+    ofs << "\n";
+    
+    ofs << "Renewable Penetration: " << this->renewable_penetration << "  \n";
     ofs << "\n";
         
     ofs << "Levellized Cost of Energy: " << this->levellized_cost_of_energy_kWh
@@ -707,8 +736,14 @@ Model :: Model(ModelInputs model_inputs)
     //  4. set public attributes
     this->total_fuel_consumed_L = 0;
     this->net_present_cost = 0;
-    this->total_dispatch_discharge_kWh = 0;
-    this->total_renewable_dispatch_kWh = 0;
+    
+    this->total_renewable_noncombustion_dispatch_kWh = 0;
+    this->total_renewable_noncombustion_charge_kWh = 0;
+    this->total_combustion_charge_kWh = 0;
+    this->total_discharge_kWh = 0;
+    this->total_dispatch_kWh = 0;
+    this->renewable_penetration = 0;
+    
     this->levellized_cost_of_energy_kWh = 0;
     
     return;
@@ -1023,6 +1058,29 @@ void Model :: run(void)
     //  4. compute key economic metrics
     this->__computeEconomics();
     
+    //  5. compute renewable penetration
+    this->renewable_penetration +=
+        this->total_renewable_noncombustion_dispatch_kWh;
+    
+    if (
+        this->total_renewable_noncombustion_charge_kWh +
+        this->total_combustion_charge_kWh > 0
+    ) {
+        double discharge_ratio = (
+            this->total_renewable_noncombustion_charge_kWh / 
+            (
+                this->total_renewable_noncombustion_charge_kWh +
+                this->total_combustion_charge_kWh
+            )
+        );
+        
+        this->renewable_penetration +=
+            discharge_ratio * this->total_discharge_kWh;
+    }
+    
+    this->renewable_penetration /=
+        this->total_dispatch_kWh + this->total_discharge_kWh;
+    
     return;
 }   /* run() */
 
@@ -1080,8 +1138,14 @@ void Model :: reset(void)
     this->total_emissions.PM_kg = 0;
     
     this->net_present_cost = 0;
-    this->total_dispatch_discharge_kWh = 0;
-    this->total_renewable_dispatch_kWh = 0;
+    
+    this->total_renewable_noncombustion_dispatch_kWh = 0;
+    this->total_renewable_noncombustion_charge_kWh = 0;
+    this->total_combustion_charge_kWh = 0;
+    this->total_discharge_kWh = 0;
+    this->total_dispatch_kWh = 0;
+    this->renewable_penetration = 0;
+    
     this->levellized_cost_of_energy_kWh = 0;
     
     return;

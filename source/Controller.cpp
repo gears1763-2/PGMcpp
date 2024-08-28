@@ -567,14 +567,14 @@ LoadStruct Controller :: __handleStorageDischarging(
         }
         
         //  5.4. commit discharging, log
-        load_struct.load_kW = storage_ptr->commitDischarge(
-            timestep,
-            dt_hrs,
-            asset_discharge_power_kW,
-            load_struct.load_kW
-        );
-        
         if (asset_discharge_power_kW > 0) {
+            load_struct.load_kW = storage_ptr->commitDischarge(
+                timestep,
+                dt_hrs,
+                asset_discharge_power_kW,
+                load_struct.load_kW
+            );
+        
             this->storage_discharge_bool_vec[asset] = true;
         }
     }
@@ -1321,6 +1321,7 @@ void Controller :: __handleStorageCharging(
             
             combustion_ptr->curtailment_vec_kW[timestep] -= acceptable_kW;
             combustion_ptr->storage_vec_kW[timestep] += acceptable_kW;
+            combustion_ptr->total_stored_kWh += acceptable_kW * dt_hrs;
             storage_ptr->power_kW += acceptable_kW;
         }
         
@@ -1341,6 +1342,7 @@ void Controller :: __handleStorageCharging(
             
             noncombustion_ptr->curtailment_vec_kW[timestep] -= acceptable_kW;
             noncombustion_ptr->storage_vec_kW[timestep] += acceptable_kW;
+            noncombustion_ptr->total_stored_kWh += acceptable_kW * dt_hrs;
             storage_ptr->power_kW += acceptable_kW;
         }
         
@@ -1361,6 +1363,7 @@ void Controller :: __handleStorageCharging(
             
             renewable_ptr->curtailment_vec_kW[timestep] -= acceptable_kW;
             renewable_ptr->storage_vec_kW[timestep] += acceptable_kW;
+            renewable_ptr->total_stored_kWh += acceptable_kW * dt_hrs;
             storage_ptr->power_kW += acceptable_kW;
         }
         

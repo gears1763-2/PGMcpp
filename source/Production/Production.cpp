@@ -372,6 +372,7 @@ Production :: Production(
     this->operation_maintenance_cost_kWh = 0;
     this->net_present_cost = 0;
     this->total_dispatch_kWh = 0;
+    this->total_stored_kWh = 0;
     this->levellized_cost_of_energy_kWh = 0;
     
     this->path_2_normalized_production_time_series = "";

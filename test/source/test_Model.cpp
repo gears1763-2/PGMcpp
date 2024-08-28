@@ -1499,8 +1499,43 @@ void testLoadBalance_Model(Model* test_model_ptr)
     }
     
     testFloatEquals(
-        test_model_ptr->total_dispatch_discharge_kWh,
-        2263351.62026685,
+        test_model_ptr->total_renewable_noncombustion_dispatch_kWh,
+        2260204.908228975,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model_ptr->total_renewable_noncombustion_charge_kWh,
+        1158.940513422668,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model_ptr->total_combustion_charge_kWh,
+        0,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model_ptr->total_discharge_kWh,
+        1247.160256850769,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model_ptr->total_dispatch_kWh,
+        2262104.460010,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model_ptr->renewable_penetration,
+        0.999161,
         __FILE__,
         __LINE__
     );

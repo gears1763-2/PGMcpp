@@ -124,6 +124,7 @@ class Production {
         
         double net_present_cost; ///< The net present cost of this asset.
         double total_dispatch_kWh; ///< The total energy dispatched [kWh] over the Model run.
+        double total_stored_kWh; ///< The total energy stored [kWh] over the Model run.
         double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatch.
         
         std::string type_str; ///< A string describing the type of the asset.

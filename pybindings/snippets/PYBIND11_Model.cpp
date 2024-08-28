@@ -64,8 +64,18 @@ pybind11::class_<Model>(m, "Model")
     .def_readwrite("total_fuel_consumed_L", &Model::total_fuel_consumed_L)
     .def_readwrite("total_emissions", &Model::total_emissions)
     .def_readwrite("net_present_cost", &Model::net_present_cost)
-    .def_readwrite("total_renewable_dispatch_kWh", &Model::total_renewable_dispatch_kWh)
-    .def_readwrite("total_dispatch_discharge_kWh", &Model::total_dispatch_discharge_kWh)
+    .def_readwrite(
+        "total_renewable_noncombustion_dispatch_kWh",
+        &Model::total_renewable_noncombustion_dispatch_kWh
+    )
+    .def_readwrite(
+        "total_renewable_noncombustion_charge_kWh",
+        &Model::total_renewable_noncombustion_charge_kWh
+    )
+    .def_readwrite("total_combustion_charge_kWh", &Model::total_combustion_charge_kWh)
+    .def_readwrite("total_discharge_kWh", &Model::total_discharge_kWh)
+    .def_readwrite("total_dispatch_kWh", &Model::total_dispatch_kWh)
+    .def_readwrite("renewable_penetration", &Model::renewable_penetration)
     .def_readwrite(
         "levellized_cost_of_energy_kWh",
         &Model::levellized_cost_of_energy_kWh
