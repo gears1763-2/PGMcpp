@@ -86,6 +86,7 @@ int main(int argc, char** argv)
         path_2_electrical_load_time_series;
     
     model_inputs.control_mode = ControlMode :: LOAD_FOLLOWING;
+    //model_inputs.control_mode = ControlMode :: CYCLE_CHARGING;
     
     model_inputs.firm_dispatch_ratio = 0.1;
     model_inputs.load_reserve_ratio = 0.1;
