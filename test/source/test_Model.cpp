@@ -1522,14 +1522,14 @@ void testLoadBalance_Model(Model* test_model_ptr)
     
     testFloatEquals(
         test_model_ptr->total_renewable_noncombustion_dispatch_kWh,
-        2260204.908228975,
+        2258946.503532,
         __FILE__,
         __LINE__
     );
     
     testFloatEquals(
         test_model_ptr->total_renewable_noncombustion_charge_kWh,
-        1158.940513422668,
+        2218.073192,
         __FILE__,
         __LINE__
     );
@@ -1543,21 +1543,21 @@ void testLoadBalance_Model(Model* test_model_ptr)
     
     testFloatEquals(
         test_model_ptr->total_discharge_kWh,
-        1247.160256850769,
+        1965.048539,
         __FILE__,
         __LINE__
     );
     
     testFloatEquals(
         test_model_ptr->total_dispatch_kWh,
-        2262104.460010,
+        2261386.571728,
         __FILE__,
         __LINE__
     );
     
     testFloatEquals(
         test_model_ptr->renewable_penetration,
-        0.999161,
+        0.998922,
         __FILE__,
         __LINE__
     );
@@ -1859,7 +1859,7 @@ int main(int argc, char** argv)
         
         // looping solely for the sake of profiling (also tests reset(), which is
         // needed for wrapping PGMcpp in an optimizer)
-        int n_times = 1000;
+        int n_times = 100;
         for (int i = 0; i < n_times; i++) {
             test_model_ptr->reset();
             

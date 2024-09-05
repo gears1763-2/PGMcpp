@@ -1195,6 +1195,12 @@ LoadStruct Controller :: __handleCombustionDispatch(
             }
         }
         
+        asset_production_kW = combustion_ptr->requestProductionkW(
+            timestep,
+            dt_hrs,
+            asset_production_kW
+        );
+        
         load_struct.load_kW = combustion_ptr->commit(
             timestep,
             dt_hrs,
