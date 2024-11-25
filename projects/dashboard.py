@@ -56,7 +56,7 @@ main_folder_path = 'example_py'
 """
 
 # Specify the start date of the project
-start_year = 2030
+start_year = 2024
 
 
 
@@ -94,6 +94,7 @@ sub_folder_path_storage = main_folder_path + '/Storage'
 # Create empty dictionaries to store DataFrames
 dataframes_model_main = {}
 dataframes_combustion = {}
+dataframes_combustion_status = {}
 dataframes_noncombustion = {}
 dataframes_renewable = {}
 dataframes_storage = {}
@@ -116,25 +117,6 @@ times = pd.concat([pd.Series(times + pd.DateOffset(years=i))
 
 # Add the 'times' series to the 'Model' DataFrame
 dataframes_model_main['Model']['datetime'] = times
-
-# Add the operation modes columns to the 'Operation_Mode' DataFrame (these operation
-# modes exist in PGMcpp-QEC Dispatch version)
-try:
-    dataframes_model_main['Operation_Mode'] = dataframes_model_main['Model'][['datetime',
-                                                                              'Operation Mode A',
-                                                                              'Operation Mode B']]
-    dataframes_model_main['Model'].drop(['Net Load [kW]',
-                                         'Operation Mode A',
-                                         'Operation Mode B'], axis=1, inplace=True)
-except:
-    dataframes_model_main['Operation_Mode'] = pd.DataFrame(index=dataframes_model_main['Model'].index, 
-                                                           columns=['datetime',
-                                                                    'Operation Mode A',
-                                                                    'Operation Mode B'])
-    dataframes_model_main['Operation_Mode']['datetime'] = dataframes_model_main['Model']['datetime']
-    dataframes_model_main['Operation_Mode'].loc[:, 'Operation Mode A'] = 0
-    dataframes_model_main['Operation_Mode'].loc[:, 'Operation Mode B'] = 0
-    dataframes_model_main['Model'].drop(['Net Load [kW]'], axis=1, inplace=True)
 
 
 # Read the other 'time_series_results.csv' files into DataFrames and store them in 
@@ -175,6 +157,7 @@ for i, path in enumerate(folder_paths):
 
                     if path == sub_folder_path_combustion:
                         dataframes_combustion[folder] = df[cols_combustion_energy]
+                        dataframes_combustion_status[folder] = df[['Is Running (N = 0 / Y = 1)']]
                     elif path == sub_folder_path_noncombustion:
                         dataframes_noncombustion[folder] = df[cols_noncombustion_energy]
                     elif path == sub_folder_path_renewable:
@@ -187,6 +170,38 @@ for i, path in enumerate(folder_paths):
 
 # Define the time column name
 col_time = 'datetime'
+
+
+# Add the operation modes columns to the 'Operation_Mode' DataFrame 
+try:
+    dataframes_model_main['Operation_Mode'] = pd.DataFrame(index=dataframes_model_main['Model'].index, 
+                                                           columns=['datetime',
+                                                                    'Diesel On Mode',
+                                                                    'Diesel Off Mode'])
+    dataframes_model_main['Operation_Mode']['datetime'] = dataframes_model_main['Model']['datetime']
+    dataframes_model_main['Model'].drop(['Net Load [kW]'], axis=1, inplace=True)
+
+
+    # add the columns of each dataframe in dataframes_combustion_status into a single df
+    df_combustion_status = pd.concat([dataframes_combustion_status[key] for key in dataframes_combustion_status], axis=1)
+
+    # make a new column 'Total' as the summation of the existing column
+    df_combustion_status['Total'] = df_combustion_status.sum(axis=1)
+
+    # if the value of 'Total' column is greater than 0, add a new column named 
+    # 'Diesel On Mode' and set it to 1, otherwise set it to 0
+    df_combustion_status['Diesel On Mode'] = df_combustion_status['Total'].apply(lambda x: 1 if x > 0 else 0)
+
+    # if the value of 'Total' column is 0, add a new column named 'Diesel Off Mode' and
+    # set it to 1, otherwise set it to 0
+    df_combustion_status['Diesel Off Mode'] = df_combustion_status['Total'].apply(lambda x: 1 if x == 0 else 0)
+    
+    dataframes_model_main['Operation_Mode'].loc[:, 'Diesel On Mode'] = df_combustion_status['Diesel On Mode']
+    dataframes_model_main['Operation_Mode'].loc[:, 'Diesel Off Mode'] = df_combustion_status['Diesel Off Mode']
+
+except:
+    dataframes_model_main['Operation_Mode'].loc[:, 'Diesel On Mode'] = 0
+    dataframes_model_main['Operation_Mode'].loc[:, 'Diesel Off Mode'] = 0
 
 #------------------------------------------------------------------------------------
 
@@ -529,8 +544,8 @@ if os.path.isdir(sub_folder_path_storage):
     1.6. Analysing the Operation Modes
 """
 
-# Make a dataframe with 'project_lifetime' rows and 2 columns named 'Mode A' and 
-# 'Mode B', each row containing the summation of each operation mode for each year
+# Make a dataframe with 'project_lifetime' rows and 2 columns named 'Diesel On Mode' and 
+# 'Diesel Off Mode', each row containing the summation of each operation mode for each year
 df_operation_modes = dataframes_model_main['Operation_Mode'].drop(columns=['datetime']).groupby(
     dataframes_model_main['Operation_Mode'].index // 8760
     ).sum()
@@ -538,18 +553,23 @@ df_operation_modes = dataframes_model_main['Operation_Mode'].drop(columns=['date
 # Add the 'index'+1 of 'df_operation_modes' as a first column named 'Year'
 df_operation_modes.insert(0, 'Year', df_operation_modes.index + 1)
 
-# Change the name of columns 2 and 3 to 'Mode A (h)' and 'Mode B (h)'
-df_operation_modes.columns = ['Year', 'Mode A (h)', 'Mode B (h)']
+# Change the name of columns 2 and 3 to 'Diesel On Mode (h)' and 'Diesel Off Mode (h)'
+df_operation_modes.columns = ['Year', 'Diesel On Mode (h)', 'Diesel Off Mode (h)']
 
-# Add two new columns named 'Mode A (%)' and 'Mode B (%)' as % of modes for each year
+# Add two new columns named 'Diesel On Mode (%)' and 'Diesel Off Mode (%)' as % of 
+# modes for each year
 try:
-    df_operation_modes['Mode A (%)'] = round(100 * df_operation_modes['Mode A (h)'] / 
-                                             (df_operation_modes['Mode A (h)'] + df_operation_modes['Mode B (h)']), 1)
-    df_operation_modes['Mode B (%)'] = round(100 * df_operation_modes['Mode B (h)'] / 
-                                             (df_operation_modes['Mode A (h)'] + df_operation_modes['Mode B (h)']), 1)
+    df_operation_modes['Diesel On Mode (%)'] = (100 * df_operation_modes['Diesel On Mode (h)'] / 
+                                             (df_operation_modes['Diesel On Mode (h)'] + df_operation_modes['Diesel Off Mode (h)']))
+    df_operation_modes['Diesel Off Mode (%)'] = (100 * df_operation_modes['Diesel Off Mode (h)'] / 
+                                             (df_operation_modes['Diesel On Mode (h)'] + df_operation_modes['Diesel Off Mode (h)']))
+        
+    df_operation_modes['Diesel On Mode (%)'] = (df_operation_modes['Diesel On Mode (%)'] * 100).astype(int) / 100
+    df_operation_modes['Diesel Off Mode (%)'] = (df_operation_modes['Diesel Off Mode (%)'] * 100).astype(int) / 100
+    
 except:
-    df_operation_modes['Mode A (%)'] = 0
-    df_operation_modes['Mode B (%)'] = 0
+    df_operation_modes['Diesel On Mode (%)'] = 0
+    df_operation_modes['Diesel Off Mode (%)'] = 0
 
 #------------------------------------------------------------------------------------
 
@@ -755,14 +775,14 @@ children_tab_3 = [
                 html.Table([
                     *[html.Tr([html.Th(col)] + [html.Td(df_operation_modes[col][i], 
                                                         style={'border':'1px solid #ddd'}) for i in range(len(df_operation_modes))]) 
-                                                        for col in df_operation_modes[['Year','Mode A (h)','Mode B (h)']].columns]
+                                                        for col in df_operation_modes[['Year','Diesel On Mode (h)','Diesel Off Mode (h)']].columns]
                 ], style={'width':'auto', 'margin':'auto', 'border':'1px solid #ddd', 'padding':'30px'})
             ],
             *[
                 html.Table([
                     *[html.Tr([html.Th(col)] + [html.Td(df_operation_modes[col][i], 
                                                         style={'border':'1px solid #ddd'}) for i in range(len(df_operation_modes))]) 
-                                                        for col in df_operation_modes[['Year','Mode A (%)','Mode B (%)']].columns]
+                                                        for col in df_operation_modes[['Year','Diesel On Mode (%)','Diesel Off Mode (%)']].columns]
                 ], style={'width':'auto', 'margin':'auto', 'border':'1px solid #ddd', 'padding':'30px'})
             ],
         ]),
