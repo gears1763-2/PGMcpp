@@ -123,7 +123,6 @@ class Diesel : public Combustion {
         double minimum_runtime_hrs; ///< The minimum runtime [hrs] of the asset. This is the minimum time that must elapse between successive starts and stops.
         double time_since_last_start_hrs; ///< The time that has elapsed [hrs] since the last start of the asset.
         
-        
         //  2. methods
         Diesel(void);
         Diesel (int, double, DieselInputs, std::vector<double>*);

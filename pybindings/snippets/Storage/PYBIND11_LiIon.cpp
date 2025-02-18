@@ -98,6 +98,7 @@ pybind11::class_<LiIon>(m, "LiIon")
     .def_readwrite("charging_efficiency", &LiIon::charging_efficiency)
     .def_readwrite("discharging_efficiency", &LiIon::discharging_efficiency)
     .def_readwrite("SOH_vec", &LiIon::SOH_vec)
+    .def_readwrite("total_discharge_kWh", &Storage::total_discharge_kWh)
       
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, LiIonInputs>())

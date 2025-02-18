@@ -371,6 +371,7 @@ Production :: Production(
     this->capital_cost = 0;
     this->operation_maintenance_cost_kWh = 0;
     this->net_present_cost = 0;
+    this->total_production_kWh = 0;
     this->total_dispatch_kWh = 0;
     this->total_stored_kWh = 0;
     this->levellized_cost_of_energy_kWh = 0;
@@ -595,8 +596,9 @@ double Production :: commit(
     double load_kW
 )
 {
-    //  1. record production
+    //  1. record production, increment total production
     this->production_vec_kW[timestep] = production_kW;
+    this->total_production_kWh += production_kW * dt_hrs;
     
     //  2. compute and record dispatch and curtailment
     double dispatch_kW = 0;

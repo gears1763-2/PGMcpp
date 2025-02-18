@@ -89,6 +89,7 @@ pybind11::class_<Wave>(m, "Wave")
     .def_readwrite("design_energy_period_s", &Wave::design_energy_period_s)
     .def_readwrite("power_model", &Wave::power_model)
     .def_readwrite("power_model_string", &Wave::power_model_string)
+    .def_readwrite("total_production_kWh", &Production::total_production_kWh)
       
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, WaveInputs, std::vector<double>*>())

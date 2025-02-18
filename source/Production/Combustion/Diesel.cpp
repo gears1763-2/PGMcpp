@@ -685,6 +685,7 @@ Combustion(
     this->minimum_load_ratio = diesel_inputs.minimum_load_ratio;
     this->minimum_runtime_hrs = diesel_inputs.minimum_runtime_hrs;
     this->time_since_last_start_hrs = 0;
+    this->total_production_kWh = 0;
     
     this->CO2_emissions_intensity_kgL = diesel_inputs.CO2_emissions_intensity_kgL;
     this->CO_emissions_intensity_kgL = diesel_inputs.CO_emissions_intensity_kgL;

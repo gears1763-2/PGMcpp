@@ -80,6 +80,7 @@ pybind11::class_<Tidal>(m, "Tidal")
     .def_readwrite("design_speed_ms", &Tidal::design_speed_ms)
     .def_readwrite("power_model", &Tidal::power_model)
     .def_readwrite("power_model_string", &Tidal::power_model_string)
+    .def_readwrite("total_production_kWh", &Production::total_production_kWh)
       
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, TidalInputs, std::vector<double>*>())

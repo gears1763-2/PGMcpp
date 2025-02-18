@@ -85,6 +85,7 @@ pybind11::class_<Hydro>(m, "Hydro")
     .def_readwrite("turbine_flow_vec_m3hr", &Hydro::turbine_flow_vec_m3hr)
     .def_readwrite("spill_rate_vec_m3hr", &Hydro::spill_rate_vec_m3hr)
     .def_readwrite("stored_volume_vec_m3", &Hydro::stored_volume_vec_m3)
+    .def_readwrite("total_production_kWh", &Production::total_production_kWh)
       
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, HydroInputs, std::vector<double>*>())

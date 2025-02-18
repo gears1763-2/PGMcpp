@@ -72,7 +72,8 @@ pybind11::class_<Diesel>(m, "Diesel")
     .def_readwrite("minimum_load_ratio", &Diesel::minimum_load_ratio)
     .def_readwrite("minimum_runtime_hrs", &Diesel::minimum_runtime_hrs)
     .def_readwrite("time_since_last_start_hrs", &Diesel::time_since_last_start_hrs)
-      
+    .def_readwrite("total_production_kWh", &Production::total_production_kWh)
+    
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, DieselInputs, std::vector<double>*>())
     .def("handleReplacement", &Diesel::handleReplacement)

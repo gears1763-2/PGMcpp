@@ -123,6 +123,7 @@ class Production {
         double operation_maintenance_cost_kWh; ///< The operation and maintenance cost of the asset [1/kWh] (undefined currency). This is a cost incurred per unit of energy produced.
         
         double net_present_cost; ///< The net present cost of this asset.
+        double total_production_kWh; ///< The total production [kWh] of the asset over the modelling period.
         double total_dispatch_kWh; ///< The total energy dispatched [kWh] over the Model run.
         double total_stored_kWh; ///< The total energy stored [kWh] over the Model run.
         double levellized_cost_of_energy_kWh; ///< The levellized cost of energy [1/kWh] (undefined currency) of this asset. This metric considers only dispatch.

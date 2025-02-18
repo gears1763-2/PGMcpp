@@ -77,6 +77,7 @@ pybind11::class_<Wind>(m, "Wind")
     .def_readwrite("design_speed_ms", &Wind::design_speed_ms)
     .def_readwrite("power_model", &Wind::power_model)
     .def_readwrite("power_model_string", &Wind::power_model_string)
+    .def_readwrite("total_production_kWh", &Production::total_production_kWh)
       
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, WindInputs, std::vector<double>*>())
