@@ -68,13 +68,14 @@ pybind11::class_<DieselInputs>(m, "DieselInputs")
     .def(pybind11::init());
 
 
-pybind11::class_<Diesel>(m, "Diesel")
+pybind11::class_<Diesel, Combustion>(m, "Diesel")
     .def_readwrite("minimum_load_ratio", &Diesel::minimum_load_ratio)
     .def_readwrite("minimum_runtime_hrs", &Diesel::minimum_runtime_hrs)
     .def_readwrite("time_since_last_start_hrs", &Diesel::time_since_last_start_hrs)
+    
+    .def_readwrite("type_str", &Production::type_str)
     .def_readwrite("capacity_kW", &Production::capacity_kW)
     .def_readwrite("total_production_kWh", &Production::total_production_kWh)
-    .def_readwrite("type_str", &Production::type_str)
     
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, DieselInputs, std::vector<double>*>())

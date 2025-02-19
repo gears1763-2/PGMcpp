@@ -76,7 +76,7 @@ pybind11::class_<LiIonInputs>(m, "LiIonInputs")
     .def(pybind11::init());
 
 
-pybind11::class_<LiIon>(m, "LiIon")
+pybind11::class_<LiIon, Storage>(m, "LiIon")
     .def_readwrite("power_degradation_flag", &LiIon::power_degradation_flag)
     .def_readwrite("dynamic_energy_capacity_kWh", &LiIon::dynamic_energy_capacity_kWh)
     .def_readwrite("dynamic_power_capacity_kW", &LiIon::dynamic_power_capacity_kW)
@@ -98,11 +98,12 @@ pybind11::class_<LiIon>(m, "LiIon")
     .def_readwrite("charging_efficiency", &LiIon::charging_efficiency)
     .def_readwrite("discharging_efficiency", &LiIon::discharging_efficiency)
     .def_readwrite("SOH_vec", &LiIon::SOH_vec)
+    
+    .def_readwrite("type_str", &Storage::type_str)
     .def_readwrite("power_capacity_kW", &Storage::power_capacity_kW)
     .def_readwrite("energy_capacity_kWh", &Storage::energy_capacity_kWh)
     .def_readwrite("total_discharge_kWh", &Storage::total_discharge_kWh)
-    .def_readwrite("type_str", &Storage::type_str)
-      
+    
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, LiIonInputs>())
     .def("handleReplacement", &LiIon::handleReplacement)

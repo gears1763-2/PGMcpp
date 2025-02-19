@@ -78,14 +78,15 @@ pybind11::class_<SolarInputs>(m, "SolarInputs")
     .def(pybind11::init());
 
 
-pybind11::class_<Solar>(m, "Solar")
+pybind11::class_<Solar, Renewable>(m, "Solar")
     .def_readwrite("derating", &Solar::derating)
     .def_readwrite("power_model", &Solar::power_model)
     .def_readwrite("power_model_string", &Solar::power_model_string)
+    
+    .def_readwrite("type_str", &Production::type_str)
     .def_readwrite("capacity_kW", &Production::capacity_kW)
     .def_readwrite("total_production_kWh", &Production::total_production_kWh)
-    .def_readwrite("type_str", &Production::type_str)
-      
+    
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, SolarInputs, std::vector<double>*>())
     .def("handleReplacement", &Solar::handleReplacement)

@@ -131,7 +131,7 @@ class Diesel : public Combustion {
         double requestProductionkW(int, double, double);
         double commit(int, double, double, double);
         
-        ~Diesel(void);
+        virtual ~Diesel(void);
         
 };  /* Diesel */
 

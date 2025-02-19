@@ -72,7 +72,7 @@ pybind11::class_<HydroInputs>(m, "HydroInputs")
     .def(pybind11::init());
 
 
-pybind11::class_<Hydro>(m, "Hydro")
+pybind11::class_<Hydro, Noncombustion>(m, "Hydro")
     .def_readwrite("turbine_type", &Hydro::turbine_type)
     .def_readwrite("fluid_density_kgm3", &Hydro::fluid_density_kgm3)
     .def_readwrite("net_head_m", &Hydro::net_head_m)
@@ -85,10 +85,11 @@ pybind11::class_<Hydro>(m, "Hydro")
     .def_readwrite("turbine_flow_vec_m3hr", &Hydro::turbine_flow_vec_m3hr)
     .def_readwrite("spill_rate_vec_m3hr", &Hydro::spill_rate_vec_m3hr)
     .def_readwrite("stored_volume_vec_m3", &Hydro::stored_volume_vec_m3)
+    
+    .def_readwrite("type_str", &Production::type_str)
     .def_readwrite("capacity_kW", &Production::capacity_kW)
     .def_readwrite("total_production_kWh", &Production::total_production_kWh)
-    .def_readwrite("type_str", &Production::type_str)
-      
+    
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, HydroInputs, std::vector<double>*>())
     .def("handleReplacement", &Hydro::handleReplacement)

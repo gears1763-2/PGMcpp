@@ -90,7 +90,7 @@ pybind11::class_<Emissions>(m, "Emissions")
     .def(pybind11::init());
 
 
-pybind11::class_<Combustion>(m, "Combustion")
+pybind11::class_<Combustion, Production>(m, "Combustion")
     .def_readwrite("type", &Combustion::type)
     .def_readwrite("fuel_mode", &Combustion::fuel_mode)
     .def_readwrite("total_emissions", &Combustion::total_emissions)

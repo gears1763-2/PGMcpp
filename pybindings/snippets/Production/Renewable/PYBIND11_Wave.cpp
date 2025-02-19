@@ -81,7 +81,7 @@ pybind11::class_<WaveInputs>(m, "WaveInputs")
     .def(pybind11::init());
 
 
-pybind11::class_<Wave>(m, "Wave")
+pybind11::class_<Wave, Renewable>(m, "Wave")
     .def_readwrite(
         "design_significant_wave_height_m",
         &Wave::design_significant_wave_height_m
@@ -89,10 +89,11 @@ pybind11::class_<Wave>(m, "Wave")
     .def_readwrite("design_energy_period_s", &Wave::design_energy_period_s)
     .def_readwrite("power_model", &Wave::power_model)
     .def_readwrite("power_model_string", &Wave::power_model_string)
+    
+    .def_readwrite("type_str", &Production::type_str)
     .def_readwrite("capacity_kW", &Production::capacity_kW)
     .def_readwrite("total_production_kWh", &Production::total_production_kWh)
-    .def_readwrite("type_str", &Production::type_str)
-      
+    
     .def(pybind11::init<>())
     .def(pybind11::init<int, double, WaveInputs, std::vector<double>*>())
     .def("handleReplacement", &Wave::handleReplacement)

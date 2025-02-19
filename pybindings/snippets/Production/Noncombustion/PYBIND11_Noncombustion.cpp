@@ -59,7 +59,7 @@ pybind11::class_<NoncombustionInputs>(m, "NoncombustionInputs")
     .def(pybind11::init());
 
 
-pybind11::class_<Noncombustion>(m, "Noncombustion")
+pybind11::class_<Noncombustion, Production>(m, "Noncombustion")
     .def_readwrite("type", &Noncombustion::type)
     .def_readwrite("resource_key", &Noncombustion::resource_key)
       

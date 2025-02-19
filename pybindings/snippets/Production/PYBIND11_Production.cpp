@@ -88,6 +88,7 @@ pybind11::class_<Production>(m, "Production")
         &Production::operation_maintenance_cost_kWh
     )
     .def_readwrite("net_present_cost", &Production::net_present_cost)
+    .def_readwrite("total_production_kWh", &Production::total_production_kWh)
     .def_readwrite("total_dispatch_kWh", &Production::total_dispatch_kWh)
     .def_readwrite("total_stored_kWh", &Production::total_stored_kWh)
     .def_readwrite(
